@@ -54,6 +54,14 @@ public class Inventario {
             return idPersonaje;
         }
         
+        public void setLastIdInventario(int id){
+            lastIdInventario = id;
+        }
+        
+        public int getLastIdInventario(){
+            return lastIdInventario;
+        }
+        
         //Comprueba si queda espacio en el inventario
         public Boolean comprobarSiEspacio(int maxima, int ocupados){
             Boolean hayEspacio = false;
@@ -76,9 +84,10 @@ public class Inventario {
         
         //Comprueba si el objeto que se quiere añadir existe en el inventario y si cabe en el inventario
         //en caso afirmativo lo añade
-        public void setAñadirObjetoAInventario(Objeto objetoAñadir){
+        public void setAnadirObjetoAInventario(Objeto objetoAñadir){
             if(comprobarSiEspacio(capacidadMaxima, espaciosOcupados) && !comprobarSiObjetoEnInventario(objetoAñadir)){
                 getObjetosInventario().add(objetoAñadir);
+                this.setEspaciosOcupados(getEspaciosOcupados()+1);
             }
         }
         

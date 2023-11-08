@@ -30,4 +30,11 @@
         <espacios_ocupados>0</espacios_ocupados>
         <objetos/>
     </inventario>
+    <inventario>
+        <id_inventario>INV7</id_inventario>
+        <id_personaje>PJ4</id_personaje>
+        <capacidad_maxima>20</capacidad_maxima>
+        <espacios_ocupados>0</espacios_ocupados>
+        <objetos/>
+    </inventario>
 </inventarios>

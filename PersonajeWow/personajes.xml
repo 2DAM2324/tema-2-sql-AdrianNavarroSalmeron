@@ -72,4 +72,20 @@
             </hermandad>
         </hermandades>
     </personaje>
+    <personaje>
+        <id_personaje>PJ4</id_personaje>
+        <nombre>Dankaly</nombre>
+        <servidor>Sanguino</servidor>
+        <raza>Trol</raza>
+        <nivel>47</nivel>
+        <faccion>Horda</faccion>
+        <inventario>
+            <id_inventario>INV7</id_inventario>
+            <id_personaje>PJ4</id_personaje>
+            <capacidad_maxima>20</capacidad_maxima>
+            <espacios_ocupados>0</espacios_ocupados>
+            <objetos/>
+        </inventario>
+        <hermandades/>
+    </personaje>
 </personajes>
