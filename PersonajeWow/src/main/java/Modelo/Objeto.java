@@ -78,6 +78,14 @@ public class Objeto {
         return idGenerada;
     }
     
+    public void setLastIdObjeto(int id){
+        lastIdObjeto = id;
+    }
+    
+    public int getLastIdObjeto(){
+        return lastIdObjeto;
+    }
+    
     @Override
     public String toString(){
             return "Id Objeto: " + getIdObjeto() + "\nRareza: " + getRareza() + "\nDescripcion: " + getDescripcion() + "\nPrecio: " + getPrecio() + "\nNombre Objeto: " + getNombreObjeto();

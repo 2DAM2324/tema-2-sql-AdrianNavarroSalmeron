@@ -2147,6 +2147,7 @@ public class Ventana1 extends javax.swing.JFrame {
         jTextField_personaje_nivel.setVisible(false);
         jComboBox_personaje_faccion.setVisible(false);
     }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel JLabelEspaciosOcupados;
