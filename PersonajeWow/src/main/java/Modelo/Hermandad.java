@@ -58,6 +58,14 @@ public class Hermandad {
         return idHermandad;
     }
     
+    public void setLastIdHermandad(int id){
+        lastIdHermandad = id;
+    }
+    
+    public int getLastIdHermandad(){
+        return lastIdHermandad;
+    }
+    
     public Hermandad(){
         ArrayList <Personaje> listaDeMiembros = new ArrayList<>();
         setNombreHermandad(null);
