@@ -86,6 +86,14 @@ public class Personaje {
         return listaHermandades;
     }
     
+    public void setLastIdPersonaje(int id){
+        lastIdPersonaje = id;
+    }
+    
+    public int getLastIdPersonaje(){
+        return lastIdPersonaje;
+    }
+    
     public Personaje(){
         Inventario inventario = new Inventario();
         ArrayList <Hermandad> hermandades = new  ArrayList<>();

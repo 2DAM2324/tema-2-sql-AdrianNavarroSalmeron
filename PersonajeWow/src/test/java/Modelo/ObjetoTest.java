@@ -160,7 +160,6 @@ public class ObjetoTest {
      */
     @Test
     public void testToString() {
-        System.out.println("toString");
         Objeto instance = new Objeto();
         String expResult = "Id Objeto: " + instance.getIdObjeto() + "\nRareza: " + instance.getRareza()
             + "\nDescripcion: " + instance.getDescripcion() + "\nPrecio: " + instance.getPrecio()
