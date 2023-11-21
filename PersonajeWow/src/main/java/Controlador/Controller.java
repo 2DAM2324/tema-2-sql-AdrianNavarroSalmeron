@@ -490,6 +490,7 @@ public class Controller {
             getArrayDePersonajesDeSistema().get(posicionPersonaje).setRaza(raza);
             getArrayDePersonajesDeSistema().get(posicionPersonaje).setNivel(nivel);
             getArrayDePersonajesDeSistema().get(posicionPersonaje).setFaccion(faccion);
+            conector.modificarPersonajeBd(getArrayDePersonajesDeSistema().get(posicionPersonaje));
             escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
             cargarPersonajesEnTabla(ArrayDePersonajesSistema);
          }
@@ -515,6 +516,7 @@ public class Controller {
             }
            
             //Borra el personaje
+            conector.borrarPersonajeIventarioBd(getArrayDePersonajesDeSistema().get(posicionPersonaje));
             getArrayDePersonajesDeSistema().remove(posicionPersonaje);
             escribirXMLInventarios(ArrayDeInventariosSistema);
             escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);

@@ -162,7 +162,6 @@ public void crearBaseDatos() {
         }
     }
     
-    //Leer los objetos de la bd
     public void leerObjetosDeBd(ArrayList ObjetosSistema){
         String sql = "SELECT * FROM objeto";
         try(Connection conn = Conector.conectar()){
@@ -182,6 +181,8 @@ public void crearBaseDatos() {
             System.err.println("Error al leer Objetos:" + e.getMessage());
         }
     }
+    
+    //CRUD PERSONAJE
     
     public void insertarPersonajeYInventarioEnBD(Personaje personaje, Inventario inventario){
         String sqlInventario = "INSERT INTO inventario (idInventario, idPersonaje, capacidadMaxima, espaciosOcupados) VALUES (?, ?, ?, ?)";
@@ -210,6 +211,47 @@ public void crearBaseDatos() {
              e.printStackTrace();
              System.err.println("Error al insertar Personaje:" + e.getMessage());
          }     
+    }
+
+    public void modificarPersonajeBd(Personaje personaje){
+        String sql = "UPDATE personaje SET nombre = ?, servidor = ?, faccion = ?, raza = ?, nivel = ? WHERE idPersonaje = ?";
+        try(Connection conn = Conector.conectar()){
+            PreparedStatement consulta = conn.prepareStatement(sql);
+            consulta.setString(1, personaje.getNombre());
+            consulta.setString(2, personaje.getServidor());
+            consulta.setString(3, personaje.getFaccion());
+            consulta.setString(4, personaje.getRaza());
+            consulta.setInt(5, personaje.getNivel());
+            consulta.setString(6, personaje.getIdPersonaje());
+            consulta.executeUpdate();
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al modificar Personaje:" + e.getMessage());
+        }
+    }
+
+    //Borra el personaje de la hermandad y su inventario
+    public void borrarPersonajeIventarioBd(Personaje personaje){
+        String sqlTablaPersonaje = "DELETE FROM personaje WHERE idPersonaje = ?";
+        String sqlTablaInventario = "DELETE FROM inventario WHERE idInventario = ?";
+        try(Connection conn = Conector.conectar()){
+            PreparedStatement consultaPersonaje = conn.prepareStatement(sqlTablaPersonaje);
+            PreparedStatement consultaInventario = conn.prepareStatement(sqlTablaInventario);
+            PreparedStatement consultaHermandadPersonaje = conn.prepareStatement("DELETE FROM hermandadPersonaje WHERE idPersonaje = ?");
+            
+            //Borramos la relacion con la hermandad
+            consultaHermandadPersonaje.setString(1, personaje.getIdPersonaje());
+            consultaHermandadPersonaje.executeUpdate();
+            //Borramos el inventario del personaje
+            consultaInventario.setString(1, personaje.getInventario().getIdInventario());
+            consultaInventario.executeUpdate();
+            //Borramos el personaje
+            consultaPersonaje.setString(1, personaje.getIdPersonaje());
+            consultaPersonaje.executeUpdate();
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al borrar Personaje:" + e.getMessage());
+        }
     }
 
     public void insertarHermandadEnBD(Hermandad hermandad) {
