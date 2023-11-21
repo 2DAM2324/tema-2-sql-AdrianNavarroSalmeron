@@ -237,6 +237,7 @@ public class Controller {
                     getArrayDeObjetosSistema().get(getPosicionObjetoById(id)).setRareza(rareza);
                     getArrayDeObjetosSistema().get(getPosicionObjetoById(id)).setPrecio(precioParseado);
                     getArrayDeObjetosSistema().get(getPosicionObjetoById(id)).setDescripcion(descripcion);
+                    conector.modificarObjetoEnBd(getArrayDeObjetosSistema().get(getPosicionObjetoById(id)));
                     escribirXMLObjetos(ArrayDeObjetosSistema);
                     cargarObjetoEnTabla(ArrayDeObjetosSistema);
                     JOptionPane.showMessageDialog(vista, "Objeto modificado correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);

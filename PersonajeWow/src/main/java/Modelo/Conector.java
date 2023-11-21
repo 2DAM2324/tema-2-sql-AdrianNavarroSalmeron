@@ -109,7 +109,8 @@ public void crearBaseDatos() {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
     }
-
+    
+    //CRUD de OBJETO
     public void insertarObjetoEnBd(Objeto objeto) {
          String sql = "INSERT INTO objeto (idObjeto, rareza, descripcion, precio, nombreObjeto) VALUES (?, ?, ?, ?, ?)";
         // Conectar a la base de datos
@@ -123,7 +124,23 @@ public void crearBaseDatos() {
                 consulta.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Error inserting Objeto:" + e.getMessage());
+            System.err.println("Error al insertar Objeto:" + e.getMessage());
+        }
+    }
+
+    public void modificarObjetoEnBd(Objeto objeto){
+        String sql = "UPDATE objeto SET rareza = ?, descripcion = ?, precio = ?, nombreObjeto = ? WHERE idObjeto = ?";
+        try(Connection conn = Conector.conectar()){
+            PreparedStatement consulta = conn.prepareStatement(sql);
+            consulta.setString(1, objeto.getRareza());
+            consulta.setString(2, objeto.getDescripcion());
+            consulta.setDouble(3, objeto.getPrecio());
+            consulta.setString(4, objeto.getNombreObjeto());
+            consulta.setString(5, objeto.getIdObjeto());
+            consulta.executeUpdate();
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al modificar Objeto:" + e.getMessage());
         }
     }
     
@@ -152,12 +169,24 @@ public void crearBaseDatos() {
              
          }catch(Exception e){
              e.printStackTrace();
-             System.err.println("Error inserting Objeto:" + e.getMessage());
-         }
-                 
-                 
-                
-             
+             System.err.println("Error al insertar Personaje:" + e.getMessage());
+         }     
+    }
+
+    public void insertarHermandadEnBD(Hermandad hermandad) {
+        String sql = "INSERT INTO hermandad (idHermandad, nombreHermandad, servidorHermandad, numeroMiembros) VALUES (?, ?, ?, ?)";
+        // Conectar a la base de datos
+        try (Connection conn = Conector.conectar()) {
+                PreparedStatement  consulta = conn.prepareStatement(sql);
+                consulta.setString(1, hermandad.getIdHermandad());
+                consulta.setString(2, hermandad.getNombreHermandad());
+                consulta.setString(3, hermandad.getServidorHermandad());
+                consulta.setInt(4, hermandad.getNumeroMiembros());
+                consulta.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error al insertar Hermandad:" + e.getMessage());
+        }
     }
 }
 
