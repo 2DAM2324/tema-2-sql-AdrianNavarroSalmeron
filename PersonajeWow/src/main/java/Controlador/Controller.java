@@ -177,6 +177,7 @@ public class Controller {
                 inventario.setEspaciosOcupados(inventario.getObjetosInventario().size());
             }
         }
+        conector.borrarObjetoDeBd(objetoaBorrar);
         ArrayDeObjetosSistema.remove(objetoaBorrar);
         escribirXMLObjetos(ArrayDeObjetosSistema);
         escribirXMLInventarios(ArrayDeInventariosSistema);

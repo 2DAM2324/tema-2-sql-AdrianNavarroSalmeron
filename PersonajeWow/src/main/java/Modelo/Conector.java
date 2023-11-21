@@ -188,6 +188,22 @@ public void crearBaseDatos() {
             System.err.println("Error al insertar Hermandad:" + e.getMessage());
         }
     }
+
+    public void borrarObjetoDeBd(Objeto objeto){
+        String sqlTablaObjeto = "DELETE FROM objeto WHERE idObjeto = ?";
+        String sqlTablaInventarioObjeto = "DELETE FROM InventarioObjeto WHERE idObjeto = ?";
+        try(Connection conn = Conector.conectar()){
+            PreparedStatement consultaInventarioObjeto = conn.prepareStatement(sqlTablaInventarioObjeto);
+            PreparedStatement consultaObjeto = conn.prepareStatement(sqlTablaObjeto);
+            consultaInventarioObjeto.setString(1, objeto.getIdObjeto());
+            consultaInventarioObjeto.executeUpdate();
+            consultaObjeto.setString(1, objeto.getIdObjeto());
+            consultaObjeto.executeUpdate();
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al borrar Objeto:" + e.getMessage());
+        }
+    }
 }
 
 
