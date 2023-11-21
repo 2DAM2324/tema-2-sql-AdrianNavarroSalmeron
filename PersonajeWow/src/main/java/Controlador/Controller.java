@@ -7,6 +7,7 @@ import Modelo.*;
 import Vista.Ventana1;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -141,6 +142,7 @@ public class Controller {
                         objeto.setDescripcion(descipcion);
                         objeto.setPrecio(precioParseado);
                         ArrayDeObjetosSistema.add(objeto);
+                        conector.insertarObjetoEnBd(objeto);
                         escribirXMLObjetos(ArrayDeObjetosSistema);
                         cargarObjetoEnTabla(ArrayDeObjetosSistema);
                         JOptionPane.showMessageDialog(vista, "Objeto añadido con exito", "OK", JOptionPane.INFORMATION_MESSAGE);
@@ -439,6 +441,7 @@ public class Controller {
             
             ArrayDeInventariosSistema.add(inventarioNuevo);
             ArrayDePersonajesSistema.add(personajeAniadir);
+            conector.insertarPersonajeYInventarioEnBD(personajeAniadir, inventarioNuevo);
             
             cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
             cargarPersonajesEnTabla(ArrayDePersonajesSistema);

@@ -6,6 +6,7 @@ package Modelo;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -58,7 +59,7 @@ public void crearBaseDatos() {
                      +")";
                      
                 String sqlPersonaje = "CREATE TABLE IF NOT EXISTS personaje ("
-                        + "idPersonaje INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        + "idPersonaje TEXT PRIMARY KEY, "
                         + "nombre TEXT NOT NULL, "
                         + "servidor TEXT NOT NULL, "
                         + "faccion TEXT NOT NULL, "
@@ -93,6 +94,7 @@ public void crearBaseDatos() {
            stmt.execute("DROP TABLE IF EXISTS hermandad");
            stmt.execute("DROP TABLE IF EXISTS objeto");
            * */
+           
                               
             // Ejecutar la consulta SQL
             stmt.execute(sqlObjeto);
@@ -106,6 +108,56 @@ public void crearBaseDatos() {
             e.printStackTrace();
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
+    }
+
+    public void insertarObjetoEnBd(Objeto objeto) {
+         String sql = "INSERT INTO objeto (idObjeto, rareza, descripcion, precio, nombreObjeto) VALUES (?, ?, ?, ?, ?)";
+        // Conectar a la base de datos
+        try (Connection conn = Conector.conectar()) {
+                PreparedStatement  consulta = conn.prepareStatement(sql);
+                consulta.setString(1, objeto.getIdObjeto());
+                consulta.setString(2, objeto.getRareza());
+                consulta.setString(3, objeto.getDescripcion());
+                consulta.setDouble(4, objeto.getPrecio());
+                consulta.setString(5, objeto.getNombreObjeto()); 
+                consulta.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error inserting Objeto:" + e.getMessage());
+        }
+    }
+    
+    public void insertarPersonajeYInventarioEnBD(Personaje personaje, Inventario inventario){
+        String sqlInventario = "INSERT INTO inventario (idInventario, idPersonaje, capacidadMaxima, espaciosOcupados) VALUES (?, ?, ?, ?)";
+         String sqlPersonaje = "INSERT INTO personaje (IdPersonaje, nombre, servidor, faccion, raza, idInventario, nivel) VALUES (?, ?, ?, ?, ?, ?, ?)";
+         
+         try(Connection conn = Conector.conectar()){
+             PreparedStatement consultaInventario = conn.prepareStatement(sqlInventario);
+             PreparedStatement consultaPersonaje = conn.prepareStatement(sqlPersonaje);
+             consultaInventario.setString(1, inventario.getIdInventario());
+             consultaInventario.setString(2, personaje.getIdPersonaje());
+             consultaInventario.setInt(3, inventario.getCapacidadMaxima());
+             consultaInventario.setInt(4, inventario.getEspaciosOcupados());
+             consultaInventario.executeUpdate();
+             
+             consultaPersonaje.setString(1, personaje.getIdPersonaje());
+             consultaPersonaje.setString(2, personaje.getNombre());
+             consultaPersonaje.setString(3, personaje.getServidor());
+             consultaPersonaje.setString(4, personaje.getFaccion());
+             consultaPersonaje.setString(5, personaje.getRaza());
+             consultaPersonaje.setString(6, inventario.getIdInventario());
+             consultaPersonaje.setInt(7, personaje.getNivel());
+             consultaPersonaje.executeUpdate();
+             
+             
+         }catch(Exception e){
+             e.printStackTrace();
+             System.err.println("Error inserting Objeto:" + e.getMessage());
+         }
+                 
+                 
+                
+             
     }
 }
 
