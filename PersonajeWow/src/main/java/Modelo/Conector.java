@@ -213,6 +213,24 @@ public void crearBaseDatos() {
          }     
     }
 
+    public void leerInventario(ArrayList inventariosSistema){
+        String sql = "SELECT * FROM inventario";
+        try(Connection conn = Conector.conectar()){
+            Statement statementInventario = conn.createStatement();
+            ResultSet resulsetInventario = statementInventario.executeQuery(sql);
+            while(resulsetInventario.next()){
+                String idInventario = resulsetInventario.getString("idInventario");
+                int capacidadMaxima = resulsetInventario.getInt("capacidadMaxima");
+                int espaciosOcupados = resulsetInventario.getInt("espaciosOcupados");
+                Inventario inventario = new Inventario(idInventario, capacidadMaxima, espaciosOcupados);
+                inventariosSistema.add(inventario);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al leer Inventario:" + e.getMessage());
+        }
+    }
+
     public void modificarPersonajeBd(Personaje personaje){
         String sql = "UPDATE personaje SET nombre = ?, servidor = ?, faccion = ?, raza = ?, nivel = ? WHERE idPersonaje = ?";
         try(Connection conn = Conector.conectar()){
@@ -252,6 +270,37 @@ public void crearBaseDatos() {
             e.printStackTrace();
             System.err.println("Error al borrar Personaje:" + e.getMessage());
         }
+    }
+
+    //Lee el personaje de la base de datos
+    public void leerPersonajeDeBd(ArrayList personajesSitema, ArrayList inventariosSistema){
+        String sql = "SELECT * FROM personaje";
+        try(Connection conn = Conector.conectar()){
+            Statement statementPersonaje = conn.createStatement();
+            ResultSet resulsetPersonaje = statementPersonaje.executeQuery(sql);
+            while(resulsetPersonaje.next()){
+                String idPersonaje = resulsetPersonaje.getString("idPersonaje");
+                String nombre = resulsetPersonaje.getString("nombre");
+                String servidor = resulsetPersonaje.getString("servidor");
+                String faccion = resulsetPersonaje.getString("faccion");
+                String raza = resulsetPersonaje.getString("raza");
+                int nivel = resulsetPersonaje.getInt("nivel");
+                String idInventario = resulsetPersonaje.getString("idInventario");
+                Inventario inventario = null;
+                for(int i = 0; i < inventariosSistema.size(); i++){
+                    if(((Inventario)inventariosSistema.get(i)).getIdInventario().equals(idInventario)){
+                        inventario = (Inventario)inventariosSistema.get(i);
+                    }
+                }
+                Personaje personaje = new Personaje(idPersonaje, nombre, servidor, faccion, raza, nivel, inventario);
+                personaje.getInventario().setIdPersonaje(personaje.getIdPersonaje());
+                personajesSitema.add(personaje);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al leer Personaje:" + e.getMessage());
+        }
+
     }
 
     public void insertarHermandadEnBD(Hermandad hermandad) {

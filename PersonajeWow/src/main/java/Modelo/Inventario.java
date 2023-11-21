@@ -127,7 +127,14 @@ public class Inventario {
             setIdPersonaje(idPersonaje);
             setObjetosInventario(vector);
         }
-        
+    
+        public Inventario(String idInventario, int capacidadMaxima, int espaciosOcupados){
+            ArrayList <Objeto> vector = new ArrayList<>();
+            setIdInventario(idInventario);
+            setEspaciosOcupados(espaciosOcupados);
+            setObjetosInventario(vector);
+            setIdPersonaje(null);
+        }
         
         public String generateNewIdInventario() {
         lastIdInventario++; // Incrementa el valor del último idPersonaje

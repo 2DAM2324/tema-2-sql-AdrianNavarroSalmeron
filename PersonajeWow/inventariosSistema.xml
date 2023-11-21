@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <inventarios>
     <inventario>
-        <id_inventario>INV1</id_inventario>
-        <id_personaje>PJ1</id_personaje>
+        <id_inventario>INV3</id_inventario>
+        <id_personaje>PJ2</id_personaje>
+        <capacidad_maxima>20</capacidad_maxima>
+        <espacios_ocupados>0</espacios_ocupados>
+        <objetos/>
+    </inventario>
+    <inventario>
+        <id_inventario>INV5</id_inventario>
+        <id_personaje>PJ3</id_personaje>
         <capacidad_maxima>20</capacidad_maxima>
         <espacios_ocupados>0</espacios_ocupados>
         <objetos/>

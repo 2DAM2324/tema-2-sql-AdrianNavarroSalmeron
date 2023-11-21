@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <personajes>
     <personaje>
-        <id_personaje>PJ1</id_personaje>
+        <id_personaje>PJ2</id_personaje>
+        <nombre>Victarion</nombre>
+        <servidor>Sanguino</servidor>
+        <raza>Humano</raza>
+        <nivel>60</nivel>
+        <faccion>Alianza</faccion>
+        <inventario>
+            <id_inventario>INV3</id_inventario>
+            <id_personaje>PJ2</id_personaje>
+            <capacidad_maxima>20</capacidad_maxima>
+            <espacios_ocupados>0</espacios_ocupados>
+            <objetos/>
+        </inventario>
+        <hermandades/>
+    </personaje>
+    <personaje>
+        <id_personaje>PJ3</id_personaje>
         <nombre>Sayka</nombre>
         <servidor>Sanguino</servidor>
         <raza>Elfo</raza>
-        <nivel>51</nivel>
+        <nivel>60</nivel>
         <faccion>Horda</faccion>
         <inventario>
-            <id_inventario>INV1</id_inventario>
-            <id_personaje>PJ1</id_personaje>
+            <id_inventario>INV5</id_inventario>
+            <id_personaje>PJ3</id_personaje>
             <capacidad_maxima>20</capacidad_maxima>
             <espacios_ocupados>0</espacios_ocupados>
             <objetos/>

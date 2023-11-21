@@ -118,6 +118,17 @@ public class Personaje {
         setInventario(inventario);
         setListaHermandades(listaHermandad);
     }
+
+    public Personaje(String idPersonaje, String nombre, String servidor, String faccion, String raza, int nivel, Inventario inventario){
+        setIdPersonaje(idPersonaje);
+        setNombre(nombre);
+        setServidor(servidor);
+        setFaccion(faccion);
+        setRaza(raza);
+        setNivel(nivel);
+        setInventario(inventario);
+        setListaHermandades(null);
+    }
     
      public String generateNewIdPersonaje() {
         lastIdPersonaje++; // Incrementa el valor del último idPersonaje

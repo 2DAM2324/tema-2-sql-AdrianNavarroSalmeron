@@ -73,8 +73,10 @@ public class Controller {
         
        // leerXMLObjetos();
        conector.leerObjetosDeBd(ArrayDeObjetosSistema);
-        leerInventarioSistema();   
-        leerXMLPersonajes();
+       conector.leerInventario(ArrayDeInventariosSistema);
+       conector.leerPersonajeDeBd(ArrayDePersonajesSistema, ArrayDeInventariosSistema);
+       // leerInventarioSistema();   
+        //leerXMLPersonajes();
         leerXMLHermandades();
         cargarObjetoEnTabla(ArrayDeObjetosSistema);
         cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
