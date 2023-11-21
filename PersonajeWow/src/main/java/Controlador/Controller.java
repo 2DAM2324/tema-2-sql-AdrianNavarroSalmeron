@@ -46,6 +46,7 @@ public class Controller {
     private Objeto objeto;
     private Personaje personaje;
     private Hermandad hermandad;
+    private Conector conector;
     private Ventana1 ventana;
     public ArrayList <Personaje> ArrayDePersonajesSistema;
     private ArrayList <Hermandad> ArrayDeHermandadesSistema;
@@ -64,6 +65,10 @@ public class Controller {
         this.ArrayDeObjetosSistema = arrayObjeto;
         this.ArrayDeHermandadesSistema = arrayHermandad;
         this.ArrayDeInventariosSistema = arrayInventario;
+        Conector conector = new Conector();
+        this.conector = conector;
+        conector.crearBaseDatos();
+        
         
         leerXMLObjetos();
         leerInventarioSistema();   
@@ -74,6 +79,19 @@ public class Controller {
         cargarPersonajesEnTabla(ArrayDePersonajesSistema);
         cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
     }
+    
+    /**
+    public Controller(){
+        ArrayList<Personaje> nuevoArray = new ArrayList<>();
+        ArrayList<Objeto> arrayObjeto = new ArrayList<>();
+        ArrayList<Inventario> arrayInventario = new ArrayList<>();
+        ArrayList<Hermandad> arrayHermandad = new ArrayList<>();
+        this.ArrayDePersonajesSistema = nuevoArray;
+        this.ArrayDeObjetosSistema = arrayObjeto;
+        this.ArrayDeHermandadesSistema = arrayHermandad;
+        this.ArrayDeInventariosSistema = arrayInventario;
+    }
+    * */
     
     public void setArrayDePersonajesDeSistema(ArrayList<Personaje> array){
         ArrayDePersonajesSistema = array;
