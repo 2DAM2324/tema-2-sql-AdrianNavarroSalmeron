@@ -7,8 +7,10 @@ package Modelo;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 
 /**
@@ -144,6 +146,43 @@ public void crearBaseDatos() {
         }
     }
     
+    public void borrarObjetoDeBd(Objeto objeto) {
+        String sqlTablaObjeto = "DELETE FROM objeto WHERE idObjeto = ?";
+        String sqlTablaInventarioObjeto = "DELETE FROM InventarioObjeto WHERE idObjeto = ?";
+        try (Connection conn = Conector.conectar()) {
+            PreparedStatement consultaInventarioObjeto = conn.prepareStatement(sqlTablaInventarioObjeto);
+            PreparedStatement consultaObjeto = conn.prepareStatement(sqlTablaObjeto);
+            consultaInventarioObjeto.setString(1, objeto.getIdObjeto());
+            consultaInventarioObjeto.executeUpdate();
+            consultaObjeto.setString(1, objeto.getIdObjeto());
+            consultaObjeto.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error al borrar Objeto:" + e.getMessage());
+        }
+    }
+    
+    //Leer los objetos de la bd
+    public void leerObjetosDeBd(ArrayList ObjetosSistema){
+        String sql = "SELECT * FROM objeto";
+        try(Connection conn = Conector.conectar()){
+            Statement statementObjeto = conn.createStatement();
+            ResultSet resulsetObjeto = statementObjeto.executeQuery(sql);
+            while(resulsetObjeto.next()){
+                String idObjeto = resulsetObjeto.getString("idObjeto");
+                String rareza = resulsetObjeto.getString("rareza");
+                String descripcion = resulsetObjeto.getString("descripcion");
+                double precio = resulsetObjeto.getDouble("precio");
+                String nombreObjeto = resulsetObjeto.getString("nombreObjeto");
+                Objeto objeto = new Objeto(idObjeto, rareza, descripcion, precio, nombreObjeto);
+                ObjetosSistema.add(objeto);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al leer Objetos:" + e.getMessage());
+        }
+    }
+    
     public void insertarPersonajeYInventarioEnBD(Personaje personaje, Inventario inventario){
         String sqlInventario = "INSERT INTO inventario (idInventario, idPersonaje, capacidadMaxima, espaciosOcupados) VALUES (?, ?, ?, ?)";
          String sqlPersonaje = "INSERT INTO personaje (IdPersonaje, nombre, servidor, faccion, raza, idInventario, nivel) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -189,21 +228,7 @@ public void crearBaseDatos() {
         }
     }
 
-    public void borrarObjetoDeBd(Objeto objeto){
-        String sqlTablaObjeto = "DELETE FROM objeto WHERE idObjeto = ?";
-        String sqlTablaInventarioObjeto = "DELETE FROM InventarioObjeto WHERE idObjeto = ?";
-        try(Connection conn = Conector.conectar()){
-            PreparedStatement consultaInventarioObjeto = conn.prepareStatement(sqlTablaInventarioObjeto);
-            PreparedStatement consultaObjeto = conn.prepareStatement(sqlTablaObjeto);
-            consultaInventarioObjeto.setString(1, objeto.getIdObjeto());
-            consultaInventarioObjeto.executeUpdate();
-            consultaObjeto.setString(1, objeto.getIdObjeto());
-            consultaObjeto.executeUpdate();
-        }catch(Exception e){
-            e.printStackTrace();
-            System.err.println("Error al borrar Objeto:" + e.getMessage());
-        }
-    }
+   
 }
 
 

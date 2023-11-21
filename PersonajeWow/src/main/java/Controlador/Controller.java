@@ -71,7 +71,8 @@ public class Controller {
         conector.crearBaseDatos();
         
         
-        leerXMLObjetos();
+       // leerXMLObjetos();
+       conector.leerObjetosDeBd(ArrayDeObjetosSistema);
         leerInventarioSistema();   
         leerXMLPersonajes();
         leerXMLHermandades();
