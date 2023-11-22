@@ -75,9 +75,11 @@ public class Controller {
        conector.leerObjetosDeBd(ArrayDeObjetosSistema);
        conector.leerInventario(ArrayDeInventariosSistema);
        conector.leerPersonajeDeBd(ArrayDePersonajesSistema, ArrayDeInventariosSistema);
+       conector.leerHermandad(ArrayDeHermandadesSistema);
+       conector.leerHermandadPersonaje(ArrayDeHermandadesSistema, ArrayDePersonajesSistema);
        // leerInventarioSistema();   
         //leerXMLPersonajes();
-        leerXMLHermandades();
+        //leerXMLHermandades();
         cargarObjetoEnTabla(ArrayDeObjetosSistema);
         cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
         cargarPersonajesEnTabla(ArrayDePersonajesSistema);
@@ -502,6 +504,8 @@ public class Controller {
         
         int posicionPersonaje = buscarPersonajeEnSistema(nombre, servidor);
         if(posicionPersonaje != -1){
+            //Borramos el personaje de la base de datos
+             conector.borrarPersonajeIventarioBd(getArrayDePersonajesDeSistema().get(posicionPersonaje));
             //Primero borra todos los objetos que contiene el inventario
             vaciarInventario(getArrayDePersonajesDeSistema().get(posicionPersonaje).getInventario().getIdInventario());
             //Borra el inventario del sistema
@@ -513,12 +517,11 @@ public class Controller {
                     if(hermandad.getListaMiembros().get(i).getIdPersonaje().equals(getArrayDePersonajesDeSistema().get(posicionPersonaje).getIdPersonaje())){
                         hermandad.getListaMiembros().remove(getArrayDePersonajesDeSistema().get(posicionPersonaje));
                         hermandad.setNumeroMiembros(hermandad.getListaMiembros().size());
+                        //Actualiza el numero de miembros de las hermandades a las que pertenecia el personaje
+                        conector.modificarHermandadEnBd(hermandad);
                     }
                 }
             }
-           
-            //Borra el personaje
-            conector.borrarPersonajeIventarioBd(getArrayDePersonajesDeSistema().get(posicionPersonaje));
             getArrayDePersonajesDeSistema().remove(posicionPersonaje);
             escribirXMLInventarios(ArrayDeInventariosSistema);
             escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
@@ -559,6 +562,7 @@ public class Controller {
             hermandad.setNombreHermandad(nombre);
             hermandad.setServidorHermandad(servidor);
             ArrayDeHermandadesSistema.add(hermandad);
+            conector.insertarHermandadEnBD(hermandad);
             cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
             escribirXMLHermandades(ArrayDeHermandadesSistema);
         }
@@ -610,6 +614,8 @@ public class Controller {
                 if(getArrayDeHermandadesSistema().get(posicionHermandad).getListaMiembros().size() <= 100 && !comprobarSiPersonajeEnHermandad(getArrayDePersonajesDeSistema().get(posicionPersonaje).getIdPersonaje(), getArrayDeHermandadesSistema().get(posicionHermandad).getIdHermandad())){
                     getArrayDeHermandadesSistema().get(posicionHermandad).getListaMiembros().add(getArrayDePersonajesDeSistema().get(posicionPersonaje));
                     getArrayDeHermandadesSistema().get(posicionHermandad).setNumeroMiembros(getArrayDeHermandadesSistema().get(posicionHermandad).getListaMiembros().size());
+                    conector.insertarPersonajeHermandad(getArrayDePersonajesDeSistema().get(posicionPersonaje), getArrayDeHermandadesSistema().get(posicionHermandad));
+                    conector.modificarHermandadEnBd(getArrayDeHermandadesSistema().get(posicionHermandad));
                     escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
                     escribirXMLHermandades(ArrayDeHermandadesSistema);
                     cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
@@ -662,6 +668,8 @@ public class Controller {
                 if(posicionHermandadCambiar == -1){
                     getArrayDeHermandadesSistema().get(posicionHermandad).setNombreHermandad(nombreCambiar);
                     getArrayDeHermandadesSistema().get(posicionHermandad).setServidorHermandad(servidorCambiar);
+                    //Una vez que se han cambiado el nombre y el servidor en el controlador lo cambiamos en la bd.
+                    conector.modificarHermandadEnBd(getArrayDeHermandadesSistema().get(posicionHermandad));
                     escribirXMLHermandades(ArrayDeHermandadesSistema);
                     cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
                 }
@@ -685,6 +693,7 @@ public class Controller {
                         }
                     }
                 }
+                conector.borrarHermandadBd(ArrayDeHermandadesSistema.get(posicionHermandad));
                 getArrayDeHermandadesSistema().remove(posicionHermandad);
                 escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
                 escribirXMLHermandades(ArrayDeHermandadesSistema);

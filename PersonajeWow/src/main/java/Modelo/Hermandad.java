@@ -76,12 +76,13 @@ public class Hermandad {
        
     }
     
-    public Hermandad(String nombre, String servidor, int numero, ArrayList<Personaje> vector){
+    public Hermandad(String idHermandad, String nombre, String servidor, int numeroMiembros){
+        ArrayList <Personaje> vector = new ArrayList<>();
         setNombreHermandad(nombre);
         setServidorHermandad(servidor);
-        setNumeroMiembros(numero);
+        setNumeroMiembros(numeroMiembros);
         setListaMiembros(vector);
-        setIdHermandad(generateNewIdHermandad());
+        setIdHermandad(idHermandad);
     }
     
     public String generateNewIdHermandad() {

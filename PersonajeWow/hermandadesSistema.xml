@@ -1,2 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<hermandades/>
+<hermandades>
+    <hermandad>
+        <id_hermandad>GUILD1</id_hermandad>
+        <nombre>Hola</nombre>
+        <servidor>Server</servidor>
+        <numero_miembros>0</numero_miembros>
+        <miembros/>
+    </hermandad>
+</hermandades>

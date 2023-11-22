@@ -303,6 +303,8 @@ public void crearBaseDatos() {
 
     }
 
+    //Crud de hermandad
+
     public void insertarHermandadEnBD(Hermandad hermandad) {
         String sql = "INSERT INTO hermandad (idHermandad, nombreHermandad, servidorHermandad, numeroMiembros) VALUES (?, ?, ?, ?)";
         // Conectar a la base de datos
@@ -319,6 +321,103 @@ public void crearBaseDatos() {
         }
     }
 
+    public void modificarHermandadEnBd(Hermandad hermandad){
+        String sql = "UPDATE hermandad SET nombreHermandad = ?, servidorHermandad = ?, numeroMiembros = ? WHERE idHermandad = ?";
+        try(Connection conn = Conector.conectar()){
+            PreparedStatement consulta = conn.prepareStatement(sql);
+            consulta.setString(1, hermandad.getNombreHermandad());
+            consulta.setString(2, hermandad.getServidorHermandad());
+            consulta.setInt(3, hermandad.getNumeroMiembros());
+            consulta.setString(4, hermandad.getIdHermandad());
+            consulta.executeUpdate();
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al modificar Hermandad:" + e.getMessage());
+        }
+    }
+    
+    public void borrarHermandadBd(Hermandad hermandad) {
+        String sqlTablaHermandad = "DELETE FROM hermandad WHERE idHermandad = ?";
+        String sqlTablaHermandadPersonaje = "DELETE FROM hermandadPersonaje WHERE idHermandad = ?";
+        try (Connection conn = Conector.conectar()) {
+            PreparedStatement consultaHermandadPersonaje = conn.prepareStatement(sqlTablaHermandadPersonaje);
+            PreparedStatement consultaHermandad = conn.prepareStatement(sqlTablaHermandad);
+            consultaHermandadPersonaje.setString(1, hermandad.getIdHermandad());
+            consultaHermandadPersonaje.executeUpdate();
+            consultaHermandad.setString(1, hermandad.getIdHermandad());
+            consultaHermandad.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error al borrar Hermandad:" + e.getMessage());
+        }
+    }
+
+    public void leerHermandad(ArrayList ArrayDeHermandadesSistema){
+        String sql = "SELECT * FROM hermandad";
+        try(Connection conn = Conector.conectar()){
+            Statement statementHermandad = conn.createStatement();
+            ResultSet resulsetHermandad = statementHermandad.executeQuery(sql);
+            while(resulsetHermandad.next()){
+                String idHermandad = resulsetHermandad.getString("idHermandad");
+                String nombreHermandad = resulsetHermandad.getString("nombreHermandad");
+                String servidorHermandad = resulsetHermandad.getString("servidorHermandad");
+                int numeroMiembros = resulsetHermandad.getInt("numeroMiembros");
+                Hermandad hermandad = new Hermandad(idHermandad, nombreHermandad, servidorHermandad, numeroMiembros);
+                ArrayDeHermandadesSistema.add(hermandad);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al leer Hermandad:" + e.getMessage());
+        }
+    }
+
+    public void leerHermandadPersonaje(ArrayList<Hermandad> arrayDeHermandadesSistema, ArrayList<Personaje> personajesSistema){
+        String sql = "SELECT * FROM hermandadPersonaje";
+        try(Connection conn = Conector.conectar()){
+            Statement statementHermandadPersonaje = conn.createStatement();
+            ResultSet resulsetHermandadPersonaje = statementHermandadPersonaje.executeQuery(sql);
+            while(resulsetHermandadPersonaje.next()){
+                String idHermandad = resulsetHermandadPersonaje.getString("idHermandad");
+                String idPersonaje = resulsetHermandadPersonaje.getString("idPersonaje");
+                //Recorremos el vector de hermandades de sistema, para cada hermandad buscamos sus miembros y los añadimos a la lis de miembros de esa hermandad
+                for(int i = 0; i < arrayDeHermandadesSistema.size(); i++){
+                    if(arrayDeHermandadesSistema.get(i).getIdHermandad().equals(idHermandad)){
+                        for(int j = 0; j < personajesSistema.size(); j++){
+                            if(personajesSistema.get(j).getIdPersonaje().equals(idPersonaje)){
+                                arrayDeHermandadesSistema.get(i).getListaMiembros().add(personajesSistema.get(j));
+                            }
+                        }
+                    }
+                }
+                //Recorremos el vector de personajes de sistema, para cada personaje buscamos sus hermandades y las añadimos a la lista de hermandades de ese personaje
+                for(int i = 0; i < personajesSistema.size(); i++){
+                    if(personajesSistema.get(i).getIdPersonaje().equals(idPersonaje)){
+                        for(int j = 0; j < arrayDeHermandadesSistema.size(); j++){
+                            if(arrayDeHermandadesSistema.get(j).getIdHermandad().equals(idHermandad)){
+                                personajesSistema.get(i).getListaHermandadades().add(arrayDeHermandadesSistema.get(j));
+                            }
+                        }
+                    }
+                }
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al leer HermandadPersonaje:" + e.getMessage());
+        }
+    }
+
+    public void insertarPersonajeHermandad(Personaje personaje, Hermandad hermandad){
+        String sql = "INSERT INTO hermandadPersonaje (idHermandad, idPersonaje) VALUES (?, ?)";
+        try(Connection conn = Conector.conectar()){
+            PreparedStatement consulta = conn.prepareStatement(sql);
+            consulta.setString(1, hermandad.getIdHermandad());
+            consulta.setString(2, personaje.getIdPersonaje());
+            consulta.executeUpdate();
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al insertar PersonajeHermandad:" + e.getMessage());
+        }
+    }
    
 }
 
