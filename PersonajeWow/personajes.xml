@@ -1,2 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<personajes/>
+<personajes>
+    <personaje>
+        <id_personaje>PJ1</id_personaje>
+        <nombre>Victarion</nombre>
+        <servidor>Sanguino</servidor>
+        <raza>Elfo</raza>
+        <nivel>41</nivel>
+        <faccion>Alianza</faccion>
+        <inventario>
+            <id_inventario>INV1</id_inventario>
+            <id_personaje>PJ1</id_personaje>
+            <capacidad_maxima>20</capacidad_maxima>
+            <espacios_ocupados>1</espacios_ocupados>
+            <objetos>
+                <objeto>
+                    <id_objeto>OB1</id_objeto>
+                    <nombre_objeto>Espada</nombre_objeto>
+                </objeto>
+            </objetos>
+        </inventario>
+        <hermandades/>
+    </personaje>
+</personajes>

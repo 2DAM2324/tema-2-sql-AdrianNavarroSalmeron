@@ -418,7 +418,57 @@ public void crearBaseDatos() {
             System.err.println("Error al insertar PersonajeHermandad:" + e.getMessage());
         }
     }
-   
+
+    public void insertarObjetoEnInventario(Objeto objeto, Inventario inventario){
+        String sql = "INSERT INTO InventarioObjeto (idInventario, idObjeto) VALUES (?, ?)";
+        try(Connection conn = Conector.conectar()){
+            PreparedStatement consulta = conn.prepareStatement(sql);
+            consulta.setString(1, inventario.getIdInventario());
+            consulta.setString(2, objeto.getIdObjeto());
+            consulta.executeUpdate();
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al insertar ObjetoInventario:" + e.getMessage());
+        }
+    }
+
+    public void modificarInventario(Inventario inventario){
+        String sql = "UPDATE inventario SET espaciosOcupados = ? WHERE idInventario = ?";
+        try(Connection conn = Conector.conectar()){
+            PreparedStatement consulta = conn.prepareStatement(sql);
+            consulta.setInt(1, inventario.getEspaciosOcupados());
+            consulta.setString(2, inventario.getIdInventario());
+            consulta.executeUpdate();
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al modificar Inventario:" + e.getMessage());
+        }
+    }
+
+    public void leerInventarioObjeto(ArrayList<Inventario> inventario, ArrayList<Objeto> objetos){
+        String sql = "SELECT * FROM InventarioObjeto";
+        try(Connection conn = Conector.conectar()){
+            Statement statementInventarioObjeto = conn.createStatement();
+            ResultSet resulsetInventarioObjeto = statementInventarioObjeto.executeQuery(sql);
+            while(resulsetInventarioObjeto.next()){
+                String idInventario = resulsetInventarioObjeto.getString("idInventario");
+                String idObjeto = resulsetInventarioObjeto.getString("idObjeto");
+                //Recorremos el array de inventarios añadiendo los objetos que este tenga a cada uno
+                for(int i = 0; i < inventario.size(); i++){
+                    if(inventario.get(i).getIdInventario().equals(idInventario)){
+                        for(int j = 0; j < objetos.size(); j++){
+                            if(objetos.get(j).getIdObjeto().equals(idObjeto)){
+                                inventario.get(i).getObjetosInventario().add(objetos.get(j));
+                            }
+                        }
+                    }
+                }
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al leer InventarioObjeto:" + e.getMessage());
+        }
+    }
 }
 
 

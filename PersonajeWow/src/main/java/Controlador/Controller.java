@@ -74,6 +74,7 @@ public class Controller {
        // leerXMLObjetos();
        conector.leerObjetosDeBd(ArrayDeObjetosSistema);
        conector.leerInventario(ArrayDeInventariosSistema);
+       conector.leerInventarioObjeto(ArrayDeInventariosSistema, ArrayDeObjetosSistema);
        conector.leerPersonajeDeBd(ArrayDePersonajesSistema, ArrayDeInventariosSistema);
        conector.leerHermandad(ArrayDeHermandadesSistema);
        conector.leerHermandadPersonaje(ArrayDeHermandadesSistema, ArrayDePersonajesSistema);
@@ -377,6 +378,8 @@ public class Controller {
             if(!getArrayDeInventariosSistema().get(posicionInventario).comprobarSiObjetoEnInventario(getObjetoById(idObjeto))){
                 getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().add(getArrayDeObjetosSistema().get(posicionObjeto));
                 getArrayDeInventariosSistema().get(posicionInventario).setEspaciosOcupados(getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().size());
+                conector.insertarObjetoEnInventario(getArrayDeObjetosSistema().get(posicionObjeto), getArrayDeInventariosSistema().get(posicionInventario));
+                conector.modificarInventario(getArrayDeInventariosSistema().get(posicionInventario));
                 escribirXMLInventarios(ArrayDeInventariosSistema);
                 escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
                 cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
