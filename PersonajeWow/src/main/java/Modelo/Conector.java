@@ -432,6 +432,19 @@ public void crearBaseDatos() {
         }
     }
 
+    public void borrarObjetoEnInventario(Objeto objeto, Inventario inventario){
+        String sql = "DELETE FROM InventarioObjeto WHERE idInventario = ? AND idObjeto = ?";
+        try(Connection conn = Conector.conectar()){
+            PreparedStatement consulta = conn.prepareStatement(sql);
+            consulta.setString(1, inventario.getIdInventario());
+            consulta.setString(2, objeto.getIdObjeto());
+            consulta.executeUpdate();
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al borrar ObjetoInventario:" + e.getMessage());
+        }
+    }
+
     public void modificarInventario(Inventario inventario){
         String sql = "UPDATE inventario SET espaciosOcupados = ? WHERE idInventario = ?";
         try(Connection conn = Conector.conectar()){

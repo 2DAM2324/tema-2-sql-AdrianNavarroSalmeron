@@ -181,6 +181,7 @@ public class Controller {
             if (inventario.getObjetosInventario().contains(objetoaBorrar)) {
                 inventario.getObjetosInventario().remove(objetoaBorrar);
                 inventario.setEspaciosOcupados(inventario.getObjetosInventario().size());
+                conector.modificarInventario(inventario);
             }
         }
         conector.borrarObjetoDeBd(objetoaBorrar);
@@ -199,6 +200,8 @@ public class Controller {
             if(getArrayDeInventariosSistema().get(posicionInventario).comprobarSiObjetoEnInventario(getObjetoById(idObjeto))){
                 getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().remove(getObjetoById(idObjeto));
                 getArrayDeInventariosSistema().get(posicionInventario).setEspaciosOcupados(getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().size());
+                conector.modificarInventario(getArrayDeInventariosSistema().get(posicionInventario));
+                conector.borrarObjetoEnInventario(getArrayDeObjetosSistema().get(posicionObjeto), getArrayDeInventariosSistema().get(posicionInventario));
                 escribirXMLInventarios(ArrayDeInventariosSistema);
                 escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
                 cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
