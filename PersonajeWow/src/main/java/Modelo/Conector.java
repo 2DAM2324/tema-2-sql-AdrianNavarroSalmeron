@@ -19,6 +19,18 @@ import java.util.ArrayList;
  * @author AdrianNS
  */
 public class Conector {
+
+    private static Conector instancia;
+
+    private Conector() {
+    }
+    
+    public static Conector getInstancia(){
+        if(instancia == null){
+            instancia = new Conector();
+        }
+        return instancia;
+    }
     
     public static Connection conectar() {
         Connection conn = null;

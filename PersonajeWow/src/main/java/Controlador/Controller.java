@@ -7,36 +7,9 @@ import Modelo.*;
 import Vista.Ventana1;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import javax.tools.DocumentationTool;
-
-//***************Imports para escribir y leer xml *******************************
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.Result;
-
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
-import org.xml.sax.SAXException;
-import org.w3c.dom.Document;
-
-/******************************************
 
 /**
  *
@@ -66,7 +39,7 @@ public class Controller {
         this.ArrayDeObjetosSistema = arrayObjeto;
         this.ArrayDeHermandadesSistema = arrayHermandad;
         this.ArrayDeInventariosSistema = arrayInventario;
-        Conector conector = new Conector();
+        Conector conector = Conector.getInstancia();
         this.conector = conector;
         conector.crearBaseDatos();
         
@@ -78,9 +51,6 @@ public class Controller {
        conector.leerPersonajeDeBd(ArrayDePersonajesSistema, ArrayDeInventariosSistema, ArrayDeHermandadesSistema);
        conector.leerHermandad(ArrayDeHermandadesSistema);
        conector.leerHermandadPersonaje(ArrayDeHermandadesSistema, ArrayDePersonajesSistema);
-       // leerInventarioSistema();   
-        //leerXMLPersonajes();
-        //leerXMLHermandades();
         cargarObjetoEnTabla(ArrayDeObjetosSistema);
         cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
         cargarPersonajesEnTabla(ArrayDePersonajesSistema);
@@ -149,7 +119,6 @@ public class Controller {
                         objeto.setPrecio(precioParseado);
                         ArrayDeObjetosSistema.add(objeto);
                         conector.insertarObjetoEnBd(objeto);
-                        escribirXMLObjetos(ArrayDeObjetosSistema);
                         cargarObjetoEnTabla(ArrayDeObjetosSistema);
                         JOptionPane.showMessageDialog(vista, "Objeto añadido con exito", "OK", JOptionPane.INFORMATION_MESSAGE);
                     }
@@ -186,9 +155,6 @@ public class Controller {
         }
         conector.borrarObjetoDeBd(objetoaBorrar);
         ArrayDeObjetosSistema.remove(objetoaBorrar);
-        escribirXMLObjetos(ArrayDeObjetosSistema);
-        escribirXMLInventarios(ArrayDeInventariosSistema);
-        escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
         cargarObjetoEnTabla(ArrayDeObjetosSistema);
         cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
     }
@@ -202,8 +168,6 @@ public class Controller {
                 getArrayDeInventariosSistema().get(posicionInventario).setEspaciosOcupados(getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().size());
                 conector.modificarInventario(getArrayDeInventariosSistema().get(posicionInventario));
                 conector.borrarObjetoEnInventario(getArrayDeObjetosSistema().get(posicionObjeto), getArrayDeInventariosSistema().get(posicionInventario));
-                escribirXMLInventarios(ArrayDeInventariosSistema);
-                escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
                 cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
                 cargarPersonajesEnTabla(ArrayDePersonajesSistema);
                 cargarInventarioPersonajeEnTabla(idInventario);
@@ -248,7 +212,6 @@ public class Controller {
                     getArrayDeObjetosSistema().get(getPosicionObjetoById(id)).setPrecio(precioParseado);
                     getArrayDeObjetosSistema().get(getPosicionObjetoById(id)).setDescripcion(descripcion);
                     conector.modificarObjetoEnBd(getArrayDeObjetosSistema().get(getPosicionObjetoById(id)));
-                    escribirXMLObjetos(ArrayDeObjetosSistema);
                     cargarObjetoEnTabla(ArrayDeObjetosSistema);
                     JOptionPane.showMessageDialog(vista, "Objeto modificado correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);
                 }
@@ -362,8 +325,6 @@ public class Controller {
                 inventario.setObjetosInventario(vectorObjetos);
                 inventario.setIdPersonaje(getArrayDePersonajesDeSistema().get(posicionPersonaje).getIdPersonaje());
                 getArrayDeInventariosSistema().add(inventario);
-                escribirXMLInventarios(ArrayDeInventariosSistema);
-                escribirXMLPersonajes(ArrayDePersonajesSistema, vectorObjetos, ArrayDeInventariosSistema);
                 cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
                
             }
@@ -383,8 +344,6 @@ public class Controller {
                 getArrayDeInventariosSistema().get(posicionInventario).setEspaciosOcupados(getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().size());
                 conector.insertarObjetoEnInventario(getArrayDeObjetosSistema().get(posicionObjeto), getArrayDeInventariosSistema().get(posicionInventario));
                 conector.modificarInventario(getArrayDeInventariosSistema().get(posicionInventario));
-                escribirXMLInventarios(ArrayDeInventariosSistema);
-                escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
                 cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
                 cargarPersonajesEnTabla(ArrayDePersonajesSistema);
                 //Mensaje informativo de que se ha añadido correctamente
@@ -406,8 +365,6 @@ public class Controller {
             if(inventario.getIdInventario().equals(idInventario)){
                 inventario.getObjetosInventario().removeAll(inventario.getObjetosInventario());
                 inventario.setEspaciosOcupados(0);
-                escribirXMLInventarios(ArrayDeInventariosSistema);
-                escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
                 cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
             }
         }
@@ -458,8 +415,6 @@ public class Controller {
             
             cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
             cargarPersonajesEnTabla(ArrayDePersonajesSistema);
-            escribirXMLInventarios(ArrayDeInventariosSistema);
-            escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
             JOptionPane.showMessageDialog(vista, "Personaje añadido correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);
         }
         catch(NumberFormatException formatoIncorrecto){
@@ -501,7 +456,6 @@ public class Controller {
             getArrayDePersonajesDeSistema().get(posicionPersonaje).setNivel(nivel);
             getArrayDePersonajesDeSistema().get(posicionPersonaje).setFaccion(faccion);
             conector.modificarPersonajeBd(getArrayDePersonajesDeSistema().get(posicionPersonaje));
-            escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
             cargarPersonajesEnTabla(ArrayDePersonajesSistema);
          }
     }
@@ -529,9 +483,6 @@ public class Controller {
                 }
             }
             getArrayDePersonajesDeSistema().remove(posicionPersonaje);
-            escribirXMLInventarios(ArrayDeInventariosSistema);
-            escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
-            escribirXMLHermandades(ArrayDeHermandadesSistema);
             cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
             cargarPersonajesEnTabla(ArrayDePersonajesSistema);
             cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
@@ -570,7 +521,6 @@ public class Controller {
             ArrayDeHermandadesSistema.add(hermandad);
             conector.insertarHermandadEnBD(hermandad);
             cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
-            escribirXMLHermandades(ArrayDeHermandadesSistema);
         }
         else{
             System.out.println("La hermandad ya existe");
@@ -678,7 +628,6 @@ public class Controller {
                     getArrayDeHermandadesSistema().get(posicionHermandad).setServidorHermandad(servidorCambiar);
                     //Una vez que se han cambiado el nombre y el servidor en el controlador lo cambiamos en la bd.
                     conector.modificarHermandadEnBd(getArrayDeHermandadesSistema().get(posicionHermandad));
-                    escribirXMLHermandades(ArrayDeHermandadesSistema);
                     cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
                 }
                 else{
@@ -703,8 +652,6 @@ public class Controller {
                 }
                 conector.borrarHermandadBd(ArrayDeHermandadesSistema.get(posicionHermandad));
                 getArrayDeHermandadesSistema().remove(posicionHermandad);
-                escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
-                escribirXMLHermandades(ArrayDeHermandadesSistema);
                 cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
             }
             else{
@@ -712,93 +659,6 @@ public class Controller {
             }
         }
 
-     public void escribirXMLHermandades(ArrayList ArrayDeHermandadesSistema){
-            try {
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                Document documento = builder.newDocument();
-
-                Element nodoHermandades = documento.createElement("hermandades");
-                documento.appendChild(nodoHermandades);
-                for (Hermandad hermandad : getArrayDeHermandadesSistema()) {
-                    Element nodoHermandad = documento.createElement("hermandad");
-                    nodoHermandades.appendChild(nodoHermandad);
-                    agregarElementoConTexto(documento, nodoHermandad, "id_hermandad", hermandad.getIdHermandad());
-                    agregarElementoConTexto(documento, nodoHermandad, "nombre", hermandad.getNombreHermandad());
-                    agregarElementoConTexto(documento, nodoHermandad, "servidor", hermandad.getServidorHermandad());
-                    agregarElementoConTexto(documento, nodoHermandad, "numero_miembros", Integer.toString(hermandad.getNumeroMiembros()));
-                    Element nodoMiembros = documento.createElement("miembros");
-                    nodoHermandad.appendChild(nodoMiembros);
-                    for(Personaje personaje : hermandad.getListaMiembros()){
-                        Element nodoMiembro = documento.createElement("miembro");
-                        nodoMiembros.appendChild(nodoMiembro);
-                        agregarElementoConTexto(documento, nodoMiembro, "id_personaje", personaje.getIdPersonaje());
-                    }
-                }
-                TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                Transformer transformer = transformerFactory.newTransformer();
-                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-                DOMSource source = new DOMSource(documento);
-                StreamResult result = new StreamResult(new File("hermandadesSistema.xml"));
-
-                transformer.transform(source, result);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void leerXMLHermandades(){
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document documento = null;
-
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            documento = builder.parse(new File("hermandadesSistema.xml"));
-
-            NodeList hermandades = documento.getElementsByTagName("hermandad");
-
-            for (int i = 0; i < hermandades.getLength(); i++) {
-                Node hermandadNode = hermandades.item(i);
-                if (hermandadNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element elemento = (Element) hermandadNode;
-                    
-                    String idHermandad = elemento.getElementsByTagName("id_hermandad").item(0).getTextContent();
-                    String nombre = elemento.getElementsByTagName("nombre").item(0).getTextContent();
-                    String servidor = elemento.getElementsByTagName("servidor").item(0).getTextContent();
-                    String numeroMiembros = elemento.getElementsByTagName("numero_miembros").item(0).getTextContent();
-                    
-                    // Crea un nuevo objeto Hermandad y lo añade a la lista
-                    Hermandad hermandad = new Hermandad();
-                    hermandad.setIdHermandad(idHermandad);
-                    hermandad.setNombreHermandad(nombre);
-                    hermandad.setServidorHermandad(servidor);
-                    hermandad.setNumeroMiembros(Integer.parseInt(numeroMiembros));
-                    
-                    // Crea un nuevo array de personajes para añadirlo a la hermandad
-                    ArrayList<Personaje> listaMiembros = new ArrayList<>();
-                    NodeList miembros = elemento.getElementsByTagName("miembro");
-                    for (int j = 0; j < miembros.getLength(); j++) {
-                        Node miembroNode = miembros.item(j);
-                        if (miembroNode.getNodeType() == Node.ELEMENT_NODE) {
-                            Element elementoMiembro = (Element) miembroNode;
-                            String idPersonaje = elementoMiembro.getElementsByTagName("id_personaje").item(0).getTextContent();
-                            for (Personaje personaje : getArrayDePersonajesDeSistema()) {
-                                if (personaje.getIdPersonaje().equals(idPersonaje)) {
-                                    listaMiembros.add(personaje);
-                                }
-                            }
-                        }
-                    }
-                    hermandad.setListaMiembros(listaMiembros);
-                    getArrayDeHermandadesSistema().add(hermandad);
-                }
-            }
-           
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void cargarHermandadesEnTabla(ArrayList ArrayDeHermandadesSistema){
         DefaultTableModel model = (DefaultTableModel) vista.jTable_hermandad.getModel();
@@ -834,315 +694,5 @@ public class Controller {
         }
          vista.jTable_personajes_hermandad.setModel(model);
     }
-    
-    
-    //**********************************************************************************************************************************************************
-    public void escribirXMLObjetos(ArrayList<Objeto> arrayListObjetos){
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document documento = builder.newDocument();
-            
-                Element nodoObjetos = documento.createElement("objetos");
-                documento.appendChild(nodoObjetos);
-                for (Objeto objeto : arrayListObjetos) {
-                Element nodoObjeto = documento.createElement("objeto");
-                nodoObjetos.appendChild(nodoObjeto);
-                agregarElementoConTexto(documento, nodoObjeto, "id_objeto", objeto.getIdObjeto());
-                agregarElementoConTexto(documento, nodoObjeto, "nombre_objeto", objeto.getNombreObjeto());
-                agregarElementoConTexto(documento, nodoObjeto, "rareza_objeto", objeto.getRareza());
-                agregarElementoConTexto(documento, nodoObjeto, "precio_objeto", Double.toString(objeto.getPrecio()));
-                agregarElementoConTexto(documento, nodoObjeto, "descripcion_objeto", objeto.getDescripcion());
-                }
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-            DOMSource source = new DOMSource(documento);
-            StreamResult result = new StreamResult(new File("objetosSistema.xml"));
-
-            transformer.transform(source, result);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public void escribirXMLInventarios(ArrayList <Inventario> arrayListInventarios){
-            try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document documento = builder.newDocument();
-
-                Element nodoInventarios = documento.createElement("inventarios");
-                documento.appendChild(nodoInventarios);
-                for (Inventario inventario : arrayListInventarios) {
-                Element nodoInventario = documento.createElement("inventario");
-                nodoInventarios.appendChild(nodoInventario);
-                agregarElementoConTexto(documento, nodoInventario, "id_inventario", inventario.getIdInventario());
-                agregarElementoConTexto(documento, nodoInventario, "id_personaje", inventario.getIdPersonaje());
-                agregarElementoConTexto(documento, nodoInventario, "capacidad_maxima", Integer.toString(inventario.getCapacidadMaxima()));
-                agregarElementoConTexto(documento, nodoInventario, "espacios_ocupados",Integer.toString( inventario.getEspaciosOcupados()));
-                Element nodoObjetos = documento.createElement("objetos");
-                nodoInventario.appendChild(nodoObjetos);
-                for (Objeto objeto : inventario.getObjetosInventario()) {
-                    Element nodoObjeto = documento.createElement("objeto");
-                    nodoObjetos.appendChild(nodoObjeto);
-                    agregarElementoConTexto(documento, nodoObjeto, "id_objeto", objeto.getIdObjeto());
-                    agregarElementoConTexto(documento, nodoObjeto, "nombre_objeto", objeto.getNombreObjeto());
-                    }
-                }
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-            DOMSource source = new DOMSource(documento);
-            StreamResult result = new StreamResult(new File("inventariosSistema.xml"));
-
-            transformer.transform(source, result);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-            
-           
-        
-     
-        public void escribirXMLPersonajes(ArrayList<Personaje> listaPersonajes, ArrayList<Objeto> listaObjetos, ArrayList<Inventario> listaInventarios) {
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document documento = builder.newDocument();
-            
-            Element raiz = documento.createElement("personajes");
-            documento.appendChild(raiz);
-          
-            for (Personaje personaje : listaPersonajes) {
-                Element nodoPersonaje = documento.createElement("personaje");
-                raiz.appendChild(nodoPersonaje);
-                
-                agregarElementoConTexto(documento, nodoPersonaje, "id_personaje", personaje.getIdPersonaje());
-                agregarElementoConTexto(documento, nodoPersonaje, "nombre", personaje.getNombre());
-                agregarElementoConTexto(documento, nodoPersonaje, "servidor", personaje.getServidor());
-                agregarElementoConTexto(documento, nodoPersonaje, "raza", personaje.getRaza());
-                agregarElementoConTexto(documento, nodoPersonaje, "nivel", String.valueOf(personaje.getNivel()));
-                agregarElementoConTexto(documento, nodoPersonaje, "faccion", personaje.getFaccion());
-                
-                Element nodoInventario = documento.createElement("inventario");
-                nodoPersonaje.appendChild(nodoInventario);
-                for (Inventario inventario : getArrayDeInventariosSistema()) {
-                    if(inventario.getIdPersonaje() == personaje.getIdPersonaje() || inventario.getIdInventario() == personaje.getInventario().getIdInventario()){
-                        agregarElementoConTexto(documento, nodoInventario, "id_inventario", inventario.getIdInventario());
-                        agregarElementoConTexto(documento, nodoInventario, "id_personaje", inventario.getIdPersonaje());
-                        agregarElementoConTexto(documento, nodoInventario, "capacidad_maxima", Integer.toString(inventario.getCapacidadMaxima()));
-                        agregarElementoConTexto(documento, nodoInventario, "espacios_ocupados", Integer.toString(inventario.getEspaciosOcupados()));
-                        // Para cada inventario, crea un nodo "objetos" para la lista de objetos
-                        Element nodoObjetos = documento.createElement("objetos");
-                        nodoInventario.appendChild(nodoObjetos);
-                        for (Objeto objeto : inventario.getObjetosInventario()) {
-                            Element nodoObjeto = documento.createElement("objeto");
-                            nodoObjetos.appendChild(nodoObjeto);
-                            agregarElementoConTexto(documento, nodoObjeto, "id_objeto", objeto.getIdObjeto());
-                            agregarElementoConTexto(documento, nodoObjeto, "nombre_objeto", objeto.getNombreObjeto());
-                        } 
-                    }
-                }
-                Element nodoHermandades = documento.createElement("hermandades");
-                nodoPersonaje.appendChild(nodoHermandades);
-                for (Hermandad hermandad : getArrayDeHermandadesSistema()) {
-                    for (Personaje personajeHermandad : hermandad.getListaMiembros()) {
-                        if (personajeHermandad.getIdPersonaje().equals(personaje.getIdPersonaje())) {
-                            Element nodoHermandad = documento.createElement("hermandad");
-                            nodoHermandades.appendChild(nodoHermandad);
-                            agregarElementoConTexto(documento, nodoHermandad, "id_hermandad", hermandad.getIdHermandad());
-                        }
-                    }
-                }
-            }
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-            DOMSource source = new DOMSource(documento);
-            StreamResult result = new StreamResult(new File("personajes.xml"));
-
-            transformer.transform(source, result);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-   }
-
-   private static void agregarElementoConTexto(Document doc, Element parent, String tagName, String texto) {
-       Element element = doc.createElement(tagName);
-       parent.appendChild(element);
-       Text textNode = doc.createTextNode(texto);
-       element.appendChild(textNode);
-   }
-   
-   public void leerXMLPersonajes() {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document documento = null;
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            documento = builder.parse(new File("personajes.xml"));
-
-            NodeList personajes = documento.getElementsByTagName("personaje");
-
-            for (int i = 0; i < personajes.getLength(); i++) {
-                Node personajeNode = personajes.item(i);
-                if (personajeNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element elemento = (Element) personajeNode;
-                    
-                    String idPersonaje = elemento.getElementsByTagName("id_personaje").item(0).getTextContent();
-                    String nombre = elemento.getElementsByTagName("nombre").item(0).getTextContent();
-                    String servidor = elemento.getElementsByTagName("servidor").item(0).getTextContent();
-                    String raza = elemento.getElementsByTagName("raza").item(0).getTextContent();
-                    String nivel = elemento.getElementsByTagName("nivel").item(0).getTextContent();
-                    String faccion = elemento.getElementsByTagName("faccion").item(0).getTextContent();
-                    
-                    // Crea un nuevo objeto Personaje y lo añade a la lista
-                    Personaje personaje = new Personaje();
-                    if(idPersonaje.isEmpty() || idPersonaje == null){
-                        idPersonaje = personaje.generateNewIdPersonaje();
-                    }
-                    personaje.setIdPersonaje(idPersonaje);
-                    personaje.setNombre(nombre);
-                    personaje.setServidor(servidor);
-                    personaje.setRaza(raza);
-                    personaje.setNivel(Integer.parseInt(nivel));
-                    personaje.setFaccion(faccion);
-                    
-                   
-
-                   String idInventario = elemento.getElementsByTagName("id_inventario").item(0).getTextContent();
-                   for (Inventario inventarioSistema : this.getArrayDeInventariosSistema()) {
-                        if (inventarioSistema.getIdInventario().equals(idInventario)) {
-                            personaje.setInventario(inventarioSistema);
-                            //Cuidado, puede ser que reviente el programa TODO :)
-                        }
-                    }
-                    //Busca en el array de hermandades, si el personaje pertenece a alguna hermandad, lo añade a la lista de hermandades del personaje
-                    ArrayList<Hermandad> listaHermandades = new ArrayList<>();
-                    NodeList hermandades = elemento.getElementsByTagName("hermandad");
-                    for (int j = 0; j < hermandades.getLength(); j++) {
-                        Node hermandadNode = hermandades.item(j);
-                        if (hermandadNode.getNodeType() == Node.ELEMENT_NODE) {
-                            Element elementoHermandad = (Element) hermandadNode;
-                            String idHermandad = elementoHermandad.getElementsByTagName("id_hermandad").item(0).getTextContent();
-                            for (Hermandad hermandad : this.getArrayDeHermandadesSistema()) {
-                                if (hermandad.getIdHermandad().equals(idHermandad)) {
-                                    personaje.getListaHermandadades().add(hermandad);
-                                }
-                            }
-                        }
-                    }
-
-                    ArrayDePersonajesSistema.add(personaje);
-                }
-            }
-        } catch (ParserConfigurationException pce) {
-            pce.printStackTrace();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        } catch (SAXException saxe) {
-            saxe.printStackTrace();
-        }
-    }
-
-
-   
-   //Lee el xml de objetosSistema y los mete en el arrayList
-   public void leerXMLObjetos(){
-       
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document documento = null;
-        
-          try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            documento = builder.parse(new File("objetosSistema.xml"));
-            
-            NodeList objetos = documento.getElementsByTagName("objeto");
-            
-            for(int i = 0; i < objetos.getLength(); i++){
-                Node objetoNode = objetos.item(i);
-                if(objetoNode.getNodeType() == Node.ELEMENT_NODE){
-                    Element elemento = (Element) objetoNode;
-            
-                    String idObjeto = elemento.getElementsByTagName("id_objeto").item(0).getTextContent();
-                    String nombreObjeto = elemento.getElementsByTagName("nombre_objeto").item(0).getTextContent();
-                    String rarezaObjeto = elemento.getElementsByTagName("rareza_objeto").item(0).getTextContent();
-                    String precioObjeto = elemento.getElementsByTagName("precio_objeto").item(0).getTextContent();
-                    String descripcionObjeto = elemento.getElementsByTagName("descripcion_objeto").item(0).getTextContent();
-                    if(getPosicionObjetoById(idObjeto) == -1){
-                        Objeto objetoNuevo = new Objeto();
-                        objetoNuevo.setIdObjeto(idObjeto);
-                        objetoNuevo.setNombreObjeto(nombreObjeto);
-                        objetoNuevo.setRareza(rarezaObjeto);
-                        objetoNuevo.setPrecio(Double.parseDouble(precioObjeto));
-                        objetoNuevo.setDescripcion(descripcionObjeto);
-                        ArrayDeObjetosSistema.add(objetoNuevo);
-                    }
-                  }
-         }
-        } catch (ParserConfigurationException pce) {
-            pce.printStackTrace();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        } catch (SAXException saxe) {
-            saxe.printStackTrace();
-        }
-   }
-   
-     public void leerInventarioSistema(){
-       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document documento = null;
-        
-        try {
-          DocumentBuilder builder = factory.newDocumentBuilder();
-          documento = builder.parse(new File("inventariosSistema.xml"));
-          
-          NodeList inventario = documento.getElementsByTagName("inventario");
-          
-            for(int i = 0; i < inventario.getLength(); i++){
-                Node inventarioNode = inventario.item(i);
-                if(inventarioNode.getNodeType() == Node.ELEMENT_NODE){
-                    Element inventarioElement = (Element) inventarioNode;
-                    
-                    Inventario inventarioNuevo = new Inventario();
-                 
-                    String idInventario = inventarioElement.getElementsByTagName("id_inventario").item(0).getTextContent();
-                    String idPersonaje = inventarioElement.getElementsByTagName("id_personaje").item(0).getTextContent();
-                    String  capacidadMaxima = inventarioElement.getElementsByTagName("capacidad_maxima").item(0).getTextContent();
-                    String espaciosOcupados = inventarioElement.getElementsByTagName("espacios_ocupados").item(0).getTextContent();
-                    
-                    inventarioNuevo.setIdInventario(idInventario);
-                    inventarioNuevo.setIdPersonaje(idPersonaje);
-                   
-                    NodeList objetos = inventarioElement.getElementsByTagName("objeto");
-                    
-                    for(int j = 0; j < objetos.getLength(); j++){
-                        Node objetoNode = objetos.item(j);
-                        if(objetoNode.getNodeType() == Node.ELEMENT_NODE){
-                            Element objetoElement = (Element) objetoNode;
-                            
-                            Objeto objetoNuevo = new Objeto();
-                            String idObjeto = objetoElement.getElementsByTagName("id_objeto").item(0).getTextContent();
-                            //Busca en el vector de objetos del sistema el objeto por su id y lo inserta en el vector de objetos del inventarioNuevo
-                            if(inventarioNuevo.getObjetosInventario() != null){
-                                inventarioNuevo.getObjetosInventario().add(getArrayDeObjetosSistema().get(getPosicionObjetoById(idObjeto)));
-                            } 
-                        }
-                    }
-                    inventarioNuevo.setEspaciosOcupados(inventarioNuevo.getObjetosInventario().size());
-                    ArrayDeInventariosSistema.add(inventarioNuevo);
-                 }
-        }
-        } catch (ParserConfigurationException pce) {
-            pce.printStackTrace();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        } catch (SAXException saxe) {
-            saxe.printStackTrace();
-        }
-     }
 }
   
