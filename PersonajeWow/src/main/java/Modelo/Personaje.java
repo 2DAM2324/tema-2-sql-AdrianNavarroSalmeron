@@ -119,7 +119,9 @@ public class Personaje {
         setListaHermandades(listaHermandad);
     }
 
+    //Constructor usado en el conector.
     public Personaje(String idPersonaje, String nombre, String servidor, String faccion, String raza, int nivel, Inventario inventario){
+        ArrayList <Hermandad> hermandad = new ArrayList<>();
         setIdPersonaje(idPersonaje);
         setNombre(nombre);
         setServidor(servidor);
@@ -127,7 +129,7 @@ public class Personaje {
         setRaza(raza);
         setNivel(nivel);
         setInventario(inventario);
-        setListaHermandades(null);
+        setListaHermandades(hermandad);
     }
     
      public String generateNewIdPersonaje() {

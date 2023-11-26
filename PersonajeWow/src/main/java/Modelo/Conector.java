@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -124,9 +125,24 @@ public void crearBaseDatos() {
                 consulta.setDouble(4, objeto.getPrecio());
                 consulta.setString(5, objeto.getNombreObjeto()); 
                 consulta.executeUpdate();
-        } catch (Exception e) {
+        
+        }
+        catch(SQLIntegrityConstraintViolationException e){
+            e.printStackTrace();
+            System.err.println("SE HA INTENTADO INSERTAR UNA PK REPETIDA EN OBJETO:" + e.getMessage());
+        }
+        catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al insertar Objeto:" + e.getMessage());
+        }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("Objeto NULL:" + e.getMessage());
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            System.err.println("ERROR generico en OBJETO" + e.getMessage());
         }
     }
 
@@ -273,7 +289,7 @@ public void crearBaseDatos() {
     }
 
     //Lee el personaje de la base de datos
-    public void leerPersonajeDeBd(ArrayList personajesSitema, ArrayList inventariosSistema){
+    public void leerPersonajeDeBd(ArrayList personajesSitema, ArrayList inventariosSistema, ArrayList<Hermandad> hermandadesSistema){
         String sql = "SELECT * FROM personaje";
         try(Connection conn = Conector.conectar()){
             Statement statementPersonaje = conn.createStatement();
@@ -286,13 +302,22 @@ public void crearBaseDatos() {
                 String raza = resulsetPersonaje.getString("raza");
                 int nivel = resulsetPersonaje.getInt("nivel");
                 String idInventario = resulsetPersonaje.getString("idInventario");
-                Inventario inventario = null;
+                Inventario inventario = new Inventario();
                 for(int i = 0; i < inventariosSistema.size(); i++){
                     if(((Inventario)inventariosSistema.get(i)).getIdInventario().equals(idInventario)){
                         inventario = (Inventario)inventariosSistema.get(i);
                     }
                 }
+                //Creamos el personaje con los parametros de la bd 
                 Personaje personaje = new Personaje(idPersonaje, nombre, servidor, faccion, raza, nivel, inventario);
+                //Leemos las hermandades del personaje
+                for(int i = 0; i < hermandadesSistema.size(); i++){
+                    for(int j = 0; j < hermandadesSistema.get(i).getListaMiembros().size(); j++){
+                        if(hermandadesSistema.get(i).getListaMiembros().get(j).getIdPersonaje().equals(idPersonaje)){
+                            personaje.getListaHermandadades().add(hermandadesSistema.get(i));
+                        }
+                    }
+                }
                 personaje.getInventario().setIdPersonaje(personaje.getIdPersonaje());
                 personajesSitema.add(personaje);
             }
@@ -419,6 +444,19 @@ public void crearBaseDatos() {
         }
     }
 
+    public void borrarPersonajeHermandad(Personaje personaje, Hermandad hermandad){
+        String sql = "DELETE FROM hermandadPersonaje WHERE idHermandad = ? AND idPersonaje = ?";
+        try(Connection conn = Conector.conectar()){
+            PreparedStatement consulta = conn.prepareStatement(sql);
+            consulta.setString(1, hermandad.getIdHermandad());
+            consulta.setString(2, personaje.getIdPersonaje());
+            consulta.executeUpdate();
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error al borrar PersonajeHermandad:" + e.getMessage());
+        }
+    }
+
     public void insertarObjetoEnInventario(Objeto objeto, Inventario inventario){
         String sql = "INSERT INTO InventarioObjeto (idInventario, idObjeto) VALUES (?, ?)";
         try(Connection conn = Conector.conectar()){
@@ -452,9 +490,18 @@ public void crearBaseDatos() {
             consulta.setInt(1, inventario.getEspaciosOcupados());
             consulta.setString(2, inventario.getIdInventario());
             consulta.executeUpdate();
-        }catch(Exception e){
+         }catch(SQLException e){
             e.printStackTrace();
-            System.err.println("Error al modificar Inventario:" + e.getMessage());
+            System.err.println("Error al modificar inventario:" + e.getMessage());
+        }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("Inventario NULL:" + e.getMessage());
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            System.err.println("ERROR en inventario:" + e.getMessage());
         }
     }
 
@@ -477,9 +524,18 @@ public void crearBaseDatos() {
                     }
                 }
             }
-        }catch(Exception e){
+        }catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al leer InventarioObjeto:" + e.getMessage());
+        }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("InventarioObjeto NULL:" + e.getMessage());
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            System.err.println("ERROR en inventarioObjeto:" + e.getMessage());
         }
     }
 }

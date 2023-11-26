@@ -75,7 +75,7 @@ public class Controller {
        conector.leerObjetosDeBd(ArrayDeObjetosSistema);
        conector.leerInventario(ArrayDeInventariosSistema);
        conector.leerInventarioObjeto(ArrayDeInventariosSistema, ArrayDeObjetosSistema);
-       conector.leerPersonajeDeBd(ArrayDePersonajesSistema, ArrayDeInventariosSistema);
+       conector.leerPersonajeDeBd(ArrayDePersonajesSistema, ArrayDeInventariosSistema, ArrayDeHermandadesSistema);
        conector.leerHermandad(ArrayDeHermandadesSistema);
        conector.leerHermandadPersonaje(ArrayDeHermandadesSistema, ArrayDePersonajesSistema);
        // leerInventarioSistema();   
@@ -620,10 +620,10 @@ public class Controller {
                 if(getArrayDeHermandadesSistema().get(posicionHermandad).getListaMiembros().size() <= 100 && !comprobarSiPersonajeEnHermandad(getArrayDePersonajesDeSistema().get(posicionPersonaje).getIdPersonaje(), getArrayDeHermandadesSistema().get(posicionHermandad).getIdHermandad())){
                     getArrayDeHermandadesSistema().get(posicionHermandad).getListaMiembros().add(getArrayDePersonajesDeSistema().get(posicionPersonaje));
                     getArrayDeHermandadesSistema().get(posicionHermandad).setNumeroMiembros(getArrayDeHermandadesSistema().get(posicionHermandad).getListaMiembros().size());
+                    //Añadimos la hermandad a la lista de hermandades de este personaje
+                    getArrayDePersonajesDeSistema().get(posicionPersonaje).getListaHermandadades().add(getArrayDeHermandadesSistema().get(posicionHermandad));
                     conector.insertarPersonajeHermandad(getArrayDePersonajesDeSistema().get(posicionPersonaje), getArrayDeHermandadesSistema().get(posicionHermandad));
                     conector.modificarHermandadEnBd(getArrayDeHermandadesSistema().get(posicionHermandad));
-                    escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
-                    escribirXMLHermandades(ArrayDeHermandadesSistema);
                     cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
                     cargarPersonajesHermandadEnTabla(getArrayDeHermandadesSistema().get(posicionHermandad).getIdHermandad());
                     JOptionPane.showMessageDialog(vista, "Personaje añadido correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);
@@ -646,11 +646,13 @@ public class Controller {
                 if(posicionPersonaje != -1 && posicionHermandad != -1){
                     //Comprueba si el personaje esta en la hermandad
                     if(comprobarSiPersonajeEnHermandad(getArrayDePersonajesDeSistema().get(posicionPersonaje).getIdPersonaje(), getArrayDeHermandadesSistema().get(posicionHermandad).getIdHermandad())){
+                        //Borramos el personaje de la tabla hermandadPersonaje
+                        conector.borrarPersonajeHermandad(getArrayDePersonajesDeSistema().get(posicionPersonaje), getArrayDeHermandadesSistema().get(posicionHermandad));
                         getArrayDeHermandadesSistema().get(posicionHermandad).getListaMiembros().remove(getArrayDePersonajesDeSistema().get(posicionPersonaje));
                         getArrayDeHermandadesSistema().get(posicionHermandad).setNumeroMiembros(getArrayDeHermandadesSistema().get(posicionHermandad).getListaMiembros().size());
                         getArrayDePersonajesDeSistema().get(posicionPersonaje).getListaHermandadades().remove(getArrayDeHermandadesSistema().get(posicionHermandad));
-                        escribirXMLPersonajes(ArrayDePersonajesSistema, ArrayDeObjetosSistema, ArrayDeInventariosSistema);
-                        escribirXMLHermandades(ArrayDeHermandadesSistema);
+                        //Actualizamos el numero de miembros de la hermnadad
+                        conector.modificarHermandadEnBd(getArrayDeHermandadesSistema().get(posicionHermandad));
                         cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
                         cargarPersonajesHermandadEnTabla(getArrayDeHermandadesSistema().get(posicionHermandad).getIdHermandad());
                         JOptionPane.showMessageDialog(vista, "Personaje borrado correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);

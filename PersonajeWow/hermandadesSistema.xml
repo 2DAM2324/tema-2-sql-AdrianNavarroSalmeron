@@ -3,8 +3,12 @@
     <hermandad>
         <id_hermandad>GUILD1</id_hermandad>
         <nombre>Hola</nombre>
-        <servidor>Server</servidor>
-        <numero_miembros>0</numero_miembros>
-        <miembros/>
+        <servidor>Servidor</servidor>
+        <numero_miembros>1</numero_miembros>
+        <miembros>
+            <miembro>
+                <id_personaje>PJ1</id_personaje>
+            </miembro>
+        </miembros>
     </hermandad>
 </hermandades>
