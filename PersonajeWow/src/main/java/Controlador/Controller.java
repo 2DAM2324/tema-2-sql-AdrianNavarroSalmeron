@@ -5,8 +5,6 @@
 package Controlador;
 import Modelo.*;
 import Vista.Ventana1;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -16,10 +14,6 @@ import javax.swing.table.DefaultTableModel;
  * @author AdrianNS
  */
 public class Controller {
-    private Inventario inventario;
-    private Objeto objeto;
-    private Personaje personaje;
-    private Hermandad hermandad;
     private Conector conector;
     private Ventana1 ventana;
     public ArrayList <Personaje> ArrayDePersonajesSistema;
@@ -57,18 +51,7 @@ public class Controller {
         cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
     }
     
-    /**
-    public Controller(){
-        ArrayList<Personaje> nuevoArray = new ArrayList<>();
-        ArrayList<Objeto> arrayObjeto = new ArrayList<>();
-        ArrayList<Inventario> arrayInventario = new ArrayList<>();
-        ArrayList<Hermandad> arrayHermandad = new ArrayList<>();
-        this.ArrayDePersonajesSistema = nuevoArray;
-        this.ArrayDeObjetosSistema = arrayObjeto;
-        this.ArrayDeHermandadesSistema = arrayHermandad;
-        this.ArrayDeInventariosSistema = arrayInventario;
-    }
-    * */
+  
     
     public void setArrayDePersonajesDeSistema(ArrayList<Personaje> array){
         ArrayDePersonajesSistema = array;
@@ -340,9 +323,9 @@ public class Controller {
         int posicionInventario = buscarInventarioPorId(idInventario);
         if(posicionObjeto != -1 && posicionInventario != -1){
             if(!getArrayDeInventariosSistema().get(posicionInventario).comprobarSiObjetoEnInventario(getObjetoById(idObjeto))){
-                getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().add(getArrayDeObjetosSistema().get(posicionObjeto));
+                //getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().add(getArrayDeObjetosSistema().get(posicionObjeto));
+                 conector.insertarObjetoEnInventario(getArrayDeObjetosSistema().get(posicionObjeto), getArrayDeInventariosSistema().get(posicionInventario));
                 getArrayDeInventariosSistema().get(posicionInventario).setEspaciosOcupados(getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().size());
-                conector.insertarObjetoEnInventario(getArrayDeObjetosSistema().get(posicionObjeto), getArrayDeInventariosSistema().get(posicionInventario));
                 conector.modificarInventario(getArrayDeInventariosSistema().get(posicionInventario));
                 cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
                 cargarPersonajesEnTabla(ArrayDePersonajesSistema);
@@ -410,11 +393,12 @@ public class Controller {
             //personajeAniadir.setAniadirInventarioaPersonaje(inventarioNuevo);
             
             conector.insertarPersonajeYInventarioEnBD(personajeAniadir, inventarioNuevo);
-            //Traemos el personaje y su inventario de la bd y lo añadimos al vector
+            //Traemos el personaje y lo añadimos al vector de personajes del sistema
              conector.leerPersonaje(nombre, servidor, ArrayDePersonajesSistema);
              int posicionPersonaje = buscarPersonajeEnSistema(nombre, servidor);
-            System.out.println("LA POSICION DEL PERSONAJE ES: " + posicionPersonaje);
+             //Añadimos el inventario al personaje que hemos introducido en el vector
             getArrayDePersonajesDeSistema().get(posicionPersonaje).setAniadirInventarioaPersonaje(inventarioNuevo);
+            //Añadimos el inventario al vector de inventarios
             getArrayDeInventariosSistema().add(inventarioNuevo);
             cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
             cargarPersonajesEnTabla(ArrayDePersonajesSistema);
@@ -687,10 +671,10 @@ public class Controller {
             model.removeRow(0);
         }
         
-        for(Hermandad hermandad : getArrayDeHermandadesSistema()){
-            if(hermandad.getIdHermandad().equals(idHermandad)){
-                for(Personaje personaje : hermandad.getListaMiembros()){
-                    Object[] rowData = {personaje.getNombre(), personaje.getServidor(), personaje.getRaza(), personaje.getNivel()};
+        for(Hermandad hermanadCargar : getArrayDeHermandadesSistema()){
+            if(hermanadCargar.getIdHermandad().equals(idHermandad)){
+                for(Personaje personajeCargar : hermanadCargar.getListaMiembros()){
+                    Object[] rowData = {personajeCargar.getNombre(), personajeCargar.getServidor(), personajeCargar.getRaza(), personajeCargar.getNivel()};
                     model.addRow(rowData);
                 }
             }

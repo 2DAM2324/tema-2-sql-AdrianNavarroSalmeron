@@ -186,7 +186,7 @@
                           </Group>
                           <Component id="jButton_cancelar_hermandad" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="116" max="32767" attributes="0"/>
+                      <EmptySpace pref="131" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jLabel_hermandad_nombre_personaje" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jTextField_hermandad_nombre_personaje" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -629,7 +629,7 @@
                           <Component id="JLabelEspaciosOcupados" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel_espacios_ocupados_personaje_detalles" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="23" max="32767" attributes="0"/>
+                      <EmptySpace pref="38" max="32767" attributes="0"/>
                       <Component id="jScrollPane7" min="-2" pref="321" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -1020,7 +1020,7 @@
                           <Group type="102" attributes="0">
                               <EmptySpace min="-2" pref="68" max="-2" attributes="0"/>
                               <Component id="jScrollPane5" min="-2" pref="138" max="-2" attributes="0"/>
-                              <EmptySpace pref="257" max="32767" attributes="0"/>
+                              <EmptySpace pref="272" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace max="32767" attributes="0"/>
@@ -1047,7 +1047,7 @@
                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                       <Table columnCount="3" rowCount="0">
                         <Column editable="false" title="Id inventario" type="java.lang.String"/>
-                        <Column editable="false" title="Id personaje" type="java.lang.String"/>
+                        <Column editable="false" title="Id personaje" type="java.lang.Integer"/>
                         <Column editable="false" title="Espacios ocupados" type="java.lang.Integer"/>
                       </Table>
                     </Property>
@@ -1312,7 +1312,7 @@
                           <Component id="jTextField_descripcion_objeto" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jButton_confirmar_aniadir_objeto_a_inventario" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="501" max="32767" attributes="0"/>
+                      <EmptySpace pref="516" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

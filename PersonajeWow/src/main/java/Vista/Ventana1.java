@@ -10,8 +10,10 @@ import Controlador.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.NotSerializableException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 import org.xml.sax.SAXException;
 
@@ -32,6 +34,7 @@ public class Ventana1 extends javax.swing.JFrame {
         jTextField_hermandad_nombre_personaje.setVisible(false);
         jTextField_hermandad_servidor_personaje.setVisible(false);
         jButton_hermandad_guardar_personaje.setVisible(false);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         ocultarSeccionInferiorObjeto();
         ocultarSeccionInferiorInventario();
         ocultarSeccionPersonajeAniadir();
@@ -412,7 +415,7 @@ public class Ventana1 extends javax.swing.JFrame {
                         .addComponent(jLabel_num_miembros)
                         .addComponent(jTextField_num_miembros, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jButton_cancelar_hermandad))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 116, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 131, Short.MAX_VALUE)
                 .addGroup(jPanel_hermandadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel_hermandad_nombre_personaje)
                     .addComponent(jTextField_hermandad_nombre_personaje, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -749,7 +752,7 @@ public class Ventana1 extends javax.swing.JFrame {
                 .addGroup(jPanel_personajeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(JLabelEspaciosOcupados)
                     .addComponent(jLabel_espacios_ocupados_personaje_detalles))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -765,7 +768,7 @@ public class Ventana1 extends javax.swing.JFrame {
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Integer.class
+                java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
                 false, false, false
@@ -950,7 +953,7 @@ public class Ventana1 extends javax.swing.JFrame {
                     .addGroup(jPanel_inventarioLayout.createSequentialGroup()
                         .addGap(68, 68, 68)
                         .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(257, Short.MAX_VALUE))
+                        .addContainerGap(272, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel_inventarioLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton_aniadir_objeto_a_inventario)
@@ -1163,7 +1166,7 @@ public class Ventana1 extends javax.swing.JFrame {
                     .addComponent(jLabel_descripcion_objeto)
                     .addComponent(jTextField_descripcion_objeto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton_confirmar_aniadir_objeto_a_inventario))
-                .addContainerGap(501, Short.MAX_VALUE))
+                .addContainerGap(516, Short.MAX_VALUE))
         );
 
         jTabbedPane.addTab("Objeto", jPanel_objeto);
@@ -1190,13 +1193,7 @@ public class Ventana1 extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     
-    //Cerrar ventana
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {
-        int resultado = javax.swing.JOptionPane.showConfirmDialog(this, "¿Desea guardar antes de salir?", "Confirmación", javax.swing.JOptionPane.YES_NO_OPTION);
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        this.dispose();
-    }
-    
+  
     private void jButton_aniadir_hermandadActionPerformed(java.awt.event.ActionEvent evt){
         
        
@@ -1536,9 +1533,9 @@ public class Ventana1 extends javax.swing.JFrame {
             int selectedRow = jTable_hermandad.getSelectedRow();
             if (selectedRow != -1) {
                 DefaultTableModel model = (DefaultTableModel) jTable_hermandad.getModel();
-                String nombreHermandad = (String) model.getValueAt(selectedRow, 0); // Suponiendo que la columna 0 contiene el nombre hermandad
-                String servidorHermandad = (String) model.getValueAt(selectedRow, 1);
-                int posicionHermandad = controlador.buscarHermandadPorNombre(nombreHermandad, servidorHermandad);
+                String nombreHermandadDetalles = (String) model.getValueAt(selectedRow, 0); // Suponiendo que la columna 0 contiene el nombre hermandad
+                String servidorHermandadDetalles = (String) model.getValueAt(selectedRow, 1);
+                int posicionHermandad = controlador.buscarHermandadPorNombre(nombreHermandadDetalles, servidorHermandadDetalles);
                 jTable_personajes_hermandad.setVisible(true);
                 controlador.cargarPersonajesHermandadEnTabla(controlador.getArrayDeHermandadesSistema().get(posicionHermandad).getIdHermandad());      
             }
@@ -1638,7 +1635,7 @@ public class Ventana1 extends javax.swing.JFrame {
         int filaSeleccionada = -1;
 
         for (int fila = 0; fila < rowCount; fila++) {
-            String idEnFila = (String) model.getValueAt(fila, 1); // Reemplaza 'columnaID' con el índice de la columna que contiene la ID
+            Integer idEnFila = (Integer) model.getValueAt(fila, 1); // Reemplaza 'columnaID' con el índice de la columna que contiene la ID
 
             if (idPersonaje.equals(idEnFila)) {
                 filaSeleccionada = fila;
@@ -1925,6 +1922,17 @@ public class Ventana1 extends javax.swing.JFrame {
         ocultarDetallesPersonaje();
         ocultarSeccionInferiorDetallesPersonaje();
     }//GEN-LAST:event_jButton_ocultar_detalles_personajeMouseClicked
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        int resultado = javax.swing.JOptionPane.showConfirmDialog(this, "¿Seguro que desea salir??", "Confirmación", javax.swing.JOptionPane.YES_NO_OPTION);
+        if (resultado == javax.swing.JOptionPane.YES_OPTION) {
+            Conector.getInstancia().cerrarConexion();
+            System.out.println("Conexion a la base de datos cerrada.");
+            System.exit(0); //Cierra la aplicacion y cierra la conexion con la base de datos
+        } else if (resultado == javax.swing.JOptionPane.NO_OPTION) {
+            // Solo cierra la ventana emergente
+        }
+    }//GEN-LAST:event_formWindowClosing
     
     public void setControlador(Controller controladorSet){
         this.controlador = controladorSet;

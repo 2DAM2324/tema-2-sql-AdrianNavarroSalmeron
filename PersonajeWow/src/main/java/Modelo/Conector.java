@@ -229,49 +229,74 @@ public void crearBaseDatos() {
     
     //CRUD PERSONAJE
     
-    public void insertarPersonajeYInventarioEnBD(Personaje personaje, Inventario inventario){
+    public void insertarPersonajeYInventarioEnBD(Personaje personaje, Inventario inventario) {
         String sqlInventario = "INSERT INTO inventario (idInventario, capacidadMaxima, espaciosOcupados) VALUES (?, ?, ?)";
         String sqlPersonaje = "INSERT INTO personaje (nombre, servidor, faccion, raza, idInventario, nivel) VALUES (?, ?, ?, ?, ?, ?)";
-        String modificacionInventario =   "UPDATE inventario SET idPersonaje = ? WHERE idInventario = ?";
+        String modificacionInventario = "UPDATE inventario SET idPersonaje = ? WHERE idInventario = ?";
         Connection conexion = instancia.getConexion();
-        
-         try{
-             PreparedStatement consultaInventario = conexion.prepareStatement(sqlInventario);
-             PreparedStatement consultaPersonaje = conexion.prepareStatement(sqlPersonaje);
-             PreparedStatement consultaInventarioModificacion = conexion.prepareStatement(modificacionInventario);
-             consultaInventario.setString(1, inventario.getIdInventario());
-             consultaInventario.setInt(2, inventario.getCapacidadMaxima());
-             consultaInventario.setInt(3, inventario.getEspaciosOcupados());
-             consultaInventario.executeUpdate();
-             
-             //consultaPersonaje.setInt(1, personaje.getIdPersonaje());
-             consultaPersonaje.setString(1, personaje.getNombre());
-             consultaPersonaje.setString(2, personaje.getServidor());
-             consultaPersonaje.setString(3, personaje.getFaccion());
-             consultaPersonaje.setString(4, personaje.getRaza());
-             consultaPersonaje.setString(5, inventario.getIdInventario());
-             consultaPersonaje.setInt(6, personaje.getNivel());
-             consultaPersonaje.executeUpdate();
-             
-             
-             // Recuperamos la id que ha creado la base de datos para nuestro personaje
-             ResultSet generatedKeys = consultaPersonaje.getGeneratedKeys();
-             int idPersonaje = -1;
-             if (generatedKeys.next()) {
-                 idPersonaje = generatedKeys.getInt(1);
-             }
-             
-             consultaInventarioModificacion.setInt(1, idPersonaje);
-             consultaInventarioModificacion.setString(2, inventario.getIdInventario());
-             consultaInventarioModificacion.executeUpdate();   
-         }catch(SQLIntegrityConstraintViolationException e){
-             e.printStackTrace();
-             System.err.println("CLAVE PRIMARIA REPETIDA EN PERSONAJE");
-         }catch(Exception e){
-             e.printStackTrace();
-             System.err.println("Error al insertar Personaje:" + e.getMessage());
-         }     
+        PreparedStatement consultaInventario = null;
+        PreparedStatement consultaPersonaje = null;
+        PreparedStatement consultaInventarioModificacion = null;
+
+        try {
+            conexion.setAutoCommit(false);
+
+            // Insertamos el inventario
+            consultaInventario = conexion.prepareStatement(sqlInventario);
+            consultaInventario.setString(1, inventario.getIdInventario());
+            consultaInventario.setInt(2, inventario.getCapacidadMaxima());
+            consultaInventario.setInt(3, inventario.getEspaciosOcupados());
+            consultaInventario.executeUpdate();
+
+            // Insertamos el personaje
+            consultaPersonaje = conexion.prepareStatement(sqlPersonaje);
+            consultaPersonaje.setString(1, personaje.getNombre());
+            consultaPersonaje.setString(2, personaje.getServidor());
+            consultaPersonaje.setString(3, personaje.getFaccion());
+            consultaPersonaje.setString(4, personaje.getRaza());
+            consultaPersonaje.setString(5, inventario.getIdInventario());
+            consultaPersonaje.setInt(6, personaje.getNivel());
+            consultaPersonaje.executeUpdate();
+
+            // Recuperamos la id que ha creado la base de datos para nuestro personaje
+            ResultSet generatedKeys = consultaPersonaje.getGeneratedKeys();
+            int idPersonaje = -1;
+            if (generatedKeys.next()) {
+                idPersonaje = generatedKeys.getInt(1);
+            }
+
+            // Añadimos el id del personaje al inventario
+            consultaInventarioModificacion = conexion.prepareStatement(modificacionInventario);
+            consultaInventarioModificacion.setInt(1, idPersonaje);
+            consultaInventarioModificacion.setString(2, inventario.getIdInventario());
+            consultaInventarioModificacion.executeUpdate();
+
+            // Validamos la transacción
+            conexion.commit();
+        } catch (SQLIntegrityConstraintViolationException e) {
+            e.printStackTrace();
+            System.err.println("CLAVE PRIMARIA REPETIDA EN PERSONAJE");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("ERROR EN LA CONSULTA PARA INSERTAR PERSONAJE");
+        } finally {
+            try {
+                if (consultaInventario != null) {
+                    consultaInventario.close();
+                }
+                if (consultaPersonaje != null) {
+                    consultaPersonaje.close();
+                }
+                if (consultaInventarioModificacion != null) {
+                    consultaInventarioModificacion.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.err.println("Error cerrando recursos: " + e.getMessage());
+            }
+        }
     }
+
 
     /**
      * 
@@ -486,7 +511,7 @@ public void crearBaseDatos() {
         }
     }
 
-    public void leerHermandad(ArrayList ArrayDeHermandadesSistema){
+    public void leerHermandad(ArrayList<Hermandad> ArrayDeHermandadesSistema){
         String sql = "SELECT * FROM hermandad";
         Connection conexion = instancia.getConexion();
 
@@ -516,7 +541,7 @@ public void crearBaseDatos() {
             ResultSet resulsetHermandadPersonaje = statementHermandadPersonaje.executeQuery(sql);
             while(resulsetHermandadPersonaje.next()){
                 String idHermandad = resulsetHermandadPersonaje.getString("idHermandad");
-                String idPersonaje = resulsetHermandadPersonaje.getString("idPersonaje");
+                Integer idPersonaje = resulsetHermandadPersonaje.getInt("idPersonaje");
                 //Recorremos el vector de hermandades de sistema, para cada hermandad buscamos sus miembros y los añadimos a la lis de miembros de esa hermandad
                 for(int i = 0; i < arrayDeHermandadesSistema.size(); i++){
                     if(arrayDeHermandadesSistema.get(i).getIdHermandad().equals(idHermandad)){
@@ -582,10 +607,16 @@ public void crearBaseDatos() {
             PreparedStatement consulta = conexion.prepareStatement(sql);
             consulta.setString(1, inventario.getIdInventario());
             consulta.setString(2, objeto.getIdObjeto());
+            inventario.getObjetosInventario().add(objeto);
             consulta.executeUpdate();
-        }catch(Exception e){
+        }catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al insertar ObjetoInventario:" + e.getMessage());
+        }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("ObjetoInventario NULL:" + e.getMessage());
+
         }
     }
 
@@ -661,6 +692,20 @@ public void crearBaseDatos() {
         catch(Exception e){
             e.printStackTrace();
             System.err.println("ERROR en inventarioObjeto:" + e.getMessage());
+        }
+    }
+
+    /**
+     * @brief Cierra la conexion a la base de datos
+     */
+    public void cerrarConexion() {
+        try {
+            if (conn != null) {
+                conn.close();
+                System.out.println("Conexión cerrada.");
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
         }
     }
 }
