@@ -16,7 +16,7 @@ public class Inventario {
         String idInventario;
         int espaciosOcupados;
         ArrayList<Objeto> objetosInventario;
-        String idPersonaje;
+        Integer idPersonaje;
    
         public int getCapacidadMaxima(){
             return capacidadMaxima;
@@ -46,11 +46,11 @@ public class Inventario {
             return objetosInventario;
         }
         
-        public void setIdPersonaje(String idPersonajeSet){
+        public void setIdPersonaje(Integer idPersonajeSet){
             idPersonaje = idPersonajeSet;
         }
         
-        public String getIdPersonaje(){
+        public Integer getIdPersonaje(){
             return idPersonaje;
         }
         
@@ -120,7 +120,7 @@ public class Inventario {
             setObjetosInventario(vector);
         }
         
-        public Inventario(String id, int espacios, ArrayList<Objeto> vector, String idPersonaje){
+        public Inventario(String id, int espacios, ArrayList<Objeto> vector, Integer idPersonaje){
             setIdInventario(id);
             setEspaciosOcupados(espacios);
             setObjetosInventario(vector);

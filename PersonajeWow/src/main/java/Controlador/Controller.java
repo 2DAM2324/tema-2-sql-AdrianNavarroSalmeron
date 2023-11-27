@@ -407,12 +407,15 @@ public class Controller {
             personajeAniadir.setRaza(Raza);
             personajeAniadir.setNivel(nivelParseado);
             personajeAniadir.setFaccion(faccion);
-            personajeAniadir.setAniadirInventarioaPersonaje(inventarioNuevo);
+            //personajeAniadir.setAniadirInventarioaPersonaje(inventarioNuevo);
             
-            ArrayDeInventariosSistema.add(inventarioNuevo);
-            ArrayDePersonajesSistema.add(personajeAniadir);
             conector.insertarPersonajeYInventarioEnBD(personajeAniadir, inventarioNuevo);
-            
+            //Traemos el personaje y su inventario de la bd y lo añadimos al vector
+             conector.leerPersonaje(nombre, servidor, ArrayDePersonajesSistema);
+             int posicionPersonaje = buscarPersonajeEnSistema(nombre, servidor);
+            System.out.println("LA POSICION DEL PERSONAJE ES: " + posicionPersonaje);
+            getArrayDePersonajesDeSistema().get(posicionPersonaje).setAniadirInventarioaPersonaje(inventarioNuevo);
+            getArrayDeInventariosSistema().add(inventarioNuevo);
             cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
             cargarPersonajesEnTabla(ArrayDePersonajesSistema);
             JOptionPane.showMessageDialog(vista, "Personaje añadido correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);
@@ -432,7 +435,7 @@ public class Controller {
     }
     
     //Devuelve la posicion en la cual se encuentra ese personaje en el array del sistema
-    public int buscarPersonajeEnSistemaPorId(String idPersonaje){
+    public int buscarPersonajeEnSistemaPorId(Integer idPersonaje){
         int posicion = -1;
         for (Personaje personaje : getArrayDePersonajesDeSistema()) {
             if (personaje.getIdPersonaje().equals(idPersonaje)) {
@@ -446,7 +449,7 @@ public class Controller {
     
     
     
-    public void modificarPersonaje(String idPersonaje, String nombre, String servidor, String raza, int nivel, String faccion){
+    public void modificarPersonaje(Integer idPersonaje, String nombre, String servidor, String raza, int nivel, String faccion){
   
         int posicionPersonaje = buscarPersonajeEnSistemaPorId(idPersonaje);
          if(posicionPersonaje != -1){
@@ -547,7 +550,7 @@ public class Controller {
         return null;
      }
 
-     public boolean comprobarSiPersonajeEnHermandad(String idPersonaje, String idHermandad){
+     public boolean comprobarSiPersonajeEnHermandad(Integer idPersonaje, String idHermandad){
         for(Hermandad hermandad : getArrayDeHermandadesSistema()){
             if(hermandad.getIdHermandad().equals(idHermandad)){
                 for(Personaje personaje : hermandad.getListaMiembros()){

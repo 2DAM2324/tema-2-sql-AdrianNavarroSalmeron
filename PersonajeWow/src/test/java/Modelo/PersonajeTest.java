@@ -23,7 +23,7 @@ public class PersonajeTest {
   
     /**
      * Test of generateNewIdPersonaje method, of class Personaje.
-     */
+     
     @Test
     public void testGenerateNewIdPersonajeWith0LastId() {
         Personaje instance = new Personaje();

@@ -587,7 +587,7 @@ public class Ventana1 extends javax.swing.JFrame {
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
                 false, false, false, false, false
@@ -1365,7 +1365,7 @@ public class Ventana1 extends javax.swing.JFrame {
                  mostarSeccionInferiorDetallesPersonaje();
                  int posicionPersonaje = controlador.buscarPersonajeEnSistema(nombrePersonaje, servidorPersonaje);
                  jTextField_nombre_personaje.setText(controlador.getArrayDePersonajesDeSistema().get(posicionPersonaje).getNombre());
-                 jTextField_personaje_id.setText(controlador.getArrayDePersonajesDeSistema().get(posicionPersonaje).getIdPersonaje());
+                 jTextField_personaje_id.setText(Integer.toString(controlador.getArrayDePersonajesDeSistema().get(posicionPersonaje).getIdPersonaje()));
                  jTextField_personaje_raza.setText(controlador.getArrayDePersonajesDeSistema().get(posicionPersonaje).getRaza());
                  jTextField_personaje_nivel.setText(Integer.toString(controlador.getArrayDePersonajesDeSistema().get(posicionPersonaje).getNivel()));
                  jTextField_personaje_servidor.setText(controlador.getArrayDePersonajesDeSistema().get(posicionPersonaje).getServidor());
@@ -1411,8 +1411,8 @@ public class Ventana1 extends javax.swing.JFrame {
         }
         catch(Exception e){
             JOptionPane.showMessageDialog(this, "Error desconocido", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        
+             e.printStackTrace(); 
+        }  
      }
      
      private void jButton_cancelar_personajeActionPerformed(java.awt.event.ActionEvent evt){
@@ -1470,7 +1470,7 @@ public class Ventana1 extends javax.swing.JFrame {
             jTextField_personaje_servidor.setText(servidor);
             jTextField_personaje_raza.setText(raza);
             jTextField_personaje_nivel.setText(nivelStr);
-            jTextField_personaje_id.setText(personaje.getIdPersonaje());
+            jTextField_personaje_id.setText(Integer.toString(personaje.getIdPersonaje()));
             jComboBox_personaje_faccion.setSelectedItem(personaje.getFaccion());
         } else {
             // Mostrar un mensaje de error o advertencia si no se selecciona ninguna fila
@@ -1627,7 +1627,8 @@ public class Ventana1 extends javax.swing.JFrame {
           }
         }
         
-        String idPersonaje = controlador.getArrayDePersonajesDeSistema().get(controlador.buscarPersonajeEnSistema(NombrePersonajeInventario, ServidorInventario)).getIdPersonaje();
+        //TODO: ESTO SEGURO FALLA
+        Integer idPersonaje = controlador.getArrayDePersonajesDeSistema().get(controlador.buscarPersonajeEnSistema(NombrePersonajeInventario, ServidorInventario)).getIdPersonaje();
         System.out.println(idPersonaje);
 
         String idDeseada = "PJ2"; // Reemplaza esto con la ID que deseas buscar
@@ -1659,7 +1660,7 @@ public class Ventana1 extends javax.swing.JFrame {
             Personaje personaje = controlador.getArrayDePersonajesDeSistema().get(posicionPersonaje);
 
             try{
-                String idPersonaje = personaje.getIdPersonaje();
+                Integer idPersonaje = personaje.getIdPersonaje();
                 String nombrePersonajeConfirmar = jTextField_nombre_personaje.getText();
                 String servidorPersonajeModificar = jTextField_personaje_servidor.getText();
                 String razaPersonajeModificar = jTextField_personaje_raza.getText();
@@ -1860,14 +1861,14 @@ public class Ventana1 extends javax.swing.JFrame {
             // Obtén información de la fila seleccionada (puedes usar DefaultTableModel)
             DefaultTableModel model = (DefaultTableModel) jTable_inventario_objetos.getModel();
             String idInventario = (String) model.getValueAt(selectedRow, 0); // Suponiendo que la columna 1 contiene el nombre del objeto
-            String idPersonaje = (String) model.getValueAt(selectedRow, 1);
+            Integer idPersonaje = (Integer) model.getValueAt(selectedRow, 1);
             int numeroEspaciosOcupadosString = (int) model.getValueAt(selectedRow, 2);
 
             int posicionPersonaje = controlador.buscarPersonajeEnSistemaPorId(idPersonaje);
             jTextField_id_inventario.setText(idInventario);
             jTextField_inventario_nombre_personaje.setText(controlador.getArrayDePersonajesDeSistema().get(posicionPersonaje).getNombre());
             jTextField_inventario_servidor.setText(controlador.getArrayDePersonajesDeSistema().get(posicionPersonaje).getServidor());
-            controlador.cargarInventarioPersonajeEnTabla(idPersonaje);
+            controlador.cargarInventarioPersonajeEnTabla(idInventario);
             
             
         } 

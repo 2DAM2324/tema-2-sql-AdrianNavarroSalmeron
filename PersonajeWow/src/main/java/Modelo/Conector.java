@@ -57,13 +57,13 @@ public class Conector {
     }
     
 public void crearBaseDatos() {
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
         // Conectar a la base de datos
-         try (Statement stmt = conn.createStatement()) {
+         try (Statement stmt = conexion.createStatement()) {
             
             // Crear tabla si no existe
             String sqlObjeto = "CREATE TABLE IF NOT EXISTS objeto ("
-                    + "idObjeto TEXT PRIMARY KEY,"
+                    + "idObjeto TEXT PRIMARY KEY NOT NULL,"
                     + "rareza TEXT NOT NULL,"
                     + "descripcion TEXT NOT NULL,"
                     + "precio DOUBLE NOT NULL,"
@@ -83,7 +83,7 @@ public void crearBaseDatos() {
                      +")";
                      
                 String sqlPersonaje = "CREATE TABLE IF NOT EXISTS personaje ("
-                        + "idPersonaje TEXT PRIMARY KEY, "
+                        + "idPersonaje INTEGER PRIMARY KEY AUTOINCREMENT, "
                         + "nombre TEXT NOT NULL, "
                         + "servidor TEXT NOT NULL, "
                         + "faccion TEXT NOT NULL, "
@@ -110,7 +110,7 @@ public void crearBaseDatos() {
                            + ") ";
            
                    
-           /**
+          /**
            stmt.execute("DROP TABLE IF EXISTS relacionHermandadPersonaje");
            stmt.execute("DROP TABLE IF EXISTS InventarioObjeto");
            stmt.execute("DROP TABLE IF EXISTS personaje");
@@ -118,6 +118,7 @@ public void crearBaseDatos() {
            stmt.execute("DROP TABLE IF EXISTS hermandad");
            stmt.execute("DROP TABLE IF EXISTS objeto");
            * */
+           
            
                               
             // Ejecutar la consulta SQL
@@ -140,10 +141,10 @@ public void crearBaseDatos() {
     //CRUD de OBJETO
     public void insertarObjetoEnBd(Objeto objeto) {
          String sql = "INSERT INTO objeto (idObjeto, rareza, descripcion, precio, nombreObjeto) VALUES (?, ?, ?, ?, ?)";
-         Connection conn = instancia.getConexion();
+         Connection conexion = instancia.getConexion();
         // Conectar a la base de datos
         try{
-                PreparedStatement  consulta = conn.prepareStatement(sql);
+                PreparedStatement  consulta = conexion.prepareStatement(sql);
                 consulta.setString(1, objeto.getIdObjeto());
                 consulta.setString(2, objeto.getRareza());
                 consulta.setString(3, objeto.getDescripcion());
@@ -173,9 +174,9 @@ public void crearBaseDatos() {
 
     public void modificarObjetoEnBd(Objeto objeto){
         String sql = "UPDATE objeto SET rareza = ?, descripcion = ?, precio = ?, nombreObjeto = ? WHERE idObjeto = ?";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
         try{
-            PreparedStatement consulta = conn.prepareStatement(sql);
+            PreparedStatement consulta = conexion.prepareStatement(sql);
             consulta.setString(1, objeto.getRareza());
             consulta.setString(2, objeto.getDescripcion());
             consulta.setDouble(3, objeto.getPrecio());
@@ -191,9 +192,9 @@ public void crearBaseDatos() {
     public void borrarObjetoDeBd(Objeto objeto) {
         String sqlTablaObjeto = "DELETE FROM objeto WHERE idObjeto = ?";
         String sqlTablaInventarioObjeto = "DELETE FROM InventarioObjeto WHERE idObjeto = ?";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
         try {
-            PreparedStatement consultaInventarioObjeto = conn.prepareStatement(sqlTablaInventarioObjeto);
+            PreparedStatement consultaInventarioObjeto = conexion.prepareStatement(sqlTablaInventarioObjeto);
             PreparedStatement consultaObjeto = conn.prepareStatement(sqlTablaObjeto);
             consultaInventarioObjeto.setString(1, objeto.getIdObjeto());
             consultaInventarioObjeto.executeUpdate();
@@ -207,9 +208,9 @@ public void crearBaseDatos() {
     
     public void leerObjetosDeBd(ArrayList ObjetosSistema){
         String sql = "SELECT * FROM objeto";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
         try{
-            Statement statementObjeto = conn.createStatement();
+            Statement statementObjeto = conexion.createStatement();
             ResultSet resulsetObjeto = statementObjeto.executeQuery(sql);
             while(resulsetObjeto.next()){
                 String idObjeto = resulsetObjeto.getString("idObjeto");
@@ -229,40 +230,100 @@ public void crearBaseDatos() {
     //CRUD PERSONAJE
     
     public void insertarPersonajeYInventarioEnBD(Personaje personaje, Inventario inventario){
-        String sqlInventario = "INSERT INTO inventario (idInventario, idPersonaje, capacidadMaxima, espaciosOcupados) VALUES (?, ?, ?, ?)";
-         String sqlPersonaje = "INSERT INTO personaje (IdPersonaje, nombre, servidor, faccion, raza, idInventario, nivel) VALUES (?, ?, ?, ?, ?, ?, ?)";
-         Connection conn = instancia.getConexion();
-         
+        String sqlInventario = "INSERT INTO inventario (idInventario, capacidadMaxima, espaciosOcupados) VALUES (?, ?, ?)";
+        String sqlPersonaje = "INSERT INTO personaje (nombre, servidor, faccion, raza, idInventario, nivel) VALUES (?, ?, ?, ?, ?, ?)";
+        String modificacionInventario =   "UPDATE inventario SET idPersonaje = ? WHERE idInventario = ?";
+        Connection conexion = instancia.getConexion();
+        
          try{
-             PreparedStatement consultaInventario = conn.prepareStatement(sqlInventario);
-             PreparedStatement consultaPersonaje = conn.prepareStatement(sqlPersonaje);
+             PreparedStatement consultaInventario = conexion.prepareStatement(sqlInventario);
+             PreparedStatement consultaPersonaje = conexion.prepareStatement(sqlPersonaje);
+             PreparedStatement consultaInventarioModificacion = conexion.prepareStatement(modificacionInventario);
              consultaInventario.setString(1, inventario.getIdInventario());
-             consultaInventario.setString(2, personaje.getIdPersonaje());
-             consultaInventario.setInt(3, inventario.getCapacidadMaxima());
-             consultaInventario.setInt(4, inventario.getEspaciosOcupados());
+             consultaInventario.setInt(2, inventario.getCapacidadMaxima());
+             consultaInventario.setInt(3, inventario.getEspaciosOcupados());
              consultaInventario.executeUpdate();
              
-             consultaPersonaje.setString(1, personaje.getIdPersonaje());
-             consultaPersonaje.setString(2, personaje.getNombre());
-             consultaPersonaje.setString(3, personaje.getServidor());
-             consultaPersonaje.setString(4, personaje.getFaccion());
-             consultaPersonaje.setString(5, personaje.getRaza());
-             consultaPersonaje.setString(6, inventario.getIdInventario());
-             consultaPersonaje.setInt(7, personaje.getNivel());
+             //consultaPersonaje.setInt(1, personaje.getIdPersonaje());
+             consultaPersonaje.setString(1, personaje.getNombre());
+             consultaPersonaje.setString(2, personaje.getServidor());
+             consultaPersonaje.setString(3, personaje.getFaccion());
+             consultaPersonaje.setString(4, personaje.getRaza());
+             consultaPersonaje.setString(5, inventario.getIdInventario());
+             consultaPersonaje.setInt(6, personaje.getNivel());
              consultaPersonaje.executeUpdate();
              
              
+             // Recuperamos la id que ha creado la base de datos para nuestro personaje
+             ResultSet generatedKeys = consultaPersonaje.getGeneratedKeys();
+             int idPersonaje = -1;
+             if (generatedKeys.next()) {
+                 idPersonaje = generatedKeys.getInt(1);
+             }
+             
+             consultaInventarioModificacion.setInt(1, idPersonaje);
+             consultaInventarioModificacion.setString(2, inventario.getIdInventario());
+             consultaInventarioModificacion.executeUpdate();   
+         }catch(SQLIntegrityConstraintViolationException e){
+             e.printStackTrace();
+             System.err.println("CLAVE PRIMARIA REPETIDA EN PERSONAJE");
          }catch(Exception e){
              e.printStackTrace();
              System.err.println("Error al insertar Personaje:" + e.getMessage());
          }     
     }
 
+    /**
+     * 
+ /
+     *
+     **
+     * @param nombre del personaje
+     * @param servidor servidor del personaje
+     * @param ArrayListDePersonajesSistema ArrayList donde se almacenarán los
+     * personajes
+     */
+    public void leerPersonaje(String nombre, String servidor, ArrayList<Personaje> ArrayListDePersonajesSistema) {
+        String sql = "SELECT idPersonaje, nombre, servidor, faccion, raza, idInventario, nivel FROM personaje WHERE nombre = ? AND servidor = ?";
+        Connection conexion = instancia.getConexion();
+
+        try {
+            PreparedStatement preparedStatement = conexion.prepareStatement(sql);
+            preparedStatement.setString(1, nombre);
+            preparedStatement.setString(2, servidor);
+
+            ResultSet resulsetPersonaje = preparedStatement.executeQuery();
+
+            while (resulsetPersonaje.next()) {
+                Personaje personaje = new Personaje();
+                Integer idPersonaje = resulsetPersonaje.getInt("idPersonaje");
+                String nombrePersonaje = resulsetPersonaje.getString("nombre");
+                String servidorPersonaje = resulsetPersonaje.getString("servidor");
+                String faccionPersonaje = resulsetPersonaje.getString("faccion");
+                String razaPersonaje = resulsetPersonaje.getString("raza");
+                Integer idInventario = resulsetPersonaje.getInt("idInventario");
+                Integer nivelPersonaje = resulsetPersonaje.getInt("nivel");
+
+                personaje.setIdPersonaje(idPersonaje);
+                personaje.setNombre(nombrePersonaje);
+                personaje.setServidor(servidorPersonaje);
+                personaje.setFaccion(faccionPersonaje);
+                personaje.setRaza(razaPersonaje);
+                personaje.setNivel(nivelPersonaje);
+
+                ArrayListDePersonajesSistema.add(personaje);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public void leerInventario(ArrayList inventariosSistema){
         String sql = "SELECT * FROM inventario";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
         try{
-            Statement statementInventario = conn.createStatement();
+            Statement statementInventario = conexion.createStatement();
             ResultSet resulsetInventario = statementInventario.executeQuery(sql);
             while(resulsetInventario.next()){
                 String idInventario = resulsetInventario.getString("idInventario");
@@ -279,16 +340,16 @@ public void crearBaseDatos() {
 
     public void modificarPersonajeBd(Personaje personaje){
         String sql = "UPDATE personaje SET nombre = ?, servidor = ?, faccion = ?, raza = ?, nivel = ? WHERE idPersonaje = ?";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
 
         try{
-            PreparedStatement consulta = conn.prepareStatement(sql);
+            PreparedStatement consulta = conexion.prepareStatement(sql);
             consulta.setString(1, personaje.getNombre());
             consulta.setString(2, personaje.getServidor());
             consulta.setString(3, personaje.getFaccion());
             consulta.setString(4, personaje.getRaza());
             consulta.setInt(5, personaje.getNivel());
-            consulta.setString(6, personaje.getIdPersonaje());
+            consulta.setInt(6, personaje.getIdPersonaje());
             consulta.executeUpdate();
         }catch(Exception e){
             e.printStackTrace();
@@ -300,21 +361,21 @@ public void crearBaseDatos() {
     public void borrarPersonajeIventarioBd(Personaje personaje){
         String sqlTablaPersonaje = "DELETE FROM personaje WHERE idPersonaje = ?";
         String sqlTablaInventario = "DELETE FROM inventario WHERE idInventario = ?";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
 
         try{
-            PreparedStatement consultaPersonaje = conn.prepareStatement(sqlTablaPersonaje);
-            PreparedStatement consultaInventario = conn.prepareStatement(sqlTablaInventario);
-            PreparedStatement consultaHermandadPersonaje = conn.prepareStatement("DELETE FROM hermandadPersonaje WHERE idPersonaje = ?");
+            PreparedStatement consultaPersonaje = conexion.prepareStatement(sqlTablaPersonaje);
+            PreparedStatement consultaInventario = conexion.prepareStatement(sqlTablaInventario);
+            PreparedStatement consultaHermandadPersonaje = conexion.prepareStatement("DELETE FROM hermandadPersonaje WHERE idPersonaje = ?");
             
             //Borramos la relacion con la hermandad
-            consultaHermandadPersonaje.setString(1, personaje.getIdPersonaje());
+            consultaHermandadPersonaje.setInt(1, personaje.getIdPersonaje());
             consultaHermandadPersonaje.executeUpdate();
             //Borramos el inventario del personaje
             consultaInventario.setString(1, personaje.getInventario().getIdInventario());
             consultaInventario.executeUpdate();
             //Borramos el personaje
-            consultaPersonaje.setString(1, personaje.getIdPersonaje());
+            consultaPersonaje.setInt(1, personaje.getIdPersonaje());
             consultaPersonaje.executeUpdate();
         }catch(Exception e){
             e.printStackTrace();
@@ -325,13 +386,13 @@ public void crearBaseDatos() {
     //Lee el personaje de la base de datos
     public void leerPersonajeDeBd(ArrayList personajesSitema, ArrayList inventariosSistema, ArrayList<Hermandad> hermandadesSistema){
         String sql = "SELECT * FROM personaje";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
 
         try{
-            Statement statementPersonaje = conn.createStatement();
+            Statement statementPersonaje = conexion.createStatement();
             ResultSet resulsetPersonaje = statementPersonaje.executeQuery(sql);
             while(resulsetPersonaje.next()){
-                String idPersonaje = resulsetPersonaje.getString("idPersonaje");
+                Integer idPersonaje = resulsetPersonaje.getInt("idPersonaje");
                 String nombre = resulsetPersonaje.getString("nombre");
                 String servidor = resulsetPersonaje.getString("servidor");
                 String faccion = resulsetPersonaje.getString("faccion");
@@ -345,7 +406,14 @@ public void crearBaseDatos() {
                     }
                 }
                 //Creamos el personaje con los parametros de la bd 
-                Personaje personaje = new Personaje(idPersonaje, nombre, servidor, faccion, raza, nivel, inventario);
+               Personaje personaje = new Personaje();
+               personaje.setNombre(nombre);
+               personaje.setServidor(servidor);
+               personaje.setFaccion(faccion);
+               personaje.setRaza(raza);
+               personaje.setNivel(nivel);
+               personaje.setAniadirInventarioaPersonaje(inventario);
+               personaje.setIdPersonaje(idPersonaje);
                 //Leemos las hermandades del personaje
                 for(int i = 0; i < hermandadesSistema.size(); i++){
                     for(int j = 0; j < hermandadesSistema.get(i).getListaMiembros().size(); j++){
@@ -368,11 +436,10 @@ public void crearBaseDatos() {
 
     public void insertarHermandadEnBD(Hermandad hermandad) {
         String sql = "INSERT INTO hermandad (idHermandad, nombreHermandad, servidorHermandad, numeroMiembros) VALUES (?, ?, ?, ?)";
-        Connection conn = instancia.getConexion();
-
-        // Conectar a la base de datos
+        Connection conexion = instancia.getConexion();
+        
         try{
-                PreparedStatement  consulta = conn.prepareStatement(sql);
+                PreparedStatement  consulta = conexion.prepareStatement(sql);
                 consulta.setString(1, hermandad.getIdHermandad());
                 consulta.setString(2, hermandad.getNombreHermandad());
                 consulta.setString(3, hermandad.getServidorHermandad());
@@ -386,10 +453,10 @@ public void crearBaseDatos() {
 
     public void modificarHermandadEnBd(Hermandad hermandad){
         String sql = "UPDATE hermandad SET nombreHermandad = ?, servidorHermandad = ?, numeroMiembros = ? WHERE idHermandad = ?";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
 
         try{
-            PreparedStatement consulta = conn.prepareStatement(sql);
+            PreparedStatement consulta = conexion.prepareStatement(sql);
             consulta.setString(1, hermandad.getNombreHermandad());
             consulta.setString(2, hermandad.getServidorHermandad());
             consulta.setInt(3, hermandad.getNumeroMiembros());
@@ -404,11 +471,11 @@ public void crearBaseDatos() {
     public void borrarHermandadBd(Hermandad hermandad) {
         String sqlTablaHermandad = "DELETE FROM hermandad WHERE idHermandad = ?";
         String sqlTablaHermandadPersonaje = "DELETE FROM hermandadPersonaje WHERE idHermandad = ?";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
 
         try{
-            PreparedStatement consultaHermandadPersonaje = conn.prepareStatement(sqlTablaHermandadPersonaje);
-            PreparedStatement consultaHermandad = conn.prepareStatement(sqlTablaHermandad);
+            PreparedStatement consultaHermandadPersonaje = conexion.prepareStatement(sqlTablaHermandadPersonaje);
+            PreparedStatement consultaHermandad = conexion.prepareStatement(sqlTablaHermandad);
             consultaHermandadPersonaje.setString(1, hermandad.getIdHermandad());
             consultaHermandadPersonaje.executeUpdate();
             consultaHermandad.setString(1, hermandad.getIdHermandad());
@@ -421,10 +488,10 @@ public void crearBaseDatos() {
 
     public void leerHermandad(ArrayList ArrayDeHermandadesSistema){
         String sql = "SELECT * FROM hermandad";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
 
         try{
-            Statement statementHermandad = conn.createStatement();
+            Statement statementHermandad = conexion.createStatement();
             ResultSet resulsetHermandad = statementHermandad.executeQuery(sql);
             while(resulsetHermandad.next()){
                 String idHermandad = resulsetHermandad.getString("idHermandad");
@@ -442,10 +509,10 @@ public void crearBaseDatos() {
 
     public void leerHermandadPersonaje(ArrayList<Hermandad> arrayDeHermandadesSistema, ArrayList<Personaje> personajesSistema){
         String sql = "SELECT * FROM hermandadPersonaje";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
 
         try{
-            Statement statementHermandadPersonaje = conn.createStatement();
+            Statement statementHermandadPersonaje = conexion.createStatement();
             ResultSet resulsetHermandadPersonaje = statementHermandadPersonaje.executeQuery(sql);
             while(resulsetHermandadPersonaje.next()){
                 String idHermandad = resulsetHermandadPersonaje.getString("idHermandad");
@@ -479,12 +546,12 @@ public void crearBaseDatos() {
 
     public void insertarPersonajeHermandad(Personaje personaje, Hermandad hermandad){
         String sql = "INSERT INTO hermandadPersonaje (idHermandad, idPersonaje) VALUES (?, ?)";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
 
         try{
-            PreparedStatement consulta = conn.prepareStatement(sql);
+            PreparedStatement consulta = conexion.prepareStatement(sql);
             consulta.setString(1, hermandad.getIdHermandad());
-            consulta.setString(2, personaje.getIdPersonaje());
+            consulta.setInt(2, personaje.getIdPersonaje());
             consulta.executeUpdate();
         }catch(Exception e){
             e.printStackTrace();
@@ -494,12 +561,12 @@ public void crearBaseDatos() {
 
     public void borrarPersonajeHermandad(Personaje personaje, Hermandad hermandad){
         String sql = "DELETE FROM hermandadPersonaje WHERE idHermandad = ? AND idPersonaje = ?";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
 
         try{
-            PreparedStatement consulta = conn.prepareStatement(sql);
+            PreparedStatement consulta = conexion.prepareStatement(sql);
             consulta.setString(1, hermandad.getIdHermandad());
-            consulta.setString(2, personaje.getIdPersonaje());
+            consulta.setInt(2, personaje.getIdPersonaje());
             consulta.executeUpdate();
         }catch(Exception e){
             e.printStackTrace();
@@ -509,10 +576,10 @@ public void crearBaseDatos() {
 
     public void insertarObjetoEnInventario(Objeto objeto, Inventario inventario){
         String sql = "INSERT INTO InventarioObjeto (idInventario, idObjeto) VALUES (?, ?)";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
 
         try{
-            PreparedStatement consulta = conn.prepareStatement(sql);
+            PreparedStatement consulta = conexion.prepareStatement(sql);
             consulta.setString(1, inventario.getIdInventario());
             consulta.setString(2, objeto.getIdObjeto());
             consulta.executeUpdate();
@@ -524,10 +591,10 @@ public void crearBaseDatos() {
 
     public void borrarObjetoEnInventario(Objeto objeto, Inventario inventario){
         String sql = "DELETE FROM InventarioObjeto WHERE idInventario = ? AND idObjeto = ?";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
 
         try{
-            PreparedStatement consulta = conn.prepareStatement(sql);
+            PreparedStatement consulta = conexion.prepareStatement(sql);
             consulta.setString(1, inventario.getIdInventario());
             consulta.setString(2, objeto.getIdObjeto());
             consulta.executeUpdate();
@@ -539,10 +606,10 @@ public void crearBaseDatos() {
 
     public void modificarInventario(Inventario inventario){
         String sql = "UPDATE inventario SET espaciosOcupados = ? WHERE idInventario = ?";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
 
         try{
-            PreparedStatement consulta = conn.prepareStatement(sql);
+            PreparedStatement consulta = conexion.prepareStatement(sql);
             consulta.setInt(1, inventario.getEspaciosOcupados());
             consulta.setString(2, inventario.getIdInventario());
             consulta.executeUpdate();
@@ -563,10 +630,10 @@ public void crearBaseDatos() {
 
     public void leerInventarioObjeto(ArrayList<Inventario> inventario, ArrayList<Objeto> objetos){
         String sql = "SELECT * FROM InventarioObjeto";
-        Connection conn = instancia.getConexion();
+        Connection conexion = instancia.getConexion();
 
         try{
-            Statement statementInventarioObjeto = conn.createStatement();
+            Statement statementInventarioObjeto = conexion.createStatement();
             ResultSet resulsetInventarioObjeto = statementInventarioObjeto.executeQuery(sql);
             while(resulsetInventarioObjeto.next()){
                 String idInventario = resulsetInventarioObjeto.getString("idInventario");

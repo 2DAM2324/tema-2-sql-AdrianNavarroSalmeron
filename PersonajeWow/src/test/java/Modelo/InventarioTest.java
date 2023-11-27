@@ -100,7 +100,7 @@ public class InventarioTest {
     @Test
     public void testSetIdPersonaje() {
         System.out.println("setIdPersonaje");
-        String idPersonajeSet = "Prueba";
+        Integer idPersonajeSet = 1;
         Inventario instance = new Inventario();
         instance.setIdPersonaje(idPersonajeSet);
         assertEquals(idPersonajeSet, instance.idPersonaje);
@@ -112,9 +112,9 @@ public class InventarioTest {
     @Test
     public void testGetIdPersonaje() {
         Inventario instance = new Inventario();
-        String expResult = "Hola";
+        Integer expResult = 1;
         instance.setIdPersonaje(expResult);
-        String result = instance.getIdPersonaje();
+        Integer result = instance.getIdPersonaje();
         assertEquals(expResult, result);
     }
 

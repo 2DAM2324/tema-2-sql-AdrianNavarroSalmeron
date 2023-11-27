@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package Modelo;
 
 
@@ -12,14 +9,13 @@ import java.util.ArrayList;
  * @author AdrianNS
  */
 public class Personaje {
-    private static int lastIdPersonaje = 0; // Variable de rastreo del último idPersonaje asignado
     String nombre;
     String servidor;
     String faccion; //Alianza u Horda
     String raza; 
     int nivel; //1-80
     Inventario inventarioPersonaje;
-    String idPersonaje;
+    Integer idPersonaje;
     ArrayList<Hermandad> listaHermandades;
     
     public void setNombre(String nombreSet){
@@ -70,11 +66,11 @@ public class Personaje {
         return inventarioPersonaje;
     }
     
-    public void setIdPersonaje(String idPersonajeSet){
+    public void setIdPersonaje(Integer idPersonajeSet){
         idPersonaje = idPersonajeSet;
     }
     
-    public String getIdPersonaje(){
+    public Integer getIdPersonaje(){
         return idPersonaje;
     }
 
@@ -85,19 +81,12 @@ public class Personaje {
     public ArrayList <Hermandad> getListaHermandadades(){
         return listaHermandades;
     }
-    
-    public void setLastIdPersonaje(int id){
-        lastIdPersonaje = id;
-    }
-    
-    public int getLastIdPersonaje(){
-        return lastIdPersonaje;
-    }
+
     
     public Personaje(){
         Inventario inventario = new Inventario();
         ArrayList <Hermandad> hermandades = new  ArrayList<>();
-        setIdPersonaje(generateNewIdPersonaje());
+        setIdPersonaje(null);
         setNombre(null);
         setServidor(null);
         setFaccion(null);
@@ -108,7 +97,7 @@ public class Personaje {
         
     }
     
-    public Personaje(String idPersonaje, String nombre, String servidor, String faccion, String raza, int nivel, Inventario inventario, ArrayList<Hermandad> listaHermandad){
+    public Personaje(Integer idPersonaje, String nombre, String servidor, String faccion, String raza, int nivel, Inventario inventario, ArrayList<Hermandad> listaHermandad){
         setIdPersonaje(idPersonaje);
         setNombre(nombre);
         setServidor(servidor);
@@ -120,7 +109,7 @@ public class Personaje {
     }
 
     //Constructor usado en el conector.
-    public Personaje(String idPersonaje, String nombre, String servidor, String faccion, String raza, int nivel, Inventario inventario){
+    public Personaje(Integer idPersonaje, String nombre, String servidor, String faccion, String raza, int nivel, Inventario inventario){
         ArrayList <Hermandad> hermandad = new ArrayList<>();
         setIdPersonaje(idPersonaje);
         setNombre(nombre);
@@ -131,15 +120,7 @@ public class Personaje {
         setInventario(inventario);
         setListaHermandades(hermandad);
     }
-    
-     public String generateNewIdPersonaje() {
-        lastIdPersonaje++; // Incrementa el valor del último idPersonaje
-        String idGenerada = "PJ" + lastIdPersonaje;  
-        return idGenerada;
-    }
-
-  
-    
+        
     public void setAniadirInventarioaPersonaje(Inventario inventario){
         if(this.getInventario()!= null){
             this.setInventario(inventario);
