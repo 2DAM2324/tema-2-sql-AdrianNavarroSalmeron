@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import static org.mockito.Mockito.never;
 import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.verify;
@@ -75,7 +76,7 @@ public void setUp() {
         String rareza = "Comun";
         String precio = "10.5";
         String descripcion = "Es una espada";
-        String IdObjeto = "OB1";
+        String IdObjeto = "OB5";
 
         double precioDouble = Double.parseDouble(precio);
 
@@ -98,4 +99,65 @@ public void setUp() {
         assertEquals(descripcion, capturedObjeto.getDescripcion());
         assertEquals(IdObjeto, capturedObjeto.getIdObjeto());
     }
+
+   @Test
+    public void testAniadirObjetoSinNombre() {
+       
+        String nombreObjeto = null;
+        String rareza = "Comun";
+        String precio = "10.5";
+        String descripcion = "Es una espada";
+        String IdObjeto = "OB2";
+
+        controlador.aniadirObjeto(nombreObjeto, rareza, precio, descripcion, IdObjeto);
+
+        // Verificamos que se ha llamado al metodo insertarObjetoEnBd con un objeto y capturamos el argumento
+        verify(mockConector, never()).insertarObjetoEnBd(any(Objeto.class));
+    }
+
+    @Test
+    public void testAniadirObjetoSinRareza() {
+       
+        String nombreObjeto = "Espada";
+        String rareza = null;
+        String precio = "10.5";
+        String descripcion = "Es una espada";
+        String IdObjeto = "OB2";
+
+        controlador.aniadirObjeto(nombreObjeto, rareza, precio, descripcion, IdObjeto);
+
+        // Verificamos que se ha llamado al metodo insertarObjetoEnBd con un objeto y capturamos el argumento
+        verify(mockConector, never()).insertarObjetoEnBd(any(Objeto.class));
+    }
+
+    @Test
+    public void testAniadirObjetoSinPrecio() {
+       
+        String nombreObjeto = "Espada";
+        String rareza = "Comun";
+        String precio = null;
+        String descripcion = "Es una espada";
+        String IdObjeto = "OB2";
+
+        controlador.aniadirObjeto(nombreObjeto, rareza, precio, descripcion, IdObjeto);
+
+        // Verificamos que se ha llamado al metodo insertarObjetoEnBd con un objeto y capturamos el argumento
+        verify(mockConector, never()).insertarObjetoEnBd(any(Objeto.class));
+    }
+
+    @Test
+    public void testAniadirObjetoSinDescripcion() {
+       
+        String nombreObjeto = "Espada";
+        String rareza = "Comun";
+        String precio = "10.5";
+        String descripcion = null;
+        String IdObjeto = "OB2";
+
+        controlador.aniadirObjeto(nombreObjeto, rareza, precio, descripcion, IdObjeto);
+
+        // Verificamos que se ha llamado al metodo insertarObjetoEnBd con un objeto y capturamos el argumento
+        verify(mockConector, never()).insertarObjetoEnBd(any(Objeto.class));
+    }
+
 }
