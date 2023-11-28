@@ -154,7 +154,7 @@ public class Controller {
                 conector.borrarObjetoEnInventario(getArrayDeObjetosSistema().get(posicionObjeto), getArrayDeInventariosSistema().get(posicionInventario));
                 cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
                 cargarPersonajesEnTabla(ArrayDePersonajesSistema);
-                cargarInventarioPersonajeEnTabla(idInventario);
+                cargarInventarioPersonajeEnTabla(getArrayDeInventariosSistema().get(posicionInventario).getIdPersonaje());
                 JOptionPane.showMessageDialog(vista, "Objeto borrado correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);
             }
             else{
@@ -268,7 +268,7 @@ public class Controller {
         return vista;
     }
 
-    public void cargarInventarioPersonajeEnTabla(String idPersonaje){
+    public void cargarInventarioPersonajeEnTabla(Integer idPersonaje){
         DefaultTableModel model = (DefaultTableModel) vista.jTable_inventario_personaje.getModel();
         while(model.getRowCount()  > 0){
             model.removeRow(0);

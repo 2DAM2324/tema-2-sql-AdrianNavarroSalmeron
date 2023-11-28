@@ -1865,7 +1865,7 @@ public class Ventana1 extends javax.swing.JFrame {
             jTextField_id_inventario.setText(idInventario);
             jTextField_inventario_nombre_personaje.setText(controlador.getArrayDePersonajesDeSistema().get(posicionPersonaje).getNombre());
             jTextField_inventario_servidor.setText(controlador.getArrayDePersonajesDeSistema().get(posicionPersonaje).getServidor());
-            controlador.cargarInventarioPersonajeEnTabla(idInventario);
+            controlador.cargarInventarioPersonajeEnTabla(idPersonaje);
             
             
         } 
