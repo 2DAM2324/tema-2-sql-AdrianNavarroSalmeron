@@ -55,12 +55,14 @@ public class Conector {
         }
         return conn;
     }
-    
+
+    /**
+     * @brief Crea la base de datos y las tablas si no existen
+     */
 public void crearBaseDatos() {
         Connection conexion = instancia.getConexion();
         // Conectar a la base de datos
-         try (Statement stmt = conexion.createStatement()) {
-            
+         try (Statement stmt = conexion.createStatement();) {
             // Crear tabla si no existe
             String sqlObjeto = "CREATE TABLE IF NOT EXISTS objeto ("
                     + "idObjeto TEXT PRIMARY KEY NOT NULL,"
@@ -139,19 +141,23 @@ public void crearBaseDatos() {
 
     
     //CRUD de OBJETO
+    /**
+     * @brief Inserta un objeto en la base de datos
+     * @param objeto Objeto a insertar
+     */
     public void insertarObjetoEnBd(Objeto objeto) {
          String sql = "INSERT INTO objeto (idObjeto, rareza, descripcion, precio, nombreObjeto) VALUES (?, ?, ?, ?, ?)";
          Connection conexion = instancia.getConexion();
         // Conectar a la base de datos
         try{
-                PreparedStatement  consulta = conexion.prepareStatement(sql);
-                consulta.setString(1, objeto.getIdObjeto());
-                consulta.setString(2, objeto.getRareza());
-                consulta.setString(3, objeto.getDescripcion());
-                consulta.setDouble(4, objeto.getPrecio());
-                consulta.setString(5, objeto.getNombreObjeto()); 
-                consulta.executeUpdate();
-        
+            PreparedStatement  consulta = conexion.prepareStatement(sql);
+            consulta.setString(1, objeto.getIdObjeto());
+            consulta.setString(2, objeto.getRareza());
+            consulta.setString(3, objeto.getDescripcion());
+            consulta.setDouble(4, objeto.getPrecio());
+            consulta.setString(5, objeto.getNombreObjeto()); 
+            consulta.executeUpdate();
+    
         }
         catch(SQLIntegrityConstraintViolationException e){
             e.printStackTrace();
@@ -166,11 +172,12 @@ public void crearBaseDatos() {
             System.err.println("Objeto NULL:" + e.getMessage());
 
         }
-        catch(Exception e){
-            e.printStackTrace();
-            System.err.println("ERROR generico en OBJETO" + e.getMessage());
-        }
     }
+
+    /**
+     * @brief Modifica un objeto en la base de datos
+     * @param objeto Objeto a modificar
+     */
 
     public void modificarObjetoEnBd(Objeto objeto){
         String sql = "UPDATE objeto SET rareza = ?, descripcion = ?, precio = ?, nombreObjeto = ? WHERE idObjeto = ?";
@@ -183,12 +190,20 @@ public void crearBaseDatos() {
             consulta.setString(4, objeto.getNombreObjeto());
             consulta.setString(5, objeto.getIdObjeto());
             consulta.executeUpdate();
-        }catch(Exception e){
+        }catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al modificar Objeto:" + e.getMessage());
         }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("Objeto NULL:" + e.getMessage());
+        }
     }
     
+    /**
+     * @brief Borra un objeto de la base de datos
+     * @param objeto Objeto a borrar
+     */
     public void borrarObjetoDeBd(Objeto objeto) {
         String sqlTablaObjeto = "DELETE FROM objeto WHERE idObjeto = ?";
         String sqlTablaInventarioObjeto = "DELETE FROM InventarioObjeto WHERE idObjeto = ?";
@@ -200,12 +215,21 @@ public void crearBaseDatos() {
             consultaInventarioObjeto.executeUpdate();
             consultaObjeto.setString(1, objeto.getIdObjeto());
             consultaObjeto.executeUpdate();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             System.err.println("Error al borrar Objeto:" + e.getMessage());
         }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("Objeto NULL:" + e.getMessage());
+        }
     }
     
+    /**
+     * @brief Lee un objeto de la base de datos
+     * @param idObjeto Id del objeto a leer
+     * @param ArrayListDeObjetosSistema ArrayList donde se almacenarán los objetos
+     */
     public void leerObjetosDeBd(ArrayList ObjetosSistema){
         String sql = "SELECT * FROM objeto";
         Connection conexion = instancia.getConexion();
@@ -221,14 +245,23 @@ public void crearBaseDatos() {
                 Objeto objeto = new Objeto(idObjeto, rareza, descripcion, precio, nombreObjeto);
                 ObjetosSistema.add(objeto);
             }
-        }catch(Exception e){
+        }catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al leer Objetos:" + e.getMessage());
+        }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("Objeto NULL:" + e.getMessage());
         }
     }
     
     //CRUD PERSONAJE
     
+    /**
+     * @brief Inserta un personaje en la base de datos y su inventario
+     * @param personaje Personaje a insertar
+     * @param inventario Inventario del personaje a insertar
+     */
     public void insertarPersonajeYInventarioEnBD(Personaje personaje, Inventario inventario) {
         String sqlInventario = "INSERT INTO inventario (idInventario, capacidadMaxima, espaciosOcupados) VALUES (?, ?, ?)";
         String sqlPersonaje = "INSERT INTO personaje (nombre, servidor, faccion, raza, idInventario, nivel) VALUES (?, ?, ?, ?, ?, ?)";
@@ -294,6 +327,10 @@ public void crearBaseDatos() {
                 e.printStackTrace();
                 System.err.println("Error cerrando recursos: " + e.getMessage());
             }
+            catch(NullPointerException e){
+                e.printStackTrace();
+                System.err.println("Objeto NULL:" + e.getMessage());
+            }
         }
     }
 
@@ -341,9 +378,16 @@ public void crearBaseDatos() {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("Personaje NULL:" + e.getMessage());
+        }
     }
 
-
+    /**
+     * @brief lee un personaje de la base de datos y cada inventario que lee lo mete en el array de inventarios
+     * @param inventariosSistema ArrayList donde se almacenarán los inventarios
+     */
     public void leerInventario(ArrayList inventariosSistema){
         String sql = "SELECT * FROM inventario";
         Connection conexion = instancia.getConexion();
@@ -357,12 +401,20 @@ public void crearBaseDatos() {
                 Inventario inventario = new Inventario(idInventario, capacidadMaxima, espaciosOcupados);
                 inventariosSistema.add(inventario);
             }
-        }catch(Exception e){
+        }catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al leer Inventario:" + e.getMessage());
         }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("Inventario NULL:" + e.getMessage());
+        }
     }
 
+    /**
+     * @brief Modifica un personaje en la base de datos
+     * @param personaje Personaje a modificar
+     */
     public void modificarPersonajeBd(Personaje personaje){
         String sql = "UPDATE personaje SET nombre = ?, servidor = ?, faccion = ?, raza = ?, nivel = ? WHERE idPersonaje = ?";
         Connection conexion = instancia.getConexion();
@@ -376,13 +428,20 @@ public void crearBaseDatos() {
             consulta.setInt(5, personaje.getNivel());
             consulta.setInt(6, personaje.getIdPersonaje());
             consulta.executeUpdate();
-        }catch(Exception e){
+        }catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al modificar Personaje:" + e.getMessage());
         }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("Objeto NULL:" + e.getMessage());
+        }
     }
 
-    //Borra el personaje de la hermandad y su inventario
+    /**
+     * @brief Borra un personaje de la base de datos. Primero borra el personaje de la hermandad, luego su inventario y por ultimo el personaje
+     * @param personaje Personaje a borrar
+     */
     public void borrarPersonajeIventarioBd(Personaje personaje){
         String sqlTablaPersonaje = "DELETE FROM personaje WHERE idPersonaje = ?";
         String sqlTablaInventario = "DELETE FROM inventario WHERE idInventario = ?";
@@ -402,13 +461,22 @@ public void crearBaseDatos() {
             //Borramos el personaje
             consultaPersonaje.setInt(1, personaje.getIdPersonaje());
             consultaPersonaje.executeUpdate();
-        }catch(Exception e){
+        }catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al borrar Personaje:" + e.getMessage());
         }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("Personaje NULL:" + e.getMessage());
+        }
     }
 
-    //Lee el personaje de la base de datos
+    /**
+     * @brief Lee un personaje de la base de datos y lo añade al array de personajes
+     * @param personajesSitema ArrayList donde se almacenarán los personajes
+     * @param inventariosSistema ArrayList donde esta el inventario del personaje
+     * @param hermandadesSistema ArrayList donde se busca las hermandades donde esta el personaje
+     */
     public void leerPersonajeDeBd(ArrayList personajesSitema, ArrayList inventariosSistema, ArrayList<Hermandad> hermandadesSistema){
         String sql = "SELECT * FROM personaje";
         Connection conexion = instancia.getConexion();
@@ -450,15 +518,23 @@ public void crearBaseDatos() {
                 personaje.getInventario().setIdPersonaje(personaje.getIdPersonaje());
                 personajesSitema.add(personaje);
             }
-        }catch(Exception e){
+        }catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al leer Personaje:" + e.getMessage());
+        }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("Personaje NULL:" + e.getMessage());
         }
 
     }
 
     //Crud de hermandad
 
+    /**
+     * @brief Inserta una hermandad en la base de datos
+     * @param hermandad Hermandad a insertar
+     */
     public void insertarHermandadEnBD(Hermandad hermandad) {
         String sql = "INSERT INTO hermandad (idHermandad, nombreHermandad, servidorHermandad, numeroMiembros) VALUES (?, ?, ?, ?)";
         Connection conexion = instancia.getConexion();
@@ -470,12 +546,20 @@ public void crearBaseDatos() {
                 consulta.setString(3, hermandad.getServidorHermandad());
                 consulta.setInt(4, hermandad.getNumeroMiembros());
                 consulta.executeUpdate();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             System.err.println("Error al insertar Hermandad:" + e.getMessage());
         }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("Hermandad NULL:" + e.getMessage());
+        }
     }
 
+    /**
+     * @brief Modifica una hermandad en la base de datos, no se puede modificar la ID
+     * @param hermandad Hermandad a modificar
+     */
     public void modificarHermandadEnBd(Hermandad hermandad){
         String sql = "UPDATE hermandad SET nombreHermandad = ?, servidorHermandad = ?, numeroMiembros = ? WHERE idHermandad = ?";
         Connection conexion = instancia.getConexion();
@@ -487,12 +571,20 @@ public void crearBaseDatos() {
             consulta.setInt(3, hermandad.getNumeroMiembros());
             consulta.setString(4, hermandad.getIdHermandad());
             consulta.executeUpdate();
-        }catch(Exception e){
+        }catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al modificar Hermandad:" + e.getMessage());
         }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("Hermandad NULL:" + e.getMessage());
+        }
     }
     
+    /**
+     * @brief Borra una hermandad de la base de datos
+     * @param hermandad Hermandad a borrar
+     */
     public void borrarHermandadBd(Hermandad hermandad) {
         String sqlTablaHermandad = "DELETE FROM hermandad WHERE idHermandad = ?";
         String sqlTablaHermandadPersonaje = "DELETE FROM hermandadPersonaje WHERE idHermandad = ?";
@@ -505,12 +597,20 @@ public void crearBaseDatos() {
             consultaHermandadPersonaje.executeUpdate();
             consultaHermandad.setString(1, hermandad.getIdHermandad());
             consultaHermandad.executeUpdate();
-        } catch (Exception e) {
+        }catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al borrar Hermandad:" + e.getMessage());
         }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("Hermandad NULL:" + e.getMessage());
+        }
     }
 
+    /**
+     * @brief Lee una hermandad de la base de datos y la añade al array de hermandades
+     * @param ArrayDeHermandadesSistema ArrayList donde se almacenarán las hermandades
+     */
     public void leerHermandad(ArrayList<Hermandad> ArrayDeHermandadesSistema){
         String sql = "SELECT * FROM hermandad";
         Connection conexion = instancia.getConexion();
@@ -526,12 +626,21 @@ public void crearBaseDatos() {
                 Hermandad hermandad = new Hermandad(idHermandad, nombreHermandad, servidorHermandad, numeroMiembros);
                 ArrayDeHermandadesSistema.add(hermandad);
             }
-        }catch(Exception e){
+        }catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al leer Hermandad:" + e.getMessage());
         }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("Hermandad NULL:" + e.getMessage());
+        }
     }
 
+    /**
+     * @brief Lee una hermandad de la base de datos y la añade al array de hermandades
+     * @param arrayDeHermandadesSistema ArrayList de hermandades en la que buscamos los personajes para saber si son miembros de esa hermandad
+     * @param personajesSistema ArrayList de personajes en el que buscamos las hermandades para saber si son miembros de esa hermandad
+     */
     public void leerHermandadPersonaje(ArrayList<Hermandad> arrayDeHermandadesSistema, ArrayList<Personaje> personajesSistema){
         String sql = "SELECT * FROM hermandadPersonaje";
         Connection conexion = instancia.getConexion();
@@ -542,7 +651,7 @@ public void crearBaseDatos() {
             while(resulsetHermandadPersonaje.next()){
                 String idHermandad = resulsetHermandadPersonaje.getString("idHermandad");
                 Integer idPersonaje = resulsetHermandadPersonaje.getInt("idPersonaje");
-                //Recorremos el vector de hermandades de sistema, para cada hermandad buscamos sus miembros y los añadimos a la lis de miembros de esa hermandad
+                //Recorremos el vector de hermandades de sistema, para cada hermandad buscamos sus miembros y los añadimos a la lista de miembros de esa hermandad
                 for(int i = 0; i < arrayDeHermandadesSistema.size(); i++){
                     if(arrayDeHermandadesSistema.get(i).getIdHermandad().equals(idHermandad)){
                         for(int j = 0; j < personajesSistema.size(); j++){
@@ -563,12 +672,21 @@ public void crearBaseDatos() {
                     }
                 }
             }
-        }catch(Exception e){
+        }catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al leer HermandadPersonaje:" + e.getMessage());
         }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("HermandadPersonaje NULL:" + e.getMessage());
+        }
     }
 
+    /**
+     * @brief Inserta un personaje en una hermandad
+     * @param personaje Personaje a insertar
+     * @param hermandad Hermandad en la que se inserta el personaje
+     */
     public void insertarPersonajeHermandad(Personaje personaje, Hermandad hermandad){
         String sql = "INSERT INTO hermandadPersonaje (idHermandad, idPersonaje) VALUES (?, ?)";
         Connection conexion = instancia.getConexion();
@@ -578,12 +696,22 @@ public void crearBaseDatos() {
             consulta.setString(1, hermandad.getIdHermandad());
             consulta.setInt(2, personaje.getIdPersonaje());
             consulta.executeUpdate();
-        }catch(Exception e){
+        }catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al insertar PersonajeHermandad:" + e.getMessage());
         }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("PersonajeHermandad NULL:" + e.getMessage());
+
+        }
     }
 
+    /**
+     * @brief Borra un personaje de una hermandad
+     * @param personaje Personaje a borrar
+     * @param hermandad Hermandad de la que se borra el personaje
+     */
     public void borrarPersonajeHermandad(Personaje personaje, Hermandad hermandad){
         String sql = "DELETE FROM hermandadPersonaje WHERE idHermandad = ? AND idPersonaje = ?";
         Connection conexion = instancia.getConexion();
@@ -593,12 +721,24 @@ public void crearBaseDatos() {
             consulta.setString(1, hermandad.getIdHermandad());
             consulta.setInt(2, personaje.getIdPersonaje());
             consulta.executeUpdate();
-        }catch(Exception e){
+        }catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al borrar PersonajeHermandad:" + e.getMessage());
         }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("PersonajeHermandad NULL:" + e.getMessage());
+
+        }
     }
 
+    //CRUD inventarioObjeto
+
+    /**
+     * @brief Inserta un objeto en un inventario
+     * @param objeto Objeto a insertar
+     * @param inventario Inventario en el que se inserta el objeto
+     */
     public void insertarObjetoEnInventario(Objeto objeto, Inventario inventario){
         String sql = "INSERT INTO InventarioObjeto (idInventario, idObjeto) VALUES (?, ?)";
         Connection conexion = instancia.getConexion();
@@ -620,6 +760,11 @@ public void crearBaseDatos() {
         }
     }
 
+    /**
+     * @brief Borra un objeto de un inventario
+     * @param objeto Objeto a borrar
+     * @param inventario Inventario del que se borra el objeto
+     */
     public void borrarObjetoEnInventario(Objeto objeto, Inventario inventario){
         String sql = "DELETE FROM InventarioObjeto WHERE idInventario = ? AND idObjeto = ?";
         Connection conexion = instancia.getConexion();
@@ -629,12 +774,21 @@ public void crearBaseDatos() {
             consulta.setString(1, inventario.getIdInventario());
             consulta.setString(2, objeto.getIdObjeto());
             consulta.executeUpdate();
-        }catch(Exception e){
+        }catch(SQLException e){
             e.printStackTrace();
             System.err.println("Error al borrar ObjetoInventario:" + e.getMessage());
         }
+        catch(NullPointerException e){
+            e.printStackTrace();
+            System.err.println("ObjetoInventario NULL:" + e.getMessage());
+
+        }
     }
 
+    /**
+     * @brief Modifica un inventario en la base de datos
+     * @param inventario Inventario a modificar
+     */
     public void modificarInventario(Inventario inventario){
         String sql = "UPDATE inventario SET espaciosOcupados = ? WHERE idInventario = ?";
         Connection conexion = instancia.getConexion();
@@ -653,12 +807,13 @@ public void crearBaseDatos() {
             System.err.println("Inventario NULL:" + e.getMessage());
 
         }
-        catch(Exception e){
-            e.printStackTrace();
-            System.err.println("ERROR en inventario:" + e.getMessage());
-        }
     }
 
+    /**
+     * @brief Lee un inventario de la base de datos y lo añade al array de inventarios
+     * @param inventario ArrayList de inventarios de donde se lee
+     * @param objetos ArrayList de objetos donde se buscan los objetos que se van a añadir al inventario
+     */
     public void leerInventarioObjeto(ArrayList<Inventario> inventario, ArrayList<Objeto> objetos){
         String sql = "SELECT * FROM InventarioObjeto";
         Connection conexion = instancia.getConexion();
@@ -688,10 +843,6 @@ public void crearBaseDatos() {
             e.printStackTrace();
             System.err.println("InventarioObjeto NULL:" + e.getMessage());
 
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            System.err.println("ERROR en inventarioObjeto:" + e.getMessage());
         }
     }
 
