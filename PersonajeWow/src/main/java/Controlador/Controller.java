@@ -6,6 +6,7 @@ package Controlador;
 import Modelo.*;
 import Vista.Ventana1;
 import java.util.ArrayList;
+import java.util.Iterator;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -627,24 +628,31 @@ public class Controller {
      }
 
     //Busca la hermandad, si esta existe busca en listaHermandades de cada personaje para borrar esta hermandad de sus listas, luego borra la hermandad del sistema
-     public void borrarHermandad(String nombreHermandad, String servidorHermandad){
-            int posicionHermandad = buscarHermandadPorNombre(nombreHermandad, servidorHermandad);
-            if(posicionHermandad != -1){
-                for(Personaje personaje : getArrayDePersonajesDeSistema()){
-                    for(Hermandad hermandad : personaje.getListaHermandadades()){
-                        if(hermandad.getIdHermandad().equals(getArrayDeHermandadesSistema().get(posicionHermandad).getIdHermandad())){
-                            personaje.getListaHermandadades().remove(hermandad);
-                        }
+     public void borrarHermandad(String nombreHermandad, String servidorHermandad) {
+        int posicionHermandad = buscarHermandadPorNombre(nombreHermandad, servidorHermandad);
+
+        if (posicionHermandad != -1) {
+            Hermandad hermandadABorrar = ArrayDeHermandadesSistema.get(posicionHermandad);
+            for (Personaje personaje : getArrayDePersonajesDeSistema()) {
+                //Añadimos un iterador 
+                Iterator<Hermandad> iterator = personaje.getListaHermandadades().iterator();
+                //Itera sobre el iterador en el que hemos almacenado la lista de hermandades
+                while (iterator.hasNext()) {
+                    Hermandad hermandad = iterator.next();
+                    if (hermandad.getIdHermandad().equals(hermandadABorrar.getIdHermandad())) {
+                        //Mediante el iterador borramos los elementos 
+                        iterator.remove();
                     }
                 }
-                conector.borrarHermandadBd(ArrayDeHermandadesSistema.get(posicionHermandad));
-                getArrayDeHermandadesSistema().remove(posicionHermandad);
-                cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
             }
-            else{
-                System.out.println("No se ha encontrado la hermandad");
-            }
+            getArrayDeHermandadesSistema().remove(posicionHermandad);
+            conector.borrarHermandadBd(hermandadABorrar);
+            cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
+        } else {
+            System.out.println("No se ha encontrado la hermandad");
         }
+    }
+
 
 
     public void cargarHermandadesEnTabla(ArrayList ArrayDeHermandadesSistema){

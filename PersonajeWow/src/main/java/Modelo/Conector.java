@@ -60,85 +60,166 @@ public class Conector {
      * @brief Crea la base de datos y las tablas si no existen
      */
 public void crearBaseDatos() {
-        Connection conexion = instancia.getConexion();
-        // Conectar a la base de datos
-         try (Statement stmt = conexion.createStatement();) {
-            // Crear tabla si no existe
-            String sqlObjeto = "CREATE TABLE IF NOT EXISTS objeto ("
-                    + "idObjeto TEXT PRIMARY KEY NOT NULL,"
-                    + "rareza TEXT NOT NULL,"
-                    + "descripcion TEXT NOT NULL,"
-                    + "precio DOUBLE NOT NULL,"
-                    + " nombreObjeto TEXT NOT NULL )";
-           
-            String sqlHermandad = "CREATE TABLE IF NOT EXISTS hermandad ("
-                    +"IdHermandad TEXT PRIMARY KEY NOT NULL,"
-                    + "nombreHermandad TEXT NOT NULL,"
-                    + "servidorHermandad TEXT NOT NULL,"
-                    + "numeroMiembros INTEGER NOT NULL)";
-       
-                     String sqlInventario = "CREATE TABLE IF NOT EXISTS inventario ("
-                    + "idInventario TEXT PRIMARY KEY, "
-                    + "idPersonaje INTEGER , "
-                    + "capacidadMaxima INTEGER NOT NULL, "
-                    + "espaciosOcupados INTEGER NOT NULL "
-                     +")";
-                     
-                String sqlPersonaje = "CREATE TABLE IF NOT EXISTS personaje ("
-                        + "idPersonaje INTEGER PRIMARY KEY AUTOINCREMENT, "
-                        + "nombre TEXT NOT NULL, "
-                        + "servidor TEXT NOT NULL, "
-                        + "faccion TEXT NOT NULL, "
-                        + "raza TEXT NOT NULL, "
-                        + "idInventario TEXT,"
-                        + "nivel INTEGER NOT NULL,"
-                        + "FOREIGN KEY (idInventario) REFERENCES inventario(idInventario)" 
-                        +")";
-                     
-                   String relacionInventarioObjeto = "CREATE TABLE IF NOT EXISTS InventarioObjeto ("
-                    + "idInventario TEXT NOT NULL,"
-                    + "idObjeto TEXT NOT NULL,"
-                    + "PRIMARY KEY (idInventario, idObjeto),"
-                    + "FOREIGN KEY (idInventario) REFERENCES inventario(idInventario),"
-                    + "FOREIGN KEY (idObjeto) REFERENCES objeto(idObjeto)"
-                    + ")";
-                   
-                   String relacionHermandadPersonaje = "CREATE TABLE IF NOT EXISTS hermandadPersonaje("
-                           + "idHermandad TEXT NOT NULL,"
-                           + "idPersonaje INTEGER NOT NULL, "
-                           + "PRIMARY KEY (idHermandad, idPersonaje),"
-                           + "FOREIGN KEY (idHermandad) REFERENCES hermandad(idHermandad),"
-                           + "FOREIGN KEY (idPersonaje) REFERENCES personaje(idPersonaje)"
-                           + ") ";
-           
-                   
-          /**
-           stmt.execute("DROP TABLE IF EXISTS relacionHermandadPersonaje");
-           stmt.execute("DROP TABLE IF EXISTS InventarioObjeto");
-           stmt.execute("DROP TABLE IF EXISTS personaje");
-           stmt.execute("DROP TABLE IF EXISTS inventario");
-           stmt.execute("DROP TABLE IF EXISTS hermandad");
-           stmt.execute("DROP TABLE IF EXISTS objeto");
-           * */
-           
-           
-                              
-            // Ejecutar la consulta SQL
-            stmt.execute(sqlObjeto);
-            stmt.execute(sqlHermandad);
-            stmt.execute(sqlPersonaje);
-            stmt.execute(sqlInventario);
-            stmt.execute(relacionInventarioObjeto);
-            stmt.execute(relacionHermandadPersonaje);
-            System.out.println("Base de datos y tabla creadas correctamente.");
-        }catch(SQLException e){
-                e.printStackTrace();
-        } catch (Exception e) {
+    Connection conexion = instancia.getConexion();
+    // Conectar a la base de datos
+
+    //Crea la tabla de objetos
+        try (PreparedStatement stmtObjeto = conexion.prepareStatement(   
+        "CREATE TABLE IF NOT EXISTS objeto ("
+        + "idObjeto TEXT PRIMARY KEY NOT NULL,"
+        + "rareza TEXT NOT NULL,"
+        + "descripcion TEXT NOT NULL,"
+        + "precio DOUBLE NOT NULL,"
+        + " nombreObjeto TEXT NOT NULL )")) {
+            stmtObjeto.executeUpdate();
+        } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.err.println("Error al crear la tabla Objeto:" + e.getMessage());
         }
+            
+        // Crear tabla hermandad
+        try (PreparedStatement stmtHermandad = conexion.prepareStatement(
+                "CREATE TABLE IF NOT EXISTS hermandad ("
+                +"IdHermandad TEXT PRIMARY KEY NOT NULL,"
+                + "nombreHermandad TEXT NOT NULL,"
+                + "servidorHermandad TEXT NOT NULL,"
+                + "numeroMiembros INTEGER NOT NULL)")) {
+            stmtHermandad.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error al crear la tabla Hermandad:" + e.getMessage());
+        }
+            
+        // Crear tabla inventario
+        try (PreparedStatement stmtInventario = conexion.prepareStatement(
+                "CREATE TABLE IF NOT EXISTS inventario ("
+                + "idInventario TEXT PRIMARY KEY, "
+                + "idPersonaje INTEGER , "
+                + "capacidadMaxima INTEGER NOT NULL, "
+                + "espaciosOcupados INTEGER NOT NULL "
+                    +")")) {
+            stmtInventario.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error al crear la tabla Inventario:" + e.getMessage());
+        }
+
+        // Crear tabla personaje
+        try (PreparedStatement stmtPersonaje = conexion.prepareStatement(
+                "CREATE TABLE IF NOT EXISTS personaje ("
+                + "idPersonaje INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "nombre TEXT NOT NULL, "
+                + "servidor TEXT NOT NULL, "
+                + "faccion TEXT NOT NULL, "
+                + "raza TEXT NOT NULL, "
+                + "idInventario TEXT,"
+                + "nivel INTEGER NOT NULL,"
+                + "FOREIGN KEY (idInventario) REFERENCES inventario(idInventario)" 
+                +")")) {
+            stmtPersonaje.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error al crear la tabla Personaje:" + e.getMessage());
+        }
+
+        //Crear tabla relacion inventario objeto
+        try(PreparedStatement stmtInventarioObjeto = conexion.prepareStatement(
+            "CREATE TABLE IF NOT EXISTS InventarioObjeto ("
+            + "idInventario TEXT NOT NULL,"
+            + "idObjeto TEXT NOT NULL,"
+            + "PRIMARY KEY (idInventario, idObjeto),"
+            + "FOREIGN KEY (idInventario) REFERENCES inventario(idInventario),"
+            + "FOREIGN KEY (idObjeto) REFERENCES objeto(idObjeto)"
+            + ")")){
+            stmtInventarioObjeto.executeUpdate();
+        }catch(SQLException e){
+            e.printStackTrace();
+            System.err.println("Error al crear la tabla InventarioObjeto:" + e.getMessage());
+        }
+            
+        try(PreparedStatement stmtHermandadPersonaje = conexion.prepareStatement(
+            "CREATE TABLE IF NOT EXISTS hermandadPersonaje("
+            + "idHermandad TEXT NOT NULL,"
+            + "idPersonaje INTEGER NOT NULL, "
+            + "PRIMARY KEY (idHermandad, idPersonaje),"
+            + "FOREIGN KEY (idHermandad) REFERENCES hermandad(idHermandad),"
+            + "FOREIGN KEY (idPersonaje) REFERENCES personaje(idPersonaje)"
+            + ") ")){
+        stmtHermandadPersonaje.executeUpdate();
+        }catch(SQLException e){
+            e.printStackTrace();
+            System.err.println("Error al crear la tabla hermandadPersonaje:" + e.getMessage());
+        }
+        
+        System.out.println("Base de datos y tabla creadas correctamente.");
     }
 
+    /**
+     * @brief Borra la base de datos y las tablas
+     */
+    public void borrarDb(){
+        Connection conexion = instancia.getConexion();
+
+        //Borrar relacionHermandadPersonaje
+        try(PreparedStatement stmtBorrarHermandadPersonaje = conexion.prepareStatement(
+            "DROP TABLE IF EXISTS hermandadPersonaje"
+            )){
+        stmtBorrarHermandadPersonaje.executeUpdate();
+        }catch(SQLException e){
+            e.printStackTrace();
+            System.err.println("Error al borrar las tablas:" + e.getMessage());
+        }
+
+        //Borrar inventarioObjeto
+        try(PreparedStatement stmtBorrarInventarioObjeto = conexion.prepareStatement(
+            "DROP TABLE IF EXISTS InventarioObjeto"
+            )){
+        stmtBorrarInventarioObjeto.executeUpdate();
+        }catch(SQLException e){
+            e.printStackTrace();
+            System.err.println("Error al borrar las tablas:" + e.getMessage());
+        }
+
+        //Borrar personaje
+        try(PreparedStatement stmtBorrarPersonaje = conexion.prepareStatement(
+            "DROP TABLE IF EXISTS personaje"
+            )){
+        stmtBorrarPersonaje.executeUpdate();
+        }catch(SQLException e){
+            e.printStackTrace();
+            System.err.println("Error al borrar las tablas:" + e.getMessage());
+        }
+
+        //Borrar inventario
+        try(PreparedStatement stmtBorrarInventario = conexion.prepareStatement(
+            "DROP TABLE IF EXISTS inventario"
+            )){
+        stmtBorrarInventario.executeUpdate();
+        }catch(SQLException e){
+            e.printStackTrace();
+            System.err.println("Error al borrar las tablas:" + e.getMessage());
+        }
+
+        //Borrar hermandad
+        try(PreparedStatement stmtBorrarHermandad = conexion.prepareStatement(
+            "DROP TABLE IF EXISTS hermandad"
+            )){
+        stmtBorrarHermandad.executeUpdate();
+        }catch(SQLException e){
+            e.printStackTrace();
+            System.err.println("Error al borrar las tablas:" + e.getMessage());
+        }
+
+        //Borrar objeto
+        try(PreparedStatement stmtBorrarObjeto = conexion.prepareStatement(
+            "DROP TABLE IF EXISTS objeto"
+            )){
+        stmtBorrarObjeto.executeUpdate();
+        }catch(SQLException e){
+            e.printStackTrace();
+            System.err.println("Error al borrar las tablas:" + e.getMessage());
+        }
+    }
     
     //CRUD de OBJETO
     /**
