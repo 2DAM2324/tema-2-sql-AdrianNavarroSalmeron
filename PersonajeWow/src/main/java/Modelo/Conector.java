@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import org.mockito.Mockito;
 
 
 /**
@@ -24,6 +25,11 @@ public class Conector {
     private Connection conn = null;
 
     private Conector() {
+    }
+    
+     //Constructor para testear
+    public Conector(Conector mockito) {
+        
     }
     
     public static Conector getInstancia(){
@@ -308,8 +314,7 @@ public void crearBaseDatos() {
     
     /**
      * @brief Lee un objeto de la base de datos
-     * @param idObjeto Id del objeto a leer
-     * @param ArrayListDeObjetosSistema ArrayList donde se almacenarán los objetos
+     * @param  ObjetosSistema ArrayList donde se almacenarán los objetos
      */
     public void leerObjetosDeBd(ArrayList ObjetosSistema){
         String sql = "SELECT * FROM objeto";

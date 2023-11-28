@@ -85,7 +85,7 @@ public class Controller {
     public ArrayList<Inventario> getArrayDeInventariosSistema(){
         return ArrayDeInventariosSistema;
     }
-    //Funciones de los objetos******************************************************************************************
+    //****************************************Funciones de los objetos******************************************************************************************
     public void aniadirObjeto(String nombreObjeto, String rareza, String precio, String descipcion, String IdObjeto){
         Objeto objeto = new Objeto();
         try{
@@ -110,7 +110,7 @@ public class Controller {
                         JOptionPane.showMessageDialog(vista, "El precio debe ser mayor que 0", "ERROR", JOptionPane.ERROR_MESSAGE);
                     }     
             }
-            else{
+            else{ 
                 JOptionPane.showMessageDialog(vista, "No puede haber campos vacios!", "ERROR", JOptionPane.ERROR_MESSAGE);
             }
         }

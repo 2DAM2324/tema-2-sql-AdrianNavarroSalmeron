@@ -1859,8 +1859,6 @@ public class Ventana1 extends javax.swing.JFrame {
             DefaultTableModel model = (DefaultTableModel) jTable_inventario_objetos.getModel();
             String idInventario = (String) model.getValueAt(selectedRow, 0); // Suponiendo que la columna 1 contiene el nombre del objeto
             Integer idPersonaje = (Integer) model.getValueAt(selectedRow, 1);
-            int numeroEspaciosOcupadosString = (int) model.getValueAt(selectedRow, 2);
-
             int posicionPersonaje = controlador.buscarPersonajeEnSistemaPorId(idPersonaje);
             jTextField_id_inventario.setText(idInventario);
             jTextField_inventario_nombre_personaje.setText(controlador.getArrayDePersonajesDeSistema().get(posicionPersonaje).getNombre());
