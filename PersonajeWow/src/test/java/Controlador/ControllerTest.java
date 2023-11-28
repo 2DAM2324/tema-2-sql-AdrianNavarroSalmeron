@@ -189,6 +189,16 @@ public void setUp() {
         assertEquals("10.5", String.valueOf(capturedObjeto.getPrecio()));
         assertEquals("Es una espada", capturedObjeto.getDescripcion());
     }
+
+    @Test
+    public void testBorrarObjetoSiNoExiste(){
+        
+        //Borramos el objeto
+        controlador.borrarObjeto("PATATA");
+
+        //Verificamos que no se ha llamado al metodo
+        verify(mockConector, never()).borrarObjetoDeBd(any(Objeto.class));
+    }
         
    }
 
