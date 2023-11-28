@@ -76,7 +76,7 @@ public void setUp() {
         String rareza = "Comun";
         String precio = "10.5";
         String descripcion = "Es una espada";
-        String IdObjeto = "OB5";
+        String IdObjeto = "OB2";
 
         double precioDouble = Double.parseDouble(precio);
 
@@ -160,4 +160,36 @@ public void setUp() {
         verify(mockConector, never()).insertarObjetoEnBd(any(Objeto.class));
     }
 
-}
+   
+    @Test
+    public void testBorrarObjeto() {
+        //Insertamos en el array el objeto
+        String IdObjeto = "OB1";
+        Objeto objeto = new Objeto();
+        objeto.setIdObjeto(IdObjeto);
+        objeto.setNombreObjeto("Espada");
+        objeto.setRareza("Comun");
+        objeto.setPrecio(10.5);
+        objeto.setDescripcion("Es una espada");
+        controlador.getArrayDeObjetosSistema().add(objeto);
+
+       //Borramos el objeto
+        controlador.borrarObjeto(IdObjeto);
+
+        // Capturamos los valores
+        ArgumentCaptor<Objeto> argumentCaptor = ArgumentCaptor.forClass(Objeto.class);
+        //Verificamos que se llame al metodo
+        verify(mockConector).borrarObjetoDeBd(argumentCaptor.capture());
+        
+        //Verficamos que los valores son correctos
+        Objeto capturedObjeto = argumentCaptor.getValue();
+        assertEquals(IdObjeto, capturedObjeto.getIdObjeto());
+        assertEquals("Espada", capturedObjeto.getNombreObjeto());
+        assertEquals("Comun", capturedObjeto.getRareza());
+        assertEquals("10.5", String.valueOf(capturedObjeto.getPrecio()));
+        assertEquals("Es una espada", capturedObjeto.getDescripcion());
+    }
+        
+   }
+
+

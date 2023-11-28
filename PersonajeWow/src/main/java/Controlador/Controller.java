@@ -87,9 +87,10 @@ public class Controller {
     }
     //****************************************Funciones de los objetos******************************************************************************************
     public void aniadirObjeto(String nombreObjeto, String rareza, String precio, String descipcion, String IdObjeto){
-        Objeto objeto = new Objeto();
+        
         try{
             if(nombreObjeto != null && rareza != null && precio != null && descipcion != null){
+                     Objeto objeto = new Objeto();
                     //Eliminamos los espacios en blanco
                     nombreObjeto = nombreObjeto.trim();
                     rareza = rareza.trim();
@@ -123,24 +124,27 @@ public class Controller {
     }
     
     //TODO los datos no se leen del xml despues de actualizarlos al borrar algo.
-    public void borrarObjeto(String idObjetoaBorrar){
-        Objeto objetoaBorrar = new Objeto();
-         for(Objeto objeto : ArrayDeObjetosSistema){
-             if(objeto.getIdObjeto().equals(idObjetoaBorrar)){
-                 objetoaBorrar = objeto;
-             }
-         }
-        for (Inventario inventario : getArrayDeInventariosSistema()) {
-            if (inventario.getObjetosInventario().contains(objetoaBorrar)) {
-                inventario.getObjetosInventario().remove(objetoaBorrar);
-                inventario.setEspaciosOcupados(inventario.getObjetosInventario().size());
-                conector.modificarInventario(inventario);
+    public void borrarObjeto(String idObjetoaBorrar) {
+        Objeto objetoaBorrar = null;
+        for (Objeto objeto : ArrayDeObjetosSistema) {
+            if (objeto.getIdObjeto().equals(idObjetoaBorrar)) {
+                objetoaBorrar = objeto;
             }
         }
-        conector.borrarObjetoDeBd(objetoaBorrar);
-        ArrayDeObjetosSistema.remove(objetoaBorrar);
-        cargarObjetoEnTabla(ArrayDeObjetosSistema);
-        cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
+
+        if (objetoaBorrar != null) {
+            for (Inventario inventario : getArrayDeInventariosSistema()) {
+                if (inventario.getObjetosInventario().contains(objetoaBorrar)) {
+                    inventario.getObjetosInventario().remove(objetoaBorrar);
+                    inventario.setEspaciosOcupados(inventario.getObjetosInventario().size());
+                    conector.modificarInventario(inventario);
+                }
+            }
+            conector.borrarObjetoDeBd(objetoaBorrar);
+            ArrayDeObjetosSistema.remove(objetoaBorrar);
+            cargarObjetoEnTabla(ArrayDeObjetosSistema);
+            cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
+        }
     }
 
     public void borrarObjetoInventario(String idObjeto, String idInventario){
