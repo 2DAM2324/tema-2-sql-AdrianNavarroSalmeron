@@ -255,7 +255,7 @@ public void crearBaseDatos() {
      * @param objeto Objeto a modificar
      */
 
-    public void modificarObjetoEnBd(Objeto objeto){
+    public void modificarObjetoEnBd(Objeto objeto) throws SQLException, NullPointerException{
         String sql = "UPDATE objeto SET rareza = ?, descripcion = ?, precio = ?, nombreObjeto = ? WHERE idObjeto = ?";
         Connection conexion = instancia.getConexion();
         try{
@@ -307,7 +307,7 @@ public void crearBaseDatos() {
      * @brief Lee un objeto de la base de datos
      * @param  ObjetosSistema ArrayList donde se almacenarán los objetos
      */
-    public void leerObjetosDeBd(ArrayList ObjetosSistema){
+    public void leerObjetosDeBd(ArrayList ObjetosSistema) throws SQLException, NullPointerException{
         String sql = "SELECT * FROM objeto";
         Connection conexion = instancia.getConexion();
         try{
@@ -339,7 +339,7 @@ public void crearBaseDatos() {
      * @param personaje Personaje a insertar
      * @param inventario Inventario del personaje a insertar
      */
-    public void insertarPersonajeYInventarioEnBD(Personaje personaje, Inventario inventario) {
+    public void insertarPersonajeYInventarioEnBD(Personaje personaje, Inventario inventario) throws SQLException, SQLIntegrityConstraintViolationException, NullPointerException {
         String sqlInventario = "INSERT INTO inventario (idInventario, capacidadMaxima, espaciosOcupados) VALUES (?, ?, ?)";
         String sqlPersonaje = "INSERT INTO personaje (nombre, servidor, faccion, raza, idInventario, nivel) VALUES (?, ?, ?, ?, ?, ?)";
         String modificacionInventario = "UPDATE inventario SET idPersonaje = ? WHERE idInventario = ?";
@@ -422,7 +422,7 @@ public void crearBaseDatos() {
      * @param ArrayListDePersonajesSistema ArrayList donde se almacenarán los
      * personajes
      */
-    public void leerPersonaje(String nombre, String servidor, ArrayList<Personaje> ArrayListDePersonajesSistema) {
+    public void leerPersonaje(String nombre, String servidor, ArrayList<Personaje> ArrayListDePersonajesSistema) throws SQLException, NullPointerException {
         String sql = "SELECT idPersonaje, nombre, servidor, faccion, raza, idInventario, nivel FROM personaje WHERE nombre = ? AND servidor = ?";
         Connection conexion = instancia.getConexion();
 
@@ -465,7 +465,7 @@ public void crearBaseDatos() {
      * @brief lee un personaje de la base de datos y cada inventario que lee lo mete en el array de inventarios
      * @param inventariosSistema ArrayList donde se almacenarán los inventarios
      */
-    public void leerInventario(ArrayList inventariosSistema){
+    public void leerInventario(ArrayList inventariosSistema) throws SQLException, NullPointerException{
         String sql = "SELECT * FROM inventario";
         Connection conexion = instancia.getConexion();
         try{
@@ -492,7 +492,7 @@ public void crearBaseDatos() {
      * @brief Modifica un personaje en la base de datos
      * @param personaje Personaje a modificar
      */
-    public void modificarPersonajeBd(Personaje personaje){
+    public void modificarPersonajeBd(Personaje personaje) throws SQLException, NullPointerException{
         String sql = "UPDATE personaje SET nombre = ?, servidor = ?, faccion = ?, raza = ?, nivel = ? WHERE idPersonaje = ?";
         Connection conexion = instancia.getConexion();
 
@@ -519,7 +519,7 @@ public void crearBaseDatos() {
      * @brief Borra un personaje de la base de datos. Primero borra el personaje de la hermandad, luego su inventario y por ultimo el personaje
      * @param personaje Personaje a borrar
      */
-    public void borrarPersonajeIventarioBd(Personaje personaje){
+    public void borrarPersonajeIventarioBd(Personaje personaje) throws SQLException, NullPointerException{
         String sqlTablaPersonaje = "DELETE FROM personaje WHERE idPersonaje = ?";
         String sqlTablaInventario = "DELETE FROM inventario WHERE idInventario = ?";
         Connection conexion = instancia.getConexion();

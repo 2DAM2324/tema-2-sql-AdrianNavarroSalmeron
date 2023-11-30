@@ -42,9 +42,27 @@ public class Controller {
         conector.crearBaseDatos();
         
         
-       // leerXMLObjetos();
-       conector.leerObjetosDeBd(ArrayDeObjetosSistema);
-       conector.leerInventario(ArrayDeInventariosSistema);
+       //Leemos los objetos de la base de datos
+       try{
+              conector.leerObjetosDeBd(ArrayDeObjetosSistema);
+         }
+        catch(SQLException e){
+            JOptionPane.showMessageDialog(vista, "ERROR AL LEER OBJETOS DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        catch(NullPointerException e){
+            JOptionPane.showMessageDialog(vista, "ERROR AL LEER OBJETOS DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+
+        //Leemos el inventario de la base de datos
+        try{
+           conector.leerInventario(ArrayDeInventariosSistema); 
+        }
+        catch(SQLException e){
+            JOptionPane.showMessageDialog(vista, "ERROR AL LEER INVENTARIOS DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        catch(NullPointerException e){
+            JOptionPane.showMessageDialog(vista, "ERROR AL LEER INVENTARIOS DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
        conector.leerInventarioObjeto(ArrayDeInventariosSistema, ArrayDeObjetosSistema);
        conector.leerPersonajeDeBd(ArrayDePersonajesSistema, ArrayDeInventariosSistema, ArrayDeHermandadesSistema);
        conector.leerHermandad(ArrayDeHermandadesSistema);
@@ -135,7 +153,6 @@ public class Controller {
         }
     }
     
-    //TODO los datos no se leen del xml despues de actualizarlos al borrar algo.
     public void borrarObjeto(String idObjetoaBorrar) {
         Objeto objetoaBorrar = null;
         for (Objeto objeto : ArrayDeObjetosSistema) {
@@ -219,7 +236,12 @@ public class Controller {
                     getArrayDeObjetosSistema().get(getPosicionObjetoById(id)).setRareza(rareza);
                     getArrayDeObjetosSistema().get(getPosicionObjetoById(id)).setPrecio(precioParseado);
                     getArrayDeObjetosSistema().get(getPosicionObjetoById(id)).setDescripcion(descripcion);
-                    conector.modificarObjetoEnBd(getArrayDeObjetosSistema().get(getPosicionObjetoById(id)));
+                    try{
+                        conector.modificarObjetoEnBd(getArrayDeObjetosSistema().get(getPosicionObjetoById(id)));
+                    }
+                    catch(SQLException | NullPointerException e){
+                        JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR EL OBJETO EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
                     cargarObjetoEnTabla(ArrayDeObjetosSistema);
                     JOptionPane.showMessageDialog(vista, "Objeto modificado correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);
                 }
@@ -416,10 +438,25 @@ public class Controller {
             personajeAniadir.setNivel(nivelParseado);
             personajeAniadir.setFaccion(faccion);
             //personajeAniadir.setAniadirInventarioaPersonaje(inventarioNuevo);
-            
-            conector.insertarPersonajeYInventarioEnBD(personajeAniadir, inventarioNuevo);
+
+            //Bloque para capturar las excepciones que puede causar la base de datos
+            try{
+                conector.insertarPersonajeYInventarioEnBD(personajeAniadir, inventarioNuevo);
+            }
+            catch(SQLIntegrityConstraintViolationException e){
+                JOptionPane.showMessageDialog(vista, "PK de personaje repetida en BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+            catch(SQLException | NullPointerException e ){
+                JOptionPane.showMessageDialog(vista, "ERROR AL INSERTAR PERSONAJE EN BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+           
             //Traemos el personaje y lo añadimos al vector de personajes del sistema
-             conector.leerPersonaje(nombre, servidor, ArrayDePersonajesSistema);
+            try{
+                conector.leerPersonaje(nombre, servidor, ArrayDePersonajesSistema);
+            }
+            catch(SQLException | NullPointerException e){
+                JOptionPane.showMessageDialog(vista, "ERROR AL LEER PERSONAJE DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
              int posicionPersonaje = buscarPersonajeEnSistema(nombre, servidor);
              //Añadimos el inventario al personaje que hemos introducido en el vector
             getArrayDePersonajesDeSistema().get(posicionPersonaje).setAniadirInventarioaPersonaje(inventarioNuevo);
@@ -467,7 +504,12 @@ public class Controller {
             getArrayDePersonajesDeSistema().get(posicionPersonaje).setRaza(raza);
             getArrayDePersonajesDeSistema().get(posicionPersonaje).setNivel(nivel);
             getArrayDePersonajesDeSistema().get(posicionPersonaje).setFaccion(faccion);
-            conector.modificarPersonajeBd(getArrayDePersonajesDeSistema().get(posicionPersonaje));
+            try{
+                conector.modificarPersonajeBd(getArrayDePersonajesDeSistema().get(posicionPersonaje));
+            }
+            catch(SQLException | NullPointerException e){
+                JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR EL PERSONAJE EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
             cargarPersonajesEnTabla(ArrayDePersonajesSistema);
          }
     }
@@ -477,7 +519,12 @@ public class Controller {
         int posicionPersonaje = buscarPersonajeEnSistema(nombre, servidor);
         if(posicionPersonaje != -1){
             //Borramos el personaje de la base de datos
-             conector.borrarPersonajeIventarioBd(getArrayDePersonajesDeSistema().get(posicionPersonaje));
+            try{
+                conector.borrarPersonajeIventarioBd(getArrayDePersonajesDeSistema().get(posicionPersonaje));
+            }
+            catch(SQLException | NullPointerException e){
+                JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO BORRAR EL PERSONAJE DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
             //Primero borra todos los objetos que contiene el inventario
             vaciarInventario(getArrayDePersonajesDeSistema().get(posicionPersonaje).getInventario().getIdInventario());
             //Borra el inventario del sistema
