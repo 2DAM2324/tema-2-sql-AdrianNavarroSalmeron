@@ -465,14 +465,23 @@ public class Controller {
         }
     }
     
-    //TODO: hay que hacer esto tambien en la base de datos
     public void vaciarInventario(String idInventario){
         
         for(Inventario inventario : getArrayDeInventariosSistema()){
             if(inventario.getIdInventario().equals(idInventario)){
-                inventario.getObjetosInventario().removeAll(inventario.getObjetosInventario());
-                inventario.setEspaciosOcupados(0);
-                cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
+                for(int i = 0; i < inventario.getObjetosInventario().size(); i++){
+                    try{
+                        conector.borrarObjetoEnInventario(inventario.getObjetosInventario().get(i), inventario);
+                        conector.modificarInventario(inventario);
+                         inventario.getObjetosInventario().removeAll(inventario.getObjetosInventario());
+                         inventario.setEspaciosOcupados(0);
+                         cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
+                    }
+                    catch(SQLException | NullPointerException e){
+                          JOptionPane.showMessageDialog(vista, "NO SE PUDO VACIAR EL INVENTARIO DE BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    }  
+                }
+               
             }
         }
         
