@@ -964,6 +964,27 @@ public void crearBaseDatos() {
             System.out.println(ex.getMessage());
         }
     }
+    
+    public Objeto getObjeto(String idObjeto) throws SQLException {
+       Connection conexion = instancia.getConexion(nombreDb);
+
+        String query = "SELECT * FROM objeto WHERE idObjeto = ?";
+        PreparedStatement stmt = conexion.prepareStatement(query);
+        stmt.setString(1, idObjeto);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            Objeto objeto = new Objeto();
+            objeto.setIdObjeto(rs.getString("idObjeto"));
+            objeto.setRareza(rs.getString("rareza"));
+            objeto.setDescripcion(rs.getString("descripcion"));
+            objeto.setPrecio(rs.getDouble("precio"));
+            objeto.setNombreObjeto(rs.getString("nombreObjeto"));
+            return objeto;
+        } else {
+            return null;
+        }
+    }
 }
 
 

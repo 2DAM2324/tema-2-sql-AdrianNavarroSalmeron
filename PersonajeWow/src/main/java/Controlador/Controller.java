@@ -18,7 +18,7 @@ import javax.swing.table.DefaultTableModel;
  * @author AdrianNS
  */
 public class Controller {
-    private Conector conector;
+    Conector conector;
     private Ventana1 ventana;
     public ArrayList <Personaje> ArrayDePersonajesSistema;
     private ArrayList <Hermandad> ArrayDeHermandadesSistema;
@@ -27,7 +27,7 @@ public class Controller {
     private Ventana1 vista;
     
    
-    public Controller(Ventana1 vistaSet){
+    public Controller(Ventana1 vistaSet, String nombreBd){
         ArrayList<Personaje> nuevoArray = new ArrayList<>();
         ArrayList<Objeto> arrayObjeto = new ArrayList<>();
         ArrayList<Inventario> arrayInventario = new ArrayList<>();
@@ -37,7 +37,7 @@ public class Controller {
         this.ArrayDeObjetosSistema = arrayObjeto;
         this.ArrayDeHermandadesSistema = arrayHermandad;
         this.ArrayDeInventariosSistema = arrayInventario;
-        Conector conectorDb = Conector.getInstancia("db.sqlite");
+        Conector conectorDb = Conector.getInstancia(nombreBd);
         this.conector = conectorDb;
         conector.crearBaseDatos();
         
@@ -897,6 +897,10 @@ public class Controller {
             }
         }
          vista.jTable_personajes_hermandad.setModel(model);
+    }
+    
+    public void cerrarConexionDesdeControlador(String nombreDb){
+          Conector.getInstancia(nombreDb).cerrarConexion(nombreDb);
     }
 }
   

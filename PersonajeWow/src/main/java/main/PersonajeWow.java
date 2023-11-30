@@ -26,7 +26,7 @@ public class PersonajeWow {
         
         try{
            Ventana1 vista = new Ventana1();
-            Controller controlador = new Controller(vista);
+            Controller controlador = new Controller(vista, "db.sqlite");
             vista.setControlador(controlador);  // Establece el controlador en la vista
             vista.setVisible(true);
         }
