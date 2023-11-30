@@ -5,6 +5,9 @@
 package Controlador;
 import Modelo.*;
 import Vista.Ventana1;
+import java.sql.SQLDataException;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.swing.JOptionPane;
@@ -102,8 +105,17 @@ public class Controller {
                         objeto.setRareza(rareza);
                         objeto.setDescripcion(descipcion);
                         objeto.setPrecio(precioParseado);
+                        //Bloque que captura las exepciones de la bd y muestra un mensaje en la vista
                         ArrayDeObjetosSistema.add(objeto);
-                        conector.insertarObjetoEnBd(objeto);
+                        try{
+                             conector.insertarObjetoEnBd(objeto);
+                        }
+                        catch(SQLIntegrityConstraintViolationException e){
+                                JOptionPane.showMessageDialog(vista, "PK de objeto repetida en BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        }
+                       catch(SQLException | NullPointerException e ){
+                           JOptionPane.showMessageDialog(vista, "ERROR AL INSERTAR OBJETO EN BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                       }
                         cargarObjetoEnTabla(ArrayDeObjetosSistema);
                         JOptionPane.showMessageDialog(vista, "Objeto añadido con exito", "OK", JOptionPane.INFORMATION_MESSAGE);
                     }
@@ -140,7 +152,15 @@ public class Controller {
                     conector.modificarInventario(inventario);
                 }
             }
-            conector.borrarObjetoDeBd(objetoaBorrar);
+            //Bloque para capturar las excepciones a la hora de borrar de la BD
+            try{
+                conector.borrarObjetoDeBd(objetoaBorrar);
+            }
+            catch(SQLException | NullPointerException e){
+                JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO BORRAR DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+            
+            
             ArrayDeObjetosSistema.remove(objetoaBorrar);
             cargarObjetoEnTabla(ArrayDeObjetosSistema);
             cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);

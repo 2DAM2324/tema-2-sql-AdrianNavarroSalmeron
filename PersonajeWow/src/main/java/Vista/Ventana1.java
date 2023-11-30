@@ -2164,7 +2164,7 @@ public class Ventana1 extends javax.swing.JFrame {
     public javax.swing.JButton jButton_aniadir_personaje;
     private javax.swing.JButton jButton_borrar_hermandad;
     private javax.swing.JButton jButton_borrar_objeto;
-    private javax.swing.JButton jButton_borrar_objeto_inventario;
+    public javax.swing.JButton jButton_borrar_objeto_inventario;
     public javax.swing.JButton jButton_borrar_personaje;
     private javax.swing.JButton jButton_borrar_personaje_hermandad;
     private javax.swing.JButton jButton_cancelar_añadir_personaje_hermandad;

@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import org.mockito.Mockito;
 
 
 /**
@@ -27,11 +26,7 @@ public class Conector {
     private Conector() {
     }
     
-     //Constructor para testear
-    public Conector(Conector mockito) {
-        
-    }
-    
+   
     public static Conector getInstancia(){
         if(instancia == null){
             instancia = new Conector();
@@ -231,8 +226,11 @@ public void crearBaseDatos() {
     /**
      * @brief Inserta un objeto en la base de datos
      * @param objeto Objeto a insertar
+     * @throws SQLException
+     * @throws SQLIntegrityConstraintViolationException
+     * @throws NullPointerException
      */
-    public void insertarObjetoEnBd(Objeto objeto) {
+    public void insertarObjetoEnBd(Objeto objeto) throws SQLException, SQLIntegrityConstraintViolationException, NullPointerException {
          String sql = "INSERT INTO objeto (idObjeto, rareza, descripcion, precio, nombreObjeto) VALUES (?, ?, ?, ?, ?)";
          Connection conexion = instancia.getConexion();
         // Conectar a la base de datos
@@ -247,17 +245,8 @@ public void crearBaseDatos() {
     
         }
         catch(SQLIntegrityConstraintViolationException e){
-            e.printStackTrace();
-            System.err.println("SE HA INTENTADO INSERTAR UNA PK REPETIDA EN OBJETO:" + e.getMessage());
         }
-        catch(SQLException e){
-            e.printStackTrace();
-            System.err.println("Error al insertar Objeto:" + e.getMessage());
-        }
-        catch(NullPointerException e){
-            e.printStackTrace();
-            System.err.println("Objeto NULL:" + e.getMessage());
-
+        catch(SQLException | NullPointerException e){
         }
     }
 
@@ -290,8 +279,10 @@ public void crearBaseDatos() {
     /**
      * @brief Borra un objeto de la base de datos
      * @param objeto Objeto a borrar
+     * @throws SQLException
+     * @throws NullPointerException
      */
-    public void borrarObjetoDeBd(Objeto objeto) {
+    public void borrarObjetoDeBd(Objeto objeto) throws SQLException, NullPointerException {
         String sqlTablaObjeto = "DELETE FROM objeto WHERE idObjeto = ?";
         String sqlTablaInventarioObjeto = "DELETE FROM InventarioObjeto WHERE idObjeto = ?";
         Connection conexion = instancia.getConexion();
