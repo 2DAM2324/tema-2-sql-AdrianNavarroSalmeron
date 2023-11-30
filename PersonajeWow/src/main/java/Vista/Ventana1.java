@@ -1924,7 +1924,7 @@ public class Ventana1 extends javax.swing.JFrame {
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         int resultado = javax.swing.JOptionPane.showConfirmDialog(this, "¿Seguro que desea salir??", "Confirmación", javax.swing.JOptionPane.YES_NO_OPTION);
         if (resultado == javax.swing.JOptionPane.YES_OPTION) {
-            Conector.getInstancia().cerrarConexion();
+            Conector.getInstancia("db.sqlite").cerrarConexion("db.sqlite");
             System.out.println("Conexion a la base de datos cerrada.");
             System.exit(0); //Cierra la aplicacion y cierra la conexion con la base de datos
         } else if (resultado == javax.swing.JOptionPane.NO_OPTION) {

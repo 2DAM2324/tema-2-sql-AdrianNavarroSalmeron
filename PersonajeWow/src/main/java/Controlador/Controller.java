@@ -37,8 +37,8 @@ public class Controller {
         this.ArrayDeObjetosSistema = arrayObjeto;
         this.ArrayDeHermandadesSistema = arrayHermandad;
         this.ArrayDeInventariosSistema = arrayInventario;
-        Conector conector = Conector.getInstancia();
-        this.conector = conector;
+        Conector conectorDb = Conector.getInstancia("db.sqlite");
+        this.conector = conectorDb;
         conector.crearBaseDatos();
         
         
@@ -465,6 +465,7 @@ public class Controller {
         }
     }
     
+    //TODO: hay que hacer esto tambien en la base de datos
     public void vaciarInventario(String idInventario){
         
         for(Inventario inventario : getArrayDeInventariosSistema()){

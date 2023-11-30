@@ -20,48 +20,65 @@ import java.util.ArrayList;
  */
 public class Conector {
 
-    private  static Conector instancia = null;
+    private static Conector instancia = null;
     private Connection conn = null;
+    private Connection connTest = null;
+    public String nombreDb;
 
     private Conector() {
     }
-    
-   
-    public static Conector getInstancia(){
-        if(instancia == null){
+
+    public static Conector getInstancia(String dbName) {
+        if (instancia == null) {
             instancia = new Conector();
-            instancia.conn = instancia.conectar();
-            
+            instancia.conectar(dbName);
         }
         return instancia;
     }
-    
-    public Connection getConexion(){
-        return conn;
-    }
-    
-    public  Connection conectar() {
-        try {
-            if(conn == null){
-                 // Ruta a la base de datos SQLite
-                String url = "jdbc:sqlite:db.sqlite";
 
-                // Conectar a la base de datos
-                conn = DriverManager.getConnection(url);
-                System.out.println("Conexión establecida a SQLite.");
+    public Connection getConexion(String dbName) {
+        switch (dbName) {
+            case "db.sqlite" -> {
+                return conn;
             }
-           
+            case "dbTest.sqlite" -> {
+                return connTest;
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
+
+    public void conectar(String dbNombre) {
+        try {
+            switch (dbNombre) {
+                case "db.sqlite" -> {
+                    if (conn == null) {
+                        String url = "jdbc:sqlite:db.sqlite";
+                        nombreDb = "db.sqlite";
+                        conn = DriverManager.getConnection(url);
+                    }
+                }
+                case "dbTest.sqlite" -> {
+                    if (connTest == null) {
+                        String urlTest = "jdbc:sqlite:dbTest.sqlite";
+                        nombreDb = "dbTest.sqlite";
+                        connTest = DriverManager.getConnection(urlTest);
+                    }
+                }
+            }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }
-        return conn;
     }
+
 
     /**
      * @brief Crea la base de datos y las tablas si no existen
      */
 public void crearBaseDatos() {
-    Connection conexion = instancia.getConexion();
+    Connection conexion = instancia.getConexion(nombreDb);
     // Conectar a la base de datos
 
     //Crea la tabla de objetos
@@ -159,7 +176,7 @@ public void crearBaseDatos() {
      * @brief Borra la base de datos y las tablas
      */
     public void borrarDb(){
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
 
         //Borrar relacionHermandadPersonaje
         try(PreparedStatement stmtBorrarHermandadPersonaje = conexion.prepareStatement(
@@ -232,7 +249,7 @@ public void crearBaseDatos() {
      */
     public void insertarObjetoEnBd(Objeto objeto) throws SQLException, SQLIntegrityConstraintViolationException, NullPointerException {
          String sql = "INSERT INTO objeto (idObjeto, rareza, descripcion, precio, nombreObjeto) VALUES (?, ?, ?, ?, ?)";
-         Connection conexion = instancia.getConexion();
+         Connection conexion = instancia.getConexion(nombreDb);
         // Conectar a la base de datos
         try{
             PreparedStatement  consulta = conexion.prepareStatement(sql);
@@ -257,7 +274,7 @@ public void crearBaseDatos() {
 
     public void modificarObjetoEnBd(Objeto objeto) throws SQLException, NullPointerException{
         String sql = "UPDATE objeto SET rareza = ?, descripcion = ?, precio = ?, nombreObjeto = ? WHERE idObjeto = ?";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
         try{
             PreparedStatement consulta = conexion.prepareStatement(sql);
             consulta.setString(1, objeto.getRareza());
@@ -285,7 +302,7 @@ public void crearBaseDatos() {
     public void borrarObjetoDeBd(Objeto objeto) throws SQLException, NullPointerException {
         String sqlTablaObjeto = "DELETE FROM objeto WHERE idObjeto = ?";
         String sqlTablaInventarioObjeto = "DELETE FROM InventarioObjeto WHERE idObjeto = ?";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
         try {
             PreparedStatement consultaInventarioObjeto = conexion.prepareStatement(sqlTablaInventarioObjeto);
             PreparedStatement consultaObjeto = conn.prepareStatement(sqlTablaObjeto);
@@ -309,7 +326,7 @@ public void crearBaseDatos() {
      */
     public void leerObjetosDeBd(ArrayList ObjetosSistema) throws SQLException, NullPointerException{
         String sql = "SELECT * FROM objeto";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
         try{
             Statement statementObjeto = conexion.createStatement();
             ResultSet resulsetObjeto = statementObjeto.executeQuery(sql);
@@ -343,7 +360,7 @@ public void crearBaseDatos() {
         String sqlInventario = "INSERT INTO inventario (idInventario, capacidadMaxima, espaciosOcupados) VALUES (?, ?, ?)";
         String sqlPersonaje = "INSERT INTO personaje (nombre, servidor, faccion, raza, idInventario, nivel) VALUES (?, ?, ?, ?, ?, ?)";
         String modificacionInventario = "UPDATE inventario SET idPersonaje = ? WHERE idInventario = ?";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
         PreparedStatement consultaInventario = null;
         PreparedStatement consultaPersonaje = null;
         PreparedStatement consultaInventarioModificacion = null;
@@ -424,7 +441,7 @@ public void crearBaseDatos() {
      */
     public void leerPersonaje(String nombre, String servidor, ArrayList<Personaje> ArrayListDePersonajesSistema) throws SQLException, NullPointerException {
         String sql = "SELECT idPersonaje, nombre, servidor, faccion, raza, idInventario, nivel FROM personaje WHERE nombre = ? AND servidor = ?";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
 
         try {
             PreparedStatement preparedStatement = conexion.prepareStatement(sql);
@@ -467,7 +484,7 @@ public void crearBaseDatos() {
      */
     public void leerInventario(ArrayList inventariosSistema) throws SQLException, NullPointerException{
         String sql = "SELECT * FROM inventario";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
         try{
             Statement statementInventario = conexion.createStatement();
             ResultSet resulsetInventario = statementInventario.executeQuery(sql);
@@ -494,7 +511,7 @@ public void crearBaseDatos() {
      */
     public void modificarPersonajeBd(Personaje personaje) throws SQLException, NullPointerException{
         String sql = "UPDATE personaje SET nombre = ?, servidor = ?, faccion = ?, raza = ?, nivel = ? WHERE idPersonaje = ?";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
 
         try{
             PreparedStatement consulta = conexion.prepareStatement(sql);
@@ -522,7 +539,7 @@ public void crearBaseDatos() {
     public void borrarPersonajeIventarioBd(Personaje personaje) throws SQLException, NullPointerException{
         String sqlTablaPersonaje = "DELETE FROM personaje WHERE idPersonaje = ?";
         String sqlTablaInventario = "DELETE FROM inventario WHERE idInventario = ?";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
 
         try{
             PreparedStatement consultaPersonaje = conexion.prepareStatement(sqlTablaPersonaje);
@@ -556,7 +573,7 @@ public void crearBaseDatos() {
      */
     public void leerPersonajeDeBd(ArrayList personajesSitema, ArrayList inventariosSistema, ArrayList<Hermandad> hermandadesSistema) throws SQLException, NullPointerException{
         String sql = "SELECT * FROM personaje";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
 
         try{
             Statement statementPersonaje = conexion.createStatement();
@@ -614,7 +631,7 @@ public void crearBaseDatos() {
      */
     public void insertarHermandadEnBD(Hermandad hermandad) throws SQLException, SQLIntegrityConstraintViolationException, NullPointerException {
         String sql = "INSERT INTO hermandad (idHermandad, nombreHermandad, servidorHermandad, numeroMiembros) VALUES (?, ?, ?, ?)";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
         
         try{
                 PreparedStatement  consulta = conexion.prepareStatement(sql);
@@ -639,7 +656,7 @@ public void crearBaseDatos() {
      */
     public void modificarHermandadEnBd(Hermandad hermandad) throws SQLException, NullPointerException{
         String sql = "UPDATE hermandad SET nombreHermandad = ?, servidorHermandad = ?, numeroMiembros = ? WHERE idHermandad = ?";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
 
         try{
             PreparedStatement consulta = conexion.prepareStatement(sql);
@@ -665,7 +682,7 @@ public void crearBaseDatos() {
     public void borrarHermandadBd(Hermandad hermandad) throws SQLException, NullPointerException {
         String sqlTablaHermandad = "DELETE FROM hermandad WHERE idHermandad = ?";
         String sqlTablaHermandadPersonaje = "DELETE FROM hermandadPersonaje WHERE idHermandad = ?";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
 
         try{
             PreparedStatement consultaHermandadPersonaje = conexion.prepareStatement(sqlTablaHermandadPersonaje);
@@ -690,7 +707,7 @@ public void crearBaseDatos() {
      */
     public void leerHermandad(ArrayList<Hermandad> ArrayDeHermandadesSistema) throws SQLException, NullPointerException{
         String sql = "SELECT * FROM hermandad";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
 
         try{
             Statement statementHermandad = conexion.createStatement();
@@ -720,7 +737,7 @@ public void crearBaseDatos() {
      */
     public void leerHermandadPersonaje(ArrayList<Hermandad> arrayDeHermandadesSistema, ArrayList<Personaje> personajesSistema) throws SQLException, NullPointerException{
         String sql = "SELECT * FROM hermandadPersonaje";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
 
         try{
             Statement statementHermandadPersonaje = conexion.createStatement();
@@ -766,7 +783,7 @@ public void crearBaseDatos() {
      */
     public void insertarPersonajeHermandad(Personaje personaje, Hermandad hermandad) throws SQLException, SQLIntegrityConstraintViolationException, NullPointerException{
         String sql = "INSERT INTO hermandadPersonaje (idHermandad, idPersonaje) VALUES (?, ?)";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
 
         try{
             PreparedStatement consulta = conexion.prepareStatement(sql);
@@ -791,7 +808,7 @@ public void crearBaseDatos() {
      */
     public void borrarPersonajeHermandad(Personaje personaje, Hermandad hermandad) throws SQLException, NullPointerException{
         String sql = "DELETE FROM hermandadPersonaje WHERE idHermandad = ? AND idPersonaje = ?";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
 
         try{
             PreparedStatement consulta = conexion.prepareStatement(sql);
@@ -818,7 +835,7 @@ public void crearBaseDatos() {
      */
     public void insertarObjetoEnInventario(Objeto objeto, Inventario inventario) throws SQLException, SQLIntegrityConstraintViolationException, NullPointerException{
         String sql = "INSERT INTO InventarioObjeto (idInventario, idObjeto) VALUES (?, ?)";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
 
         try{
             PreparedStatement consulta = conexion.prepareStatement(sql);
@@ -844,7 +861,7 @@ public void crearBaseDatos() {
      */
     public void borrarObjetoEnInventario(Objeto objeto, Inventario inventario) throws SQLException, NullPointerException{
         String sql = "DELETE FROM InventarioObjeto WHERE idInventario = ? AND idObjeto = ?";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
 
         try{
             PreparedStatement consulta = conexion.prepareStatement(sql);
@@ -868,7 +885,7 @@ public void crearBaseDatos() {
      */
     public void modificarInventario(Inventario inventario) throws SQLException, NullPointerException{
         String sql = "UPDATE inventario SET espaciosOcupados = ? WHERE idInventario = ?";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
 
         try{
             PreparedStatement consulta = conexion.prepareStatement(sql);
@@ -893,7 +910,7 @@ public void crearBaseDatos() {
      */
     public void leerInventarioObjeto(ArrayList<Inventario> inventario, ArrayList<Objeto> objetos) throws SQLException, NullPointerException{
         String sql = "SELECT * FROM InventarioObjeto";
-        Connection conexion = instancia.getConexion();
+        Connection conexion = instancia.getConexion(nombreDb);
 
         try{
             Statement statementInventarioObjeto = conexion.createStatement();
@@ -924,13 +941,24 @@ public void crearBaseDatos() {
     }
 
     /**
+     * @param dbName
      * @brief Cierra la conexion a la base de datos
      */
-    public void cerrarConexion() {
+    public void cerrarConexion(String dbName) {
         try {
-            if (conn != null) {
-                conn.close();
-                System.out.println("Conexión cerrada.");
+            switch (dbName) {
+                case "db.sqlite" -> {
+                    if (conn != null) {
+                        conn.close();
+                        System.out.println("Conexión a db.sqlite cerrada.");
+                    }
+                }
+                case "dbTest.sqlite" -> {
+                    if (connTest != null) {
+                        connTest.close();
+                        System.out.println("Conexión a dbTest.sqlite cerrada.");
+                    }
+                }
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
