@@ -63,10 +63,50 @@ public class Controller {
         catch(NullPointerException e){
             JOptionPane.showMessageDialog(vista, "ERROR AL LEER INVENTARIOS DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
-       conector.leerInventarioObjeto(ArrayDeInventariosSistema, ArrayDeObjetosSistema);
-       conector.leerPersonajeDeBd(ArrayDePersonajesSistema, ArrayDeInventariosSistema, ArrayDeHermandadesSistema);
-       conector.leerHermandad(ArrayDeHermandadesSistema);
-       conector.leerHermandadPersonaje(ArrayDeHermandadesSistema, ArrayDePersonajesSistema);
+
+        //Leemos inventario Objeto
+        try{
+            conector.leerInventarioObjeto(ArrayDeInventariosSistema, ArrayDeObjetosSistema);
+        }
+        catch(SQLException e){
+            JOptionPane.showMessageDialog(vista, "ERROR AL LEER INVENTARIO-OBJETO DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        catch(NullPointerException e){
+            JOptionPane.showMessageDialog(vista, "ERROR AL LEER INVENTARIO-OBJETO DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+
+         //Leemos los personajes de la base de datos
+         try{
+            conector.leerPersonajeDeBd(ArrayDePersonajesSistema, ArrayDeInventariosSistema, ArrayDeHermandadesSistema);
+        }
+        catch(SQLException e){
+            JOptionPane.showMessageDialog(vista, "ERROR AL LEER PERSONAJES DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        catch(NullPointerException e){
+            JOptionPane.showMessageDialog(vista, "ERROR AL LEER PERSONAJES DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+
+        //Leemos las hermandades de la base de datos
+        try{
+            conector.leerHermandad(ArrayDeHermandadesSistema);
+        }
+        catch(SQLException e){
+            JOptionPane.showMessageDialog(vista, "ERROR AL LEER HERMANDADES DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        catch(NullPointerException e){
+            JOptionPane.showMessageDialog(vista, "ERROR AL LEER HERMANDADES DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+
+        //Leemos la tabla hermandadPersonaje de la base de datos
+        try{
+            conector.leerHermandadPersonaje(ArrayDeHermandadesSistema, ArrayDePersonajesSistema);
+        }
+        catch(SQLException e){
+            JOptionPane.showMessageDialog(vista, "ERROR AL LEER HERMANDAD-PERSONAJE DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        catch(NullPointerException e){
+            JOptionPane.showMessageDialog(vista, "ERROR AL LEER HERMANDAD-PERSONAJE DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
         cargarObjetoEnTabla(ArrayDeObjetosSistema);
         cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
         cargarPersonajesEnTabla(ArrayDePersonajesSistema);
@@ -166,7 +206,14 @@ public class Controller {
                 if (inventario.getObjetosInventario().contains(objetoaBorrar)) {
                     inventario.getObjetosInventario().remove(objetoaBorrar);
                     inventario.setEspaciosOcupados(inventario.getObjetosInventario().size());
-                    conector.modificarInventario(inventario);
+
+                    //Bloque para capturar las excepciones a la hora de modificar el inventario en la BD
+                    try{
+                        conector.modificarInventario(inventario);
+                    }
+                    catch(SQLException | NullPointerException e){
+                        JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR EL INVENTARIO EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
             //Bloque para capturar las excepciones a la hora de borrar de la BD
@@ -191,8 +238,20 @@ public class Controller {
             if(getArrayDeInventariosSistema().get(posicionInventario).comprobarSiObjetoEnInventario(getObjetoById(idObjeto))){
                 getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().remove(getObjetoById(idObjeto));
                 getArrayDeInventariosSistema().get(posicionInventario).setEspaciosOcupados(getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().size());
-                conector.modificarInventario(getArrayDeInventariosSistema().get(posicionInventario));
-                conector.borrarObjetoEnInventario(getArrayDeObjetosSistema().get(posicionObjeto), getArrayDeInventariosSistema().get(posicionInventario));
+                //Actualizamos el inventario en la base de datos
+                try{
+                    conector.modificarInventario(getArrayDeInventariosSistema().get(posicionInventario));
+                }
+                catch(SQLException | NullPointerException e){
+                    JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR EL INVENTARIO EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+                //Borramos el objeto del inventario en la base de datos
+                try{
+                    conector.borrarObjetoEnInventario(getArrayDeObjetosSistema().get(posicionObjeto), getArrayDeInventariosSistema().get(posicionInventario));
+                }
+                catch(SQLException | NullPointerException e){
+                    JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO BORRAR EL OBJETO DEL INVENTARIO EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
                 cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
                 cargarPersonajesEnTabla(ArrayDePersonajesSistema);
                 cargarInventarioPersonajeEnTabla(getArrayDeInventariosSistema().get(posicionInventario).getIdPersonaje());
@@ -371,9 +430,26 @@ public class Controller {
         if(posicionObjeto != -1 && posicionInventario != -1){
             if(!getArrayDeInventariosSistema().get(posicionInventario).comprobarSiObjetoEnInventario(getObjetoById(idObjeto))){
                 //getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().add(getArrayDeObjetosSistema().get(posicionObjeto));
-                 conector.insertarObjetoEnInventario(getArrayDeObjetosSistema().get(posicionObjeto), getArrayDeInventariosSistema().get(posicionInventario));
+
+                //Insertamos el objeto en el inventario en la base de datos
+                try{
+                    conector.insertarObjetoEnInventario(getArrayDeObjetosSistema().get(posicionObjeto), getArrayDeInventariosSistema().get(posicionInventario));
+                }
+                catch(SQLIntegrityConstraintViolationException e){
+                    JOptionPane.showMessageDialog(vista, "PK de objeto-inventario repetida en BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+                catch(SQLException | NullPointerException e ){
+                    JOptionPane.showMessageDialog(vista, "ERROR AL INSERTAR OBJETO-INVENTARIO EN BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
                 getArrayDeInventariosSistema().get(posicionInventario).setEspaciosOcupados(getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().size());
-                conector.modificarInventario(getArrayDeInventariosSistema().get(posicionInventario));
+
+                //Actualizamos el inventario en la base de datos
+                try{
+                    conector.modificarInventario(getArrayDeInventariosSistema().get(posicionInventario));
+                }
+                catch(SQLException | NullPointerException e){
+                    JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR EL INVENTARIO EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
                 cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
                 cargarPersonajesEnTabla(ArrayDePersonajesSistema);
                 //Mensaje informativo de que se ha añadido correctamente
@@ -389,6 +465,7 @@ public class Controller {
         }
     }
     
+    //TODO: hay que hacer esto tambien en la base de datos
     public void vaciarInventario(String idInventario){
         
         for(Inventario inventario : getArrayDeInventariosSistema()){
@@ -537,7 +614,12 @@ public class Controller {
                         hermandad.getListaMiembros().remove(getArrayDePersonajesDeSistema().get(posicionPersonaje));
                         hermandad.setNumeroMiembros(hermandad.getListaMiembros().size());
                         //Actualiza el numero de miembros de las hermandades a las que pertenecia el personaje
-                        conector.modificarHermandadEnBd(hermandad);
+                        try{
+                            conector.modificarHermandadEnBd(hermandad);
+                        }
+                        catch(SQLException | NullPointerException e){
+                            JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR LA HERMANDAD EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 }
             }
@@ -578,7 +660,16 @@ public class Controller {
             hermandad.setNombreHermandad(nombre);
             hermandad.setServidorHermandad(servidor);
             ArrayDeHermandadesSistema.add(hermandad);
-            conector.insertarHermandadEnBD(hermandad);
+            //Insertamos la hermandad 
+            try{
+                conector.insertarHermandadEnBD(hermandad);
+            }
+            catch(SQLIntegrityConstraintViolationException e){
+                JOptionPane.showMessageDialog(vista, "PK de hermandad repetida en BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+            catch(SQLException | NullPointerException e ){
+                JOptionPane.showMessageDialog(vista, "ERROR AL INSERTAR HERMANDAD EN BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
             cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
         }
         else{
@@ -631,8 +722,25 @@ public class Controller {
                     getArrayDeHermandadesSistema().get(posicionHermandad).setNumeroMiembros(getArrayDeHermandadesSistema().get(posicionHermandad).getListaMiembros().size());
                     //Añadimos la hermandad a la lista de hermandades de este personaje
                     getArrayDePersonajesDeSistema().get(posicionPersonaje).getListaHermandadades().add(getArrayDeHermandadesSistema().get(posicionHermandad));
-                    conector.insertarPersonajeHermandad(getArrayDePersonajesDeSistema().get(posicionPersonaje), getArrayDeHermandadesSistema().get(posicionHermandad));
-                    conector.modificarHermandadEnBd(getArrayDeHermandadesSistema().get(posicionHermandad));
+                    
+                    //Insertamos la hermandad-personaje en la base de datos
+                    try{
+                        conector.insertarPersonajeHermandad(getArrayDePersonajesDeSistema().get(posicionPersonaje), getArrayDeHermandadesSistema().get(posicionHermandad));
+                    }
+                    catch(SQLIntegrityConstraintViolationException e){
+                        JOptionPane.showMessageDialog(vista, "PK de hermandad-personaje repetida en BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
+                    catch(SQLException | NullPointerException e ){
+                        JOptionPane.showMessageDialog(vista, "ERROR AL INSERTAR HERMANDAD-PERSONAJE EN BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
+                    
+                    //Actualizamos el numero de miembros de la hermnadad
+                    try{
+                        conector.modificarHermandadEnBd(getArrayDeHermandadesSistema().get(posicionHermandad));
+                    }
+                    catch(SQLException | NullPointerException e){
+                        JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR LA HERMANDAD EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
                     cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
                     cargarPersonajesHermandadEnTabla(getArrayDeHermandadesSistema().get(posicionHermandad).getIdHermandad());
                     JOptionPane.showMessageDialog(vista, "Personaje añadido correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);
@@ -656,12 +764,22 @@ public class Controller {
                     //Comprueba si el personaje esta en la hermandad
                     if(comprobarSiPersonajeEnHermandad(getArrayDePersonajesDeSistema().get(posicionPersonaje).getIdPersonaje(), getArrayDeHermandadesSistema().get(posicionHermandad).getIdHermandad())){
                         //Borramos el personaje de la tabla hermandadPersonaje
-                        conector.borrarPersonajeHermandad(getArrayDePersonajesDeSistema().get(posicionPersonaje), getArrayDeHermandadesSistema().get(posicionHermandad));
+                        try{
+                            conector.borrarPersonajeHermandad(getArrayDePersonajesDeSistema().get(posicionPersonaje), getArrayDeHermandadesSistema().get(posicionHermandad));
+                        }
+                        catch(SQLException | NullPointerException e){
+                            JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO BORRAR EL PERSONAJE-HERMANDAD DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        }
                         getArrayDeHermandadesSistema().get(posicionHermandad).getListaMiembros().remove(getArrayDePersonajesDeSistema().get(posicionPersonaje));
                         getArrayDeHermandadesSistema().get(posicionHermandad).setNumeroMiembros(getArrayDeHermandadesSistema().get(posicionHermandad).getListaMiembros().size());
                         getArrayDePersonajesDeSistema().get(posicionPersonaje).getListaHermandadades().remove(getArrayDeHermandadesSistema().get(posicionHermandad));
                         //Actualizamos el numero de miembros de la hermnadad
-                        conector.modificarHermandadEnBd(getArrayDeHermandadesSistema().get(posicionHermandad));
+                        try{
+                            conector.modificarHermandadEnBd(getArrayDeHermandadesSistema().get(posicionHermandad));
+                        }
+                        catch(SQLException | NullPointerException e){
+                            JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR LA HERMANDAD EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        }
                         cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
                         cargarPersonajesHermandadEnTabla(getArrayDeHermandadesSistema().get(posicionHermandad).getIdHermandad());
                         JOptionPane.showMessageDialog(vista, "Personaje borrado correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);
@@ -686,7 +804,12 @@ public class Controller {
                     getArrayDeHermandadesSistema().get(posicionHermandad).setNombreHermandad(nombreCambiar);
                     getArrayDeHermandadesSistema().get(posicionHermandad).setServidorHermandad(servidorCambiar);
                     //Una vez que se han cambiado el nombre y el servidor en el controlador lo cambiamos en la bd.
-                    conector.modificarHermandadEnBd(getArrayDeHermandadesSistema().get(posicionHermandad));
+                    try{
+                        conector.modificarHermandadEnBd(getArrayDeHermandadesSistema().get(posicionHermandad));
+                    }
+                    catch(SQLException | NullPointerException e){
+                        JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR LA HERMANDAD EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
                     cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
                 }
                 else{
@@ -717,7 +840,12 @@ public class Controller {
                 }
             }
             getArrayDeHermandadesSistema().remove(posicionHermandad);
-            conector.borrarHermandadBd(hermandadABorrar);
+            try{
+                conector.borrarHermandadBd(hermandadABorrar);
+            }
+            catch(SQLException | NullPointerException e){
+                JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO BORRAR LA HERMANDAD DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
             cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
         } else {
             System.out.println("No se ha encontrado la hermandad");

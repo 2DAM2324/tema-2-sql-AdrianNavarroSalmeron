@@ -554,7 +554,7 @@ public void crearBaseDatos() {
      * @param inventariosSistema ArrayList donde esta el inventario del personaje
      * @param hermandadesSistema ArrayList donde se busca las hermandades donde esta el personaje
      */
-    public void leerPersonajeDeBd(ArrayList personajesSitema, ArrayList inventariosSistema, ArrayList<Hermandad> hermandadesSistema){
+    public void leerPersonajeDeBd(ArrayList personajesSitema, ArrayList inventariosSistema, ArrayList<Hermandad> hermandadesSistema) throws SQLException, NullPointerException{
         String sql = "SELECT * FROM personaje";
         Connection conexion = instancia.getConexion();
 
@@ -612,7 +612,7 @@ public void crearBaseDatos() {
      * @brief Inserta una hermandad en la base de datos
      * @param hermandad Hermandad a insertar
      */
-    public void insertarHermandadEnBD(Hermandad hermandad) {
+    public void insertarHermandadEnBD(Hermandad hermandad) throws SQLException, SQLIntegrityConstraintViolationException, NullPointerException {
         String sql = "INSERT INTO hermandad (idHermandad, nombreHermandad, servidorHermandad, numeroMiembros) VALUES (?, ?, ?, ?)";
         Connection conexion = instancia.getConexion();
         
@@ -637,7 +637,7 @@ public void crearBaseDatos() {
      * @brief Modifica una hermandad en la base de datos, no se puede modificar la ID
      * @param hermandad Hermandad a modificar
      */
-    public void modificarHermandadEnBd(Hermandad hermandad){
+    public void modificarHermandadEnBd(Hermandad hermandad) throws SQLException, NullPointerException{
         String sql = "UPDATE hermandad SET nombreHermandad = ?, servidorHermandad = ?, numeroMiembros = ? WHERE idHermandad = ?";
         Connection conexion = instancia.getConexion();
 
@@ -662,7 +662,7 @@ public void crearBaseDatos() {
      * @brief Borra una hermandad de la base de datos
      * @param hermandad Hermandad a borrar
      */
-    public void borrarHermandadBd(Hermandad hermandad) {
+    public void borrarHermandadBd(Hermandad hermandad) throws SQLException, NullPointerException {
         String sqlTablaHermandad = "DELETE FROM hermandad WHERE idHermandad = ?";
         String sqlTablaHermandadPersonaje = "DELETE FROM hermandadPersonaje WHERE idHermandad = ?";
         Connection conexion = instancia.getConexion();
@@ -688,7 +688,7 @@ public void crearBaseDatos() {
      * @brief Lee una hermandad de la base de datos y la añade al array de hermandades
      * @param ArrayDeHermandadesSistema ArrayList donde se almacenarán las hermandades
      */
-    public void leerHermandad(ArrayList<Hermandad> ArrayDeHermandadesSistema){
+    public void leerHermandad(ArrayList<Hermandad> ArrayDeHermandadesSistema) throws SQLException, NullPointerException{
         String sql = "SELECT * FROM hermandad";
         Connection conexion = instancia.getConexion();
 
@@ -718,7 +718,7 @@ public void crearBaseDatos() {
      * @param arrayDeHermandadesSistema ArrayList de hermandades en la que buscamos los personajes para saber si son miembros de esa hermandad
      * @param personajesSistema ArrayList de personajes en el que buscamos las hermandades para saber si son miembros de esa hermandad
      */
-    public void leerHermandadPersonaje(ArrayList<Hermandad> arrayDeHermandadesSistema, ArrayList<Personaje> personajesSistema){
+    public void leerHermandadPersonaje(ArrayList<Hermandad> arrayDeHermandadesSistema, ArrayList<Personaje> personajesSistema) throws SQLException, NullPointerException{
         String sql = "SELECT * FROM hermandadPersonaje";
         Connection conexion = instancia.getConexion();
 
@@ -764,7 +764,7 @@ public void crearBaseDatos() {
      * @param personaje Personaje a insertar
      * @param hermandad Hermandad en la que se inserta el personaje
      */
-    public void insertarPersonajeHermandad(Personaje personaje, Hermandad hermandad){
+    public void insertarPersonajeHermandad(Personaje personaje, Hermandad hermandad) throws SQLException, SQLIntegrityConstraintViolationException, NullPointerException{
         String sql = "INSERT INTO hermandadPersonaje (idHermandad, idPersonaje) VALUES (?, ?)";
         Connection conexion = instancia.getConexion();
 
@@ -789,7 +789,7 @@ public void crearBaseDatos() {
      * @param personaje Personaje a borrar
      * @param hermandad Hermandad de la que se borra el personaje
      */
-    public void borrarPersonajeHermandad(Personaje personaje, Hermandad hermandad){
+    public void borrarPersonajeHermandad(Personaje personaje, Hermandad hermandad) throws SQLException, NullPointerException{
         String sql = "DELETE FROM hermandadPersonaje WHERE idHermandad = ? AND idPersonaje = ?";
         Connection conexion = instancia.getConexion();
 
@@ -816,7 +816,7 @@ public void crearBaseDatos() {
      * @param objeto Objeto a insertar
      * @param inventario Inventario en el que se inserta el objeto
      */
-    public void insertarObjetoEnInventario(Objeto objeto, Inventario inventario){
+    public void insertarObjetoEnInventario(Objeto objeto, Inventario inventario) throws SQLException, SQLIntegrityConstraintViolationException, NullPointerException{
         String sql = "INSERT INTO InventarioObjeto (idInventario, idObjeto) VALUES (?, ?)";
         Connection conexion = instancia.getConexion();
 
@@ -842,7 +842,7 @@ public void crearBaseDatos() {
      * @param objeto Objeto a borrar
      * @param inventario Inventario del que se borra el objeto
      */
-    public void borrarObjetoEnInventario(Objeto objeto, Inventario inventario){
+    public void borrarObjetoEnInventario(Objeto objeto, Inventario inventario) throws SQLException, NullPointerException{
         String sql = "DELETE FROM InventarioObjeto WHERE idInventario = ? AND idObjeto = ?";
         Connection conexion = instancia.getConexion();
 
@@ -866,7 +866,7 @@ public void crearBaseDatos() {
      * @brief Modifica un inventario en la base de datos
      * @param inventario Inventario a modificar
      */
-    public void modificarInventario(Inventario inventario){
+    public void modificarInventario(Inventario inventario) throws SQLException, NullPointerException{
         String sql = "UPDATE inventario SET espaciosOcupados = ? WHERE idInventario = ?";
         Connection conexion = instancia.getConexion();
 
@@ -891,7 +891,7 @@ public void crearBaseDatos() {
      * @param inventario ArrayList de inventarios de donde se lee
      * @param objetos ArrayList de objetos donde se buscan los objetos que se van a añadir al inventario
      */
-    public void leerInventarioObjeto(ArrayList<Inventario> inventario, ArrayList<Objeto> objetos){
+    public void leerInventarioObjeto(ArrayList<Inventario> inventario, ArrayList<Objeto> objetos) throws SQLException, NullPointerException{
         String sql = "SELECT * FROM InventarioObjeto";
         Connection conexion = instancia.getConexion();
 
