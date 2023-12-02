@@ -43,7 +43,7 @@ public class ControllerTest {
     public void setUp() {
         try {
             ventana = new Ventana1();
-            controlador = new Controller(ventana, nombreBd);
+            controlador = new Controller(ventana, nombreBd, true);
             ventana.setControlador(controlador);  // Establece el controlador en la vista
             ventana.setVisible(false);
             controlador.conector.borrarDb();

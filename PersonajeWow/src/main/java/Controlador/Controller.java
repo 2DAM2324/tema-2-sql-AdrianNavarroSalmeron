@@ -3,15 +3,20 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Controlador;
-import Modelo.*;
-import Vista.Ventana1;
-import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
+import Modelo.Conector;
+import Modelo.Hermandad;
+import Modelo.Inventario;
+import Modelo.Objeto;
+import Modelo.Personaje;
+import Vista.Ventana1;
 
 /**
  *
@@ -25,9 +30,10 @@ public class Controller {
     private ArrayList <Objeto> ArrayDeObjetosSistema;
     private ArrayList<Inventario> ArrayDeInventariosSistema;
     private Ventana1 vista;
+    private boolean estoyEnTest;
     
    
-    public Controller(Ventana1 vistaSet, String nombreBd){
+    public Controller(Ventana1 vistaSet, String nombreBd, boolean estoyTestando){
         ArrayList<Personaje> nuevoArray = new ArrayList<>();
         ArrayList<Objeto> arrayObjeto = new ArrayList<>();
         ArrayList<Inventario> arrayInventario = new ArrayList<>();
@@ -40,6 +46,7 @@ public class Controller {
         Conector conectorDb = Conector.getInstancia(nombreBd);
         this.conector = conectorDb;
         conector.crearBaseDatos();
+        estoyEnTest = estoyTestando;
         
         
        //Leemos los objetos de la base de datos
@@ -47,10 +54,11 @@ public class Controller {
               conector.leerObjetosDeBd(ArrayDeObjetosSistema);
          }
         catch(SQLException e){
-            JOptionPane.showMessageDialog(vista, "ERROR AL LEER OBJETOS DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            mostrarMensajesError("ERROR AL LEER OBJETOS DE LA BASE DE DATOS");
+           
         }
         catch(NullPointerException e){
-            JOptionPane.showMessageDialog(vista, "ERROR AL LEER OBJETOS DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            mostrarMensajesError("ERROR AL LEER OBJETOS DE LA BASE DE DATOS");
         }
 
         //Leemos el inventario de la base de datos
@@ -58,10 +66,10 @@ public class Controller {
            conector.leerInventario(ArrayDeInventariosSistema); 
         }
         catch(SQLException e){
-            JOptionPane.showMessageDialog(vista, "ERROR AL LEER INVENTARIOS DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            mostrarMensajesError("ERROR AL LEER INVENTARIOS DE LA BASE DE DATOS");
         }
         catch(NullPointerException e){
-            JOptionPane.showMessageDialog(vista, "ERROR AL LEER INVENTARIOS DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            mostrarMensajesError("ERROR AL LEER INVENTARIOS DE LA BASE DE DATOS");
         }
 
         //Leemos inventario Objeto
@@ -69,10 +77,10 @@ public class Controller {
             conector.leerInventarioObjeto(ArrayDeInventariosSistema, ArrayDeObjetosSistema);
         }
         catch(SQLException e){
-            JOptionPane.showMessageDialog(vista, "ERROR AL LEER INVENTARIO-OBJETO DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            mostrarMensajesError("ERROR AL LEER INVENTARIO-OBJETO DE LA BASE DE DATOS");
         }
         catch(NullPointerException e){
-            JOptionPane.showMessageDialog(vista, "ERROR AL LEER INVENTARIO-OBJETO DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            mostrarMensajesError("ERROR AL LEER INVENTARIO-OBJETO DE LA BASE DE DATOS");
         }
 
          //Leemos los personajes de la base de datos
@@ -80,10 +88,10 @@ public class Controller {
             conector.leerPersonajeDeBd(ArrayDePersonajesSistema, ArrayDeInventariosSistema, ArrayDeHermandadesSistema);
         }
         catch(SQLException e){
-            JOptionPane.showMessageDialog(vista, "ERROR AL LEER PERSONAJES DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            mostrarMensajesError("ERROR AL LEER PERSONAJES DE LA BASE DE DATOS");
         }
         catch(NullPointerException e){
-            JOptionPane.showMessageDialog(vista, "ERROR AL LEER PERSONAJES DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            mostrarMensajesError("ERROR AL LEER PERSONAJES DE LA BASE DE DATOS");
         }
 
         //Leemos las hermandades de la base de datos
@@ -91,10 +99,10 @@ public class Controller {
             conector.leerHermandad(ArrayDeHermandadesSistema);
         }
         catch(SQLException e){
-            JOptionPane.showMessageDialog(vista, "ERROR AL LEER HERMANDADES DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            mostrarMensajesError("ERROR AL LEER HERMANDADES DE LA BASE DE DATOS");
         }
         catch(NullPointerException e){
-            JOptionPane.showMessageDialog(vista, "ERROR AL LEER HERMANDADES DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            mostrarMensajesError("ERROR AL LEER HERMANDADES DE LA BASE DE DATOS");
         }
 
         //Leemos la tabla hermandadPersonaje de la base de datos
@@ -102,10 +110,10 @@ public class Controller {
             conector.leerHermandadPersonaje(ArrayDeHermandadesSistema, ArrayDePersonajesSistema);
         }
         catch(SQLException e){
-            JOptionPane.showMessageDialog(vista, "ERROR AL LEER HERMANDAD-PERSONAJE DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            mostrarMensajesError("ERROR AL LEER HERMANDAD-PERSONAJE DE LA BASE DE DATOS");
         }
         catch(NullPointerException e){
-            JOptionPane.showMessageDialog(vista, "ERROR AL LEER HERMANDAD-PERSONAJE DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+            mostrarMensajesError("ERROR AL LEER HERMANDAD-PERSONAJE DE LA BASE DE DATOS");
         }
         cargarObjetoEnTabla(ArrayDeObjetosSistema);
         cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
@@ -113,8 +121,19 @@ public class Controller {
         cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
     }
     
-  
-    
+    public void mostrarMensajesError(String message) {
+        if (!estoyEnTest) {
+            JOptionPane.showMessageDialog(vista, message, "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void mostrarMensajesOk(String message){
+        if(!estoyEnTest){
+            JOptionPane.showMessageDialog(vista, message, "OK", JOptionPane.INFORMATION_MESSAGE);
+
+        }
+    }
+
     public void setArrayDePersonajesDeSistema(ArrayList<Personaje> array){
         ArrayDePersonajesSistema = array;
     }
@@ -169,27 +188,27 @@ public class Controller {
                              conector.insertarObjetoEnBd(objeto);
                         }
                         catch(SQLIntegrityConstraintViolationException e){
-                                JOptionPane.showMessageDialog(vista, "PK de objeto repetida en BD", "ERROR", JOptionPane.ERROR_MESSAGE);
-                        }
+                            mostrarMensajesError("PK de objeto repetida en BD");
+                     }
                        catch(SQLException | NullPointerException e ){
-                           JOptionPane.showMessageDialog(vista, "ERROR AL INSERTAR OBJETO EN BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                            mostrarMensajesError("ERROR AL INSERTAR OBJETO EN BD");
                        }
                         cargarObjetoEnTabla(ArrayDeObjetosSistema);
-                        JOptionPane.showMessageDialog(vista, "Objeto añadido con exito", "OK", JOptionPane.INFORMATION_MESSAGE);
+                        mostrarMensajesOk("Objeto añadido con exito");
                     }
                     else{
-                        JOptionPane.showMessageDialog(vista, "El precio debe ser mayor que 0", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        mostrarMensajesError("El precio debe ser mayor que 0");
                     }     
             }
             else{ 
-                JOptionPane.showMessageDialog(vista, "No puede haber campos vacios!", "ERROR", JOptionPane.ERROR_MESSAGE);
+                mostrarMensajesError("No puede haber campos vacios");
             }
         }
          catch(NumberFormatException formatoIncorrecto){
-            JOptionPane.showMessageDialog(ventana, "El precio debe de ser un numero", "Error", JOptionPane.ERROR_MESSAGE);;
+            mostrarMensajesError("El precio debe de ser un numero");
         }
         catch(NullPointerException campoVacio){
-            JOptionPane.showMessageDialog(ventana, "No puede haber campos vacios", "Error", JOptionPane.ERROR_MESSAGE);
+            mostrarMensajesError("No puede haber campos vacios");
         }
     }
     
@@ -212,7 +231,7 @@ public class Controller {
                         conector.modificarInventario(inventario);
                     }
                     catch(SQLException | NullPointerException e){
-                        JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR EL INVENTARIO EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        mostrarMensajesError("NO SE HA PODIDO MODIFICAR EL INVENTARIO EN LA BASE DE DATOS");
                     }
                 }
             }
@@ -221,7 +240,7 @@ public class Controller {
                 conector.borrarObjetoDeBd(objetoaBorrar);
             }
             catch(SQLException | NullPointerException e){
-                JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO BORRAR DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                mostrarMensajesError("NO SE HA PODIDO BORRAR DE LA BASE DE DATOS");
             }
             
             
@@ -243,26 +262,27 @@ public class Controller {
                     conector.modificarInventario(getArrayDeInventariosSistema().get(posicionInventario));
                 }
                 catch(SQLException | NullPointerException e){
-                    JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR EL INVENTARIO EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    mostrarMensajesError("NO SE HA PODIDO MODIFICAR EL INVENTARIO EN LA BASE DE DATOS");
                 }
                 //Borramos el objeto del inventario en la base de datos
                 try{
                     conector.borrarObjetoEnInventario(getArrayDeObjetosSistema().get(posicionObjeto), getArrayDeInventariosSistema().get(posicionInventario));
                 }
                 catch(SQLException | NullPointerException e){
-                    JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO BORRAR EL OBJETO DEL INVENTARIO EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    mostrarMensajesError("NO SE HA PODIDO BORRAR EL OBJETO DEL INVENTARIO EN LA BASE DE DATOS");
                 }
                 cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
                 cargarPersonajesEnTabla(ArrayDePersonajesSistema);
                 cargarInventarioPersonajeEnTabla(getArrayDeInventariosSistema().get(posicionInventario).getIdPersonaje());
-                JOptionPane.showMessageDialog(vista, "Objeto borrado correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);
+                mostrarMensajesOk("Objeto borrado correctamente");
             }
             else{
-                JOptionPane.showMessageDialog(vista, "El objeto no existe en el inventario", "ERROR", JOptionPane.ERROR_MESSAGE);
+                //Mensaje de error de que el objeto no existe en el inventario
+                mostrarMensajesError("El objeto no existe en el inventario");
             }
         }
         else{
-            System.out.println("No se ha encontrado el objeto o el inventario");
+            mostrarMensajesError("No se ha encontrado el objeto o el inventario");
         }
     }
     
@@ -299,20 +319,20 @@ public class Controller {
                         conector.modificarObjetoEnBd(getArrayDeObjetosSistema().get(getPosicionObjetoById(id)));
                     }
                     catch(SQLException | NullPointerException e){
-                        JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR EL OBJETO EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        mostrarMensajesError("NO SE HA PODIDO MODIFICAR EL OBJETO EN LA BASE DE DATOS");
                     }
                     cargarObjetoEnTabla(ArrayDeObjetosSistema);
-                    JOptionPane.showMessageDialog(vista, "Objeto modificado correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);
+                    mostrarMensajesOk("Objeto modificado correctamente");
                 }
                  else{
-                JOptionPane.showMessageDialog(vista, "El precio debe ser mayor que 0", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    mostrarMensajesError("El precio debe ser mayor que 0");
                 }
             }
             catch(NumberFormatException formatoIncorrecto){
-                JOptionPane.showMessageDialog(ventana, "El precio debe de ser un numero", "Error", JOptionPane.ERROR_MESSAGE);;
+                mostrarMensajesError("El precio debe de ser un numero");
             }
             catch(NullPointerException campoVacio){
-                JOptionPane.showMessageDialog(ventana, "No puede haber campos vacios", "Error", JOptionPane.ERROR_MESSAGE);
+                mostrarMensajesError("No puede haber campos vacios");
             }
         }
     }
@@ -418,7 +438,7 @@ public class Controller {
                
             }
             else{
-                System.out.println("Personaje no encontrado");
+                mostrarMensajesError("No se ha encontrado el personaje");
             } 
     }
     
@@ -436,10 +456,10 @@ public class Controller {
                     conector.insertarObjetoEnInventario(getArrayDeObjetosSistema().get(posicionObjeto), getArrayDeInventariosSistema().get(posicionInventario));
                 }
                 catch(SQLIntegrityConstraintViolationException e){
-                    JOptionPane.showMessageDialog(vista, "PK de objeto-inventario repetida en BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    mostrarMensajesError("PK de objeto-inventario repetida en BD");
                 }
                 catch(SQLException | NullPointerException e ){
-                    JOptionPane.showMessageDialog(vista, "ERROR AL INSERTAR OBJETO-INVENTARIO EN BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    mostrarMensajesError("ERROR AL INSERTAR OBJETO-INVENTARIO EN BD");
                 }
                 getArrayDeInventariosSistema().get(posicionInventario).setEspaciosOcupados(getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().size());
 
@@ -448,20 +468,20 @@ public class Controller {
                     conector.modificarInventario(getArrayDeInventariosSistema().get(posicionInventario));
                 }
                 catch(SQLException | NullPointerException e){
-                    JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR EL INVENTARIO EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    mostrarMensajesError("NO SE HA PODIDO MODIFICAR EL INVENTARIO EN LA BASE DE DATOS");
                 }
                 cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
                 cargarPersonajesEnTabla(ArrayDePersonajesSistema);
                 //Mensaje informativo de que se ha añadido correctamente
-                JOptionPane.showMessageDialog(vista, "Objeto añadido correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);
+                mostrarMensajesOk("Objeto añadido correctamente");
             }
             else{
                 //Mensaje de error de que el objeto ya existe en el inventario
-                JOptionPane.showMessageDialog(vista, "El objeto ya existe en el inventario", "ERROR", JOptionPane.ERROR_MESSAGE);
+                mostrarMensajesError("El objeto ya existe en el inventario");
             }
         }
         else{
-            System.out.println("No se ha encontrado el objeto o el inventario");
+            mostrarMensajesError("No se ha encontrado el objeto o el inventario");
         }
     }
     
@@ -479,7 +499,7 @@ public class Controller {
                          cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
                     }
                     catch(SQLException | NullPointerException e){
-                          JOptionPane.showMessageDialog(vista, "NO SE PUDO VACIAR EL INVENTARIO DE BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        mostrarMensajesError("NO SE HA PODIDO VACIAR EL INVENTARIO EN LA BASE DE DATOS");
                     }  
                 }
                
@@ -531,10 +551,10 @@ public class Controller {
                 conector.insertarPersonajeYInventarioEnBD(personajeAniadir, inventarioNuevo);
             }
             catch(SQLIntegrityConstraintViolationException e){
-                JOptionPane.showMessageDialog(vista, "PK de personaje repetida en BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                mostrarMensajesError("PK de personaje repetida en BD");
             }
             catch(SQLException | NullPointerException e ){
-                JOptionPane.showMessageDialog(vista, "ERROR AL INSERTAR PERSONAJE EN BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                mostrarMensajesError("ERROR AL INSERTAR PERSONAJE EN BD");
             }
            
             //Traemos el personaje y lo añadimos al vector de personajes del sistema
@@ -542,7 +562,7 @@ public class Controller {
                 conector.leerPersonaje(nombre, servidor, ArrayDePersonajesSistema);
             }
             catch(SQLException | NullPointerException e){
-                JOptionPane.showMessageDialog(vista, "ERROR AL LEER PERSONAJE DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                mostrarMensajesError("ERROR AL LEER PERSONAJE DE LA BASE DE DATOS");
             }
              int posicionPersonaje = buscarPersonajeEnSistema(nombre, servidor);
              //Añadimos el inventario al personaje que hemos introducido en el vector
@@ -551,7 +571,7 @@ public class Controller {
             getArrayDeInventariosSistema().add(inventarioNuevo);
             cargarInventariosSistmemaEnTabla(ArrayDeInventariosSistema);
             cargarPersonajesEnTabla(ArrayDePersonajesSistema);
-            JOptionPane.showMessageDialog(vista, "Personaje añadido correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);
+            mostrarMensajesOk("Personaje añadido correctamente");
         }
         catch(NumberFormatException formatoIncorrecto){
             System.out.println(formatoIncorrecto.getMessage());
@@ -595,7 +615,7 @@ public class Controller {
                 conector.modificarPersonajeBd(getArrayDePersonajesDeSistema().get(posicionPersonaje));
             }
             catch(SQLException | NullPointerException e){
-                JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR EL PERSONAJE EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                mostrarMensajesError("NO SE HA PODIDO MODIFICAR EL PERSONAJE EN LA BASE DE DATOS");
             }
             cargarPersonajesEnTabla(ArrayDePersonajesSistema);
          }
@@ -610,13 +630,12 @@ public class Controller {
                 conector.borrarPersonajeIventarioBd(getArrayDePersonajesDeSistema().get(posicionPersonaje));
             }
             catch(SQLException | NullPointerException e){
-                JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO BORRAR EL PERSONAJE DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                mostrarMensajesError("NO SE HA PODIDO BORRAR EL PERSONAJE DE LA BASE DE DATOS");
             }
             //Primero borra todos los objetos que contiene el inventario
             vaciarInventario(getArrayDePersonajesDeSistema().get(posicionPersonaje).getInventario().getIdInventario());
             //Borra el inventario del sistema
             getArrayDeInventariosSistema().remove(getArrayDePersonajesDeSistema().get(posicionPersonaje).getInventario());
-             System.out.println("Llega aqui");
             //Busca en el array de hermandades de sistema si el personaje pertenece a alguna hermandad y lo borra de la lista de miembros
             for(Hermandad hermandad : getArrayDeHermandadesSistema()){
                for(int i = 0; i < hermandad.getListaMiembros().size(); i++){
@@ -628,7 +647,7 @@ public class Controller {
                             conector.modificarHermandadEnBd(hermandad);
                         }
                         catch(SQLException | NullPointerException e){
-                            JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR LA HERMANDAD EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                            mostrarMensajesError("NO SE HA PODIDO MODIFICAR LA HERMANDAD EN LA BASE DE DATOS");
                         }
                     }
                 }
@@ -639,7 +658,7 @@ public class Controller {
             cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
         }
         else{
-            System.out.println("No se ha encontrado el personaje");
+            mostrarMensajesError("No se ha encontrado el personaje");
         }
     }
     
@@ -675,10 +694,10 @@ public class Controller {
                 conector.insertarHermandadEnBD(hermandad);
             }
             catch(SQLIntegrityConstraintViolationException e){
-                JOptionPane.showMessageDialog(vista, "PK de hermandad repetida en BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                mostrarMensajesError("PK de hermandad repetida en BD");
             }
             catch(SQLException | NullPointerException e ){
-                JOptionPane.showMessageDialog(vista, "ERROR AL INSERTAR HERMANDAD EN BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                mostrarMensajesError("ERROR AL INSERTAR HERMANDAD EN BD");
             }
             cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
         }
@@ -738,10 +757,10 @@ public class Controller {
                         conector.insertarPersonajeHermandad(getArrayDePersonajesDeSistema().get(posicionPersonaje), getArrayDeHermandadesSistema().get(posicionHermandad));
                     }
                     catch(SQLIntegrityConstraintViolationException e){
-                        JOptionPane.showMessageDialog(vista, "PK de hermandad-personaje repetida en BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        mostrarMensajesError("PK de hermandad-personaje repetida en BD");
                     }
                     catch(SQLException | NullPointerException e ){
-                        JOptionPane.showMessageDialog(vista, "ERROR AL INSERTAR HERMANDAD-PERSONAJE EN BD", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        mostrarMensajesError("ERROR AL INSERTAR HERMANDAD-PERSONAJE EN BD");
                     }
                     
                     //Actualizamos el numero de miembros de la hermnadad
@@ -749,15 +768,15 @@ public class Controller {
                         conector.modificarHermandadEnBd(getArrayDeHermandadesSistema().get(posicionHermandad));
                     }
                     catch(SQLException | NullPointerException e){
-                        JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR LA HERMANDAD EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        mostrarMensajesError("NO SE HA PODIDO MODIFICAR LA HERMANDAD EN LA BASE DE DATOS");
                     }
                     cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
                     cargarPersonajesHermandadEnTabla(getArrayDeHermandadesSistema().get(posicionHermandad).getIdHermandad());
-                    JOptionPane.showMessageDialog(vista, "Personaje añadido correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);
+                    mostrarMensajesOk("Personaje añadido correctamente");
 
                 }
                 else{
-                    JOptionPane.showMessageDialog(vista, "El personaje ya esta en la hermandad", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    mostrarMensajesError("La hermandad esta llena o el personaje ya esta en la hermandad");
                 }
             }
             else{
@@ -778,7 +797,7 @@ public class Controller {
                             conector.borrarPersonajeHermandad(getArrayDePersonajesDeSistema().get(posicionPersonaje), getArrayDeHermandadesSistema().get(posicionHermandad));
                         }
                         catch(SQLException | NullPointerException e){
-                            JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO BORRAR EL PERSONAJE-HERMANDAD DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                            mostrarMensajesError("NO SE HA PODIDO BORRAR EL PERSONAJE-HERMANDAD DE LA BASE DE DATOS");
                         }
                         getArrayDeHermandadesSistema().get(posicionHermandad).getListaMiembros().remove(getArrayDePersonajesDeSistema().get(posicionPersonaje));
                         getArrayDeHermandadesSistema().get(posicionHermandad).setNumeroMiembros(getArrayDeHermandadesSistema().get(posicionHermandad).getListaMiembros().size());
@@ -788,14 +807,14 @@ public class Controller {
                             conector.modificarHermandadEnBd(getArrayDeHermandadesSistema().get(posicionHermandad));
                         }
                         catch(SQLException | NullPointerException e){
-                            JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR LA HERMANDAD EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                            mostrarMensajesError("NO SE HA PODIDO MODIFICAR LA HERMANDAD EN LA BASE DE DATOS");
                         }
                         cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
                         cargarPersonajesHermandadEnTabla(getArrayDeHermandadesSistema().get(posicionHermandad).getIdHermandad());
-                        JOptionPane.showMessageDialog(vista, "Personaje borrado correctamente", "OK", JOptionPane.INFORMATION_MESSAGE);
+                        mostrarMensajesOk("Personaje borrado correctamente");
                     }
                     else{
-                        JOptionPane.showMessageDialog(vista, "El personaje no esta en la hermandad", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        mostrarMensajesError("El personaje no esta en la hermandad");
                     }
                 }
                 else{
@@ -818,7 +837,7 @@ public class Controller {
                         conector.modificarHermandadEnBd(getArrayDeHermandadesSistema().get(posicionHermandad));
                     }
                     catch(SQLException | NullPointerException e){
-                        JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO MODIFICAR LA HERMANDAD EN LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        mostrarMensajesError("NO SE HA PODIDO MODIFICAR LA HERMANDAD EN LA BASE DE DATOS");
                     }
                     cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
                 }
@@ -854,7 +873,7 @@ public class Controller {
                 conector.borrarHermandadBd(hermandadABorrar);
             }
             catch(SQLException | NullPointerException e){
-                JOptionPane.showMessageDialog(vista, "NO SE HA PODIDO BORRAR LA HERMANDAD DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                mostrarMensajesError("NO SE HA PODIDO BORRAR LA HERMANDAD DE LA BASE DE DATOS");
             }
             cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
         } else {
