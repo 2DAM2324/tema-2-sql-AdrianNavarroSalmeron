@@ -307,7 +307,7 @@ public class Controller {
      }
     
     public void modificarObjeto(String id, String nombre, String rareza, String precio, String descripcion){
-        if(getPosicionObjetoById(id) !=-1){
+        if(getPosicionObjetoById(id) !=-1 && nombre != null && rareza != null && precio != null && descripcion != null){
             try{
                 double precioParseado = Double.parseDouble(precio);
                 if(getArrayDeObjetosSistema().get(getPosicionObjetoById(id)) != null && precioParseado >= 1){

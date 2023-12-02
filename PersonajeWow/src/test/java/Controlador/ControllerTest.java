@@ -25,6 +25,7 @@ import org.xml.sax.SAXException;
 import Modelo.Inventario;
 import Modelo.Objeto;
 import Vista.Ventana1;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  *
@@ -161,7 +162,100 @@ public class ControllerTest {
         }
         assertNull(objetoFromDb, "El objeto no debería existir en la base de datos");
     }
-    
+
+    /**
+     * Test de modificarObjeto de la clase Controller, cuando el objeto existe y los datos son validos
+     */
+    @Test
+    public void testModificarObjetoExistenteValido(){
+        controlador.modificarObjeto(idObjetoInicialTest, "Cumbia", "Legendaria", "2.1", "Tremenda cumbia");
+        Objeto objetoModificado = null;
+        try{
+            objetoModificado = controlador.conector.getObjeto(idObjetoInicialTest);
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertEquals("Cumbia", objetoModificado.getNombreObjeto(), "El nombre del objeto no se ha modificado");
+        assertEquals("Legendaria", objetoModificado.getRareza(), "La rareza del objeto no se ha modificado");
+        assertEquals(2.1, objetoModificado.getPrecio(), "El precio del objeto no se ha modificado");
+        assertEquals("Tremenda cumbia", objetoModificado.getDescripcion(), "La descripcion del objeto no se ha modificado");
+    }
+
+    /**
+     * Test de modificarObjeto de la clase Controller, cuando el objeto no existe
+     */ 
+    @Test
+    public void testModificarObjetoNoExistente(){
+        controlador.modificarObjeto("idInvalida", "Cumbia", "Legendaria", "2.1", "Tremenda cumbia");
+        Objeto objetoModificado = null;
+        try{
+            objetoModificado = controlador.conector.getObjeto("idInvalida");
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertNull(objetoModificado, "El objeto no debería existir en la base de datos");
+    }
+
+    /**
+     * Test de modificarObjeto de la clase Controller, cuando el objeto existe y el precio es < 0
+     */
+    @Test
+    public void testModificarObjetoExistentePrecioInvalido(){
+        controlador.modificarObjeto(idObjetoInicialTest, "Cumbia", "Legendaria", "-2.1", "Tremenda cumbia");
+        Objeto objetoModificado = null;
+        try{
+            objetoModificado = controlador.conector.getObjeto(idObjetoInicialTest);
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertEquals("Espada", objetoModificado.getNombreObjeto(), "El nombre del objeto no se ha modificado");
+        assertEquals("Comun", objetoModificado.getRareza(), "La rareza del objeto no se ha modificado");
+        assertEquals(41, objetoModificado.getPrecio(), "El precio del objeto no se ha modificado");
+        assertEquals("Es una espada", objetoModificado.getDescripcion(), "La descripcion del objeto no se ha modificado");
+    }
+
+    /**
+     * Test de modificarObjeto de la clase Controller, cuando el objeto existe y el precio no es un numero
+     * Los datos no se modifican
+     */
+    @Test
+    public void testModificarObjetoExistentePrecioNoNumero(){
+        controlador.modificarObjeto(idObjetoInicialTest, "Cumbia", "Legendaria", "2.1a", "Tremenda cumbia");
+        Objeto objetoModificado = null;
+        try{
+            objetoModificado = controlador.conector.getObjeto(idObjetoInicialTest);
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertEquals("Espada", objetoModificado.getNombreObjeto(), "El nombre del objeto no se ha modificado");
+        assertEquals("Comun", objetoModificado.getRareza(), "La rareza del objeto no se ha modificado");
+        assertEquals(41, objetoModificado.getPrecio(), "El precio del objeto no se ha modificado");
+        assertEquals("Es una espada", objetoModificado.getDescripcion(), "La descripcion del objeto no se ha modificado");
+    }
+
+    /**
+     * Test de modificarObjeto de la clase Controller, cuando el objeto existe y el nombre es null
+     * Los datos no se modifican
+     */
+    @Test
+    public void testModificarObjetoExistenteNombreNull(){
+        controlador.modificarObjeto(idObjetoInicialTest, null, "Legendaria", "2.1", "Tremenda cumbia");
+        Objeto objetoModificado = null;
+        try{
+            objetoModificado = controlador.conector.getObjeto(idObjetoInicialTest);
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertEquals("Espada", objetoModificado.getNombreObjeto(), "El nombre del objeto no se ha modificado");
+        assertEquals("Comun", objetoModificado.getRareza(), "La rareza del objeto no se ha modificado");
+        assertEquals(41, objetoModificado.getPrecio(), "El precio del objeto no se ha modificado");
+        assertEquals("Es una espada", objetoModificado.getDescripcion(), "La descripcion del objeto no se ha modificado");
+    }
     /**
      * Test de borrarObjetoInventario de la clase Controller, cuando el objeto si existe
      */
@@ -248,5 +342,41 @@ public class ControllerTest {
             fail("La base de datos ha fallado: " + e.getMessage());
         }
         assertNull(objetoBd, "El objeto no debería existir en la base de datos");
+    }
+
+    /**
+     * Test de vaciarInventario de la clase Controller, cuando el inventario existe
+     */
+    @Test
+    public void testVaciarInventarioValido(){
+        String idObjetoBorradoString = "";
+        controlador.vaciarInventario(idInventarioTestInicial);
+        try{
+           idObjetoBorradoString = controlador.conector.getIdObjetoEnTablaInventarioObjeto(idObjetoInicialTest, idInventarioTestInicial);
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertNull(idObjetoBorradoString, "El objeto no debería existir en la base de datos");
+        assertTrue(controlador.getArrayDeInventariosSistema().get(0).getObjetosInventario().isEmpty(), "El inventario se ha vaciado");
+    }
+
+    /**
+     * Test de vaciarInventario de la clase Controller, cuando el inventario no existe
+     */
+    @Test
+    public void testVaciarInventarioInvalido(){
+        String idInventarioInvalido = "idInvalida";
+        String idObjetoBorradoString = "";
+        controlador.vaciarInventario(idInventarioInvalido);
+        try{
+            idObjetoBorradoString = controlador.conector.getIdObjetoEnTablaInventarioObjeto(idObjetoInicialTest, idInventarioTestInicial);
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertEquals(idObjetoBorradoString, idObjetoInicialTest, "El objeto debería existir en la base de datos");
+        assertTrue(controlador.getArrayDeInventariosSistema().get(0).getObjetosInventario().size() == 1, "El inventario no se ha vaciado");
+
     }
 }

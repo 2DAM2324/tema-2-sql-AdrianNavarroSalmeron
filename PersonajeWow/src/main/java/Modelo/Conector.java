@@ -951,25 +951,48 @@ public void crearBaseDatos() {
             System.out.println(ex.getMessage());
         }
     }
+
+    /**
+     * @brief Devuelve el id del inventario en la tabla inventarioObjeto
+     * @param idInventario
+     * @param idObjeto
+     * @return el id del inventario o null si no se encuentra en la tabla
+     * @throws SQLException
+     */
     
     public Objeto getObjeto(String idObjeto) throws SQLException {
-       Connection conexion = instancia.getConexion(nombreDb);
+        Connection conexion = instancia.getConexion(nombreDb);
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
 
-        String query = "SELECT * FROM objeto WHERE idObjeto = ?";
-        PreparedStatement stmt = conexion.prepareStatement(query);
-        stmt.setString(1, idObjeto);
-        ResultSet rs = stmt.executeQuery();
+        try {
+            String query = "SELECT * FROM objeto WHERE idObjeto = ?";
+            stmt = conexion.prepareStatement(query);
+            stmt.setString(1, idObjeto);
+            rs = stmt.executeQuery();
 
-        if (rs.next()) {
-            Objeto objeto = new Objeto();
-            objeto.setIdObjeto(rs.getString("idObjeto"));
-            objeto.setRareza(rs.getString("rareza"));
-            objeto.setDescripcion(rs.getString("descripcion"));
-            objeto.setPrecio(rs.getDouble("precio"));
-            objeto.setNombreObjeto(rs.getString("nombreObjeto"));
-            return objeto;
-        } else {
-            return null;
+            if (rs.next()) {
+                Objeto objeto = new Objeto();
+                objeto.setIdObjeto(rs.getString("idObjeto"));
+                objeto.setRareza(rs.getString("rareza"));
+                objeto.setDescripcion(rs.getString("descripcion"));
+                objeto.setPrecio(rs.getDouble("precio"));
+                objeto.setNombreObjeto(rs.getString("nombreObjeto"));
+                return objeto;
+            } else {
+                return null;
+            }
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { /* ignored */ }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) { /* ignored */ }
+            }
         }
     }
 
