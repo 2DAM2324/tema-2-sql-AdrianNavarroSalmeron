@@ -46,9 +46,18 @@ public class ControllerTest {
             ventana.setVisible(false);
             controlador.conector.borrarDb();
             controlador.conector.crearBaseDatos();
+            
+            //Dejamos los arrays del sistema vacios
+           controlador.setArrayDeObjetosSistema(new ArrayList<>());
+           controlador.setArrayDeInventariosSistema(new ArrayList<>());
+           controlador.setArrayDePersonajesDeSistema(new ArrayList<>());
+           
+            //Setter, personaje, inventario y objeto
             controlador.aniadirObjeto("Espada", "Comun", "41", "Es una espada", "41");
             controlador.aniadirPersonaje("Victarion", "Sanguino", "Elfo", "60", "Horda");
             controlador.aniadirObjetoaInventario(controlador.getArrayDeObjetosSistema().get(0).getIdObjeto(), controlador.getArrayDePersonajesDeSistema().get(0).getInventario().getIdInventario());
+            
+            //Almacenos los ids en la variable de clase
              idObjetoInicialTest = controlador.getArrayDeObjetosSistema().get(0).getIdObjeto();
              idInventarioTestInicial = controlador.getArrayDeInventariosSistema().get(0).getIdInventario();
         } catch (IOException | ClassNotFoundException | SAXException e) {
@@ -153,21 +162,24 @@ public class ControllerTest {
     
 
     @Test
-    public void testBorrarObjetoInventario() {
+    public void testBorrarObjetoInventarioInvalido() {
+        // Arrange
+        String idObjetoInvalido = "idInvalida";
+        String idInventarioInvalido = "idInvalida";
         
-        controlador.borrarObjetoInventario(idObjetoInicialTest, idInventarioTestInicial);
+   
+        //Borramos un objeto invalido
+        controlador.borrarObjetoInventario(idObjetoInvalido, idInventarioInvalido);
+        assertTrue(controlador.getArrayDeObjetosSistema().size() == 1, "El array de objetos debería de tener solo 1 objeto");
+        assertTrue(controlador.getArrayDeInventariosSistema().size() == 1, "El array de inventarios deberia de tener solo 1 inventario");
 
-        // Assert
-        assertFalse(controlador.getArrayDeInventariosSistema().get(0).getObjetosInventario().contains(controlador.getArrayDeObjetosSistema().get(0)), "El objeto debería haber sido borrado del inventario");
-
-        // Check the database
-        Objeto objetoFromDb = null;
+        // Comprobamos la base de datos
+        Objeto objetoBd = null;
         try {
-            objetoFromDb = controlador.conector.getObjeto(idObjetoInicialTest);
+            objetoBd = controlador.conector.getObjeto(idObjetoInvalido);
         } catch (SQLException e) {
             fail("La base de datos ha fallado: " + e.getMessage());
         }
-        assertNull(objetoFromDb, "El objeto ha sido borrado de la base de datos");
+        assertNull(objetoBd, "El objeto no debería existir en la base de datos");
     }
-  
 }

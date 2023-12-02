@@ -429,7 +429,7 @@ public class Controller {
         int posicionInventario = buscarInventarioPorId(idInventario);
         if(posicionObjeto != -1 && posicionInventario != -1){
             if(!getArrayDeInventariosSistema().get(posicionInventario).comprobarSiObjetoEnInventario(getObjetoById(idObjeto))){
-                //getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().add(getArrayDeObjetosSistema().get(posicionObjeto));
+                getArrayDeInventariosSistema().get(posicionInventario).getObjetosInventario().add(getArrayDeObjetosSistema().get(posicionObjeto));
 
                 //Insertamos el objeto en el inventario en la base de datos
                 try{

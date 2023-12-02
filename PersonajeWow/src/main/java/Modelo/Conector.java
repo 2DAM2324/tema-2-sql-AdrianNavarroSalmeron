@@ -841,7 +841,7 @@ public void crearBaseDatos() {
             PreparedStatement consulta = conexion.prepareStatement(sql);
             consulta.setString(1, inventario.getIdInventario());
             consulta.setString(2, objeto.getIdObjeto());
-            inventario.getObjetosInventario().add(objeto);
+           // inventario.getObjetosInventario().add(objeto);
             consulta.executeUpdate();
         }catch(SQLException e){
             e.printStackTrace();
