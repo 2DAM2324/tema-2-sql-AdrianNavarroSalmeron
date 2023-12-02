@@ -13,12 +13,15 @@ import Vista.Ventana1;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.xml.sax.SAXException;
 
 /**
@@ -38,6 +41,7 @@ public class ControllerTest {
             controlador = new Controller(ventana, nombreBd);
             ventana.setControlador(controlador);  // Establece el controlador en la vista
             ventana.setVisible(false);
+            controlador.conector.borrarDb();
             controlador.conector.crearBaseDatos();
         } catch (IOException | ClassNotFoundException | SAXException e) {
             fail("Setup failed: " + e.getMessage());
@@ -46,7 +50,6 @@ public class ControllerTest {
 
     @AfterAll
     public static void tearDownClass() {
-        controlador.conector.borrarDb();
         controlador.cerrarConexionDesdeControlador(nombreBd);
     }
     
@@ -74,5 +77,69 @@ public class ControllerTest {
             fail("Failed to retrieve object: " + e.getMessage());
         }   
         assertNull(objeto);
+    }
+    
+       
+    @Test
+    public void testBorrarObjetoValido() {
+        
+        String idObjetoaBorrar = "testId";
+        Objeto objetoaBorrar = new Objeto();
+        objetoaBorrar.setNombreObjeto("testName");
+        objetoaBorrar.setDescripcion("testDescription");
+        objetoaBorrar.setRareza("testRarity");
+        objetoaBorrar.setPrecio(14);
+        objetoaBorrar.setIdObjeto(idObjetoaBorrar);
+
+        Inventario inventario = new Inventario();
+        inventario.getObjetosInventario().add(objetoaBorrar);
+
+        controlador.setArrayDeObjetosSistema(new ArrayList<>(Arrays.asList(objetoaBorrar)));
+        controlador.setArrayDeInventariosSistema(new ArrayList<>(Arrays.asList(inventario)));
+        
+        //Insertamos el objeto en la base de datos
+        try {
+            controlador.conector.insertarObjetoEnBd(objetoaBorrar);
+        } catch (SQLException e) {
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+
+        // Borramos el objeto
+        controlador.borrarObjeto(idObjetoaBorrar);
+
+        // Testeamos que el bojeto no este en los arrays del sistema ni en el inventario
+        assertFalse(controlador.getArrayDeObjetosSistema().contains(objetoaBorrar));
+        assertFalse(inventario.getObjetosInventario().contains(objetoaBorrar));
+
+        // Comprobamos la base de datos
+        Objeto objetoFromDb = null;
+        try {
+            objetoFromDb = controlador.conector.getObjeto(idObjetoaBorrar);
+        } catch (SQLException e) {
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertNull(objetoFromDb, "El objeto ha sido borrado de la base de datos");
+    }
+    
+    @Test
+    public void testBorrarObjetoNoExistente() {
+        // Arrange
+        String idObjetoaBorrar = "testId";
+        
+        //Dejamos los arrays vacios
+        controlador.setArrayDeObjetosSistema(new ArrayList<>());
+        controlador.setArrayDeInventariosSistema(new ArrayList<>());
+
+        //Borramos el objeto que no existe
+        controlador.borrarObjeto(idObjetoaBorrar);
+
+        //  Comprobamos la base de datos
+        Objeto objetoFromDb = null;
+        try {
+            objetoFromDb = controlador.conector.getObjeto(idObjetoaBorrar);
+        } catch (SQLException e) {
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertNull(objetoFromDb, "El objeto no debería existir en la base de datos");
     }
 }

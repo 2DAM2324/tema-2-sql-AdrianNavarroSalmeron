@@ -305,7 +305,7 @@ public void crearBaseDatos() {
         Connection conexion = instancia.getConexion(nombreDb);
         try {
             PreparedStatement consultaInventarioObjeto = conexion.prepareStatement(sqlTablaInventarioObjeto);
-            PreparedStatement consultaObjeto = conn.prepareStatement(sqlTablaObjeto);
+            PreparedStatement consultaObjeto = conexion.prepareStatement(sqlTablaObjeto);
             consultaInventarioObjeto.setString(1, objeto.getIdObjeto());
             consultaInventarioObjeto.executeUpdate();
             consultaObjeto.setString(1, objeto.getIdObjeto());
