@@ -33,6 +33,9 @@ public class ControllerTest {
     private Ventana1 ventana;
     static Controller controlador;
     static  String nombreBd = "dbTest.sqlite";
+    public String idObjetoInicialTest = "";
+    public String idInventarioTestInicial = "";
+   
 
     @BeforeEach
     public void setUp() {
@@ -43,6 +46,11 @@ public class ControllerTest {
             ventana.setVisible(false);
             controlador.conector.borrarDb();
             controlador.conector.crearBaseDatos();
+            controlador.aniadirObjeto("Espada", "Comun", "41", "Es una espada", "41");
+            controlador.aniadirPersonaje("Victarion", "Sanguino", "Elfo", "60", "Horda");
+            controlador.aniadirObjetoaInventario(controlador.getArrayDeObjetosSistema().get(0).getIdObjeto(), controlador.getArrayDePersonajesDeSistema().get(0).getInventario().getIdInventario());
+             idObjetoInicialTest = controlador.getArrayDeObjetosSistema().get(0).getIdObjeto();
+             idInventarioTestInicial = controlador.getArrayDeInventariosSistema().get(0).getIdInventario();
         } catch (IOException | ClassNotFoundException | SAXException e) {
             fail("Setup failed: " + e.getMessage());
         }
@@ -142,4 +150,24 @@ public class ControllerTest {
         }
         assertNull(objetoFromDb, "El objeto no debería existir en la base de datos");
     }
+    
+
+    @Test
+    public void testBorrarObjetoInventario() {
+        
+        controlador.borrarObjetoInventario(idObjetoInicialTest, idInventarioTestInicial);
+
+        // Assert
+        assertFalse(controlador.getArrayDeInventariosSistema().get(0).getObjetosInventario().contains(controlador.getArrayDeObjetosSistema().get(0)), "El objeto debería haber sido borrado del inventario");
+
+        // Check the database
+        Objeto objetoFromDb = null;
+        try {
+            objetoFromDb = controlador.conector.getObjeto(idObjetoInicialTest);
+        } catch (SQLException e) {
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertNull(objetoFromDb, "El objeto ha sido borrado de la base de datos");
+    }
+  
 }
