@@ -465,7 +465,7 @@ public class Controller {
         }
     }
     
-    //TODO: hay que hacer esto tambien en la base de datos
+    
     public void vaciarInventario(String idInventario){
         
         for(Inventario inventario : getArrayDeInventariosSistema()){

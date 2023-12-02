@@ -4,25 +4,27 @@
  */
 package Controlador;
 
-import Modelo.Conector;
-import Modelo.Hermandad;
-import Modelo.Inventario;
-import Modelo.Objeto;
-import Modelo.Personaje;
-import Vista.Ventana1;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import org.junit.jupiter.api.AfterEach;
+
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.xml.sax.SAXException;
+
+import Modelo.Inventario;
+import Modelo.Objeto;
+import Vista.Ventana1;
 
 /**
  *
@@ -160,7 +162,72 @@ public class ControllerTest {
         assertNull(objetoFromDb, "El objeto no debería existir en la base de datos");
     }
     
+    /**
+     * Test de borrarObjetoInventario de la clase Controller, cuando el objeto si existe
+     */
+    
+    @Test
+    public void testAniadirObjetoaInventarioValido(){
+        
+        String idObjetoPruebaAniadir = "";
+        //Creamos un objeto 
+        controlador.aniadirObjeto("Daga", "Rara", "41", "Es una daga", "2.1");
+        idObjetoPruebaAniadir = controlador.getArrayDeObjetosSistema().get(1).getIdObjeto();
+        
+       
+        //Insertamos el objeto en el inventario
+        controlador.aniadirObjetoaInventario(idObjetoPruebaAniadir, idInventarioTestInicial);
+        
+        //Comprobamos que el objeto se ha añadido al inventario
+        assertTrue(controlador.getArrayDeInventariosSistema().get(0).getObjetosInventario().contains(controlador.getArrayDeObjetosSistema().get(1)), "El objeto no se ha añadido al inventario");
+        
+        //Comprobamos que el objeto se ha añadido a la base de datos
+        String idObjetoComprobado = "";
+        try{
+            idObjetoComprobado = controlador.conector.getIdObjetoEnTablaInventarioObjeto(idObjetoPruebaAniadir, idInventarioTestInicial);
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertEquals(idObjetoPruebaAniadir, idObjetoComprobado, "El objeto no se ha añadido a la base de datos");
+    }
 
+    /**
+     * Añadir un objeto que no existe a un inventario
+     * Comprueba que el tamaño sigue siendo 1 despues de añadir el objeto, de manera que sabemos que no se ha añadido
+     */
+
+    @Test 
+    public void testAniadirObjetoaInventarioInvalido(){
+        controlador.aniadirObjetoaInventario("PATATA", idInventarioTestInicial);
+        assertTrue(controlador.getArrayDeInventariosSistema().get(0).getObjetosInventario().size() ==1, "El objeto no se ha añadido al inventario");
+    }
+    
+    
+
+    @Test
+    public void testBorrarObjetoInventarioValido(){
+        String idObjetoComprobado = "";
+        controlador.borrarObjetoInventario(idObjetoInicialTest, idInventarioTestInicial);
+        assertTrue(controlador.getArrayDeObjetosSistema().size() ==1, "El array de objetos debería de tener solo 1 objeto");
+        assertTrue(controlador.getArrayDeInventariosSistema().get(0).getObjetosInventario().isEmpty(), "El array de inventarios deberia de tener solo 1 inventario");
+        
+        // Comprobamos la base de datos
+       try{
+           //Si el objeto se ha borrado correctamente el metodo nos devuelve null
+           idObjetoComprobado =controlador.conector.getIdObjetoEnTablaInventarioObjeto(idObjetoInicialTest, idInventarioTestInicial);
+       }
+       catch(SQLException e){
+                fail("La base de datos ha fallado: " + e.getMessage());
+           }
+       
+        assertNull(idObjetoComprobado, "El objeto no debería existir en la base de datos");
+    }
+    
+    /**
+     * Test de borrarObjetoInventario de la clase Controller, cuando el objeto no existe
+     */
+    
     @Test
     public void testBorrarObjetoInventarioInvalido() {
         // Arrange

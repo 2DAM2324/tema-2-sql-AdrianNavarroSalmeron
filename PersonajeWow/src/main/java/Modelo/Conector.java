@@ -171,6 +171,18 @@ public void crearBaseDatos() {
         
         System.out.println("Base de datos y tabla creadas correctamente.");
     }
+    
+
+        private void dropTable(Connection conexion, String tableName) {
+            try (PreparedStatement stmt = conexion.prepareStatement(
+                    "DROP TABLE IF EXISTS " + tableName
+            )) {
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.err.println("Error al borrar la tabla " + tableName + ": " + e.getMessage());
+            }
+    }
 
     /**
      * @brief Borra la base de datos y las tablas
@@ -179,64 +191,22 @@ public void crearBaseDatos() {
         Connection conexion = instancia.getConexion(nombreDb);
 
         //Borrar relacionHermandadPersonaje
-        try(PreparedStatement stmtBorrarHermandadPersonaje = conexion.prepareStatement(
-            "DROP TABLE IF EXISTS hermandadPersonaje"
-            )){
-        stmtBorrarHermandadPersonaje.executeUpdate();
-        }catch(SQLException e){
-            e.printStackTrace();
-            System.err.println("Error al borrar las tablas:" + e.getMessage());
-        }
+        dropTable(conexion, "hermandadPersonaje");
 
         //Borrar inventarioObjeto
-        try(PreparedStatement stmtBorrarInventarioObjeto = conexion.prepareStatement(
-            "DROP TABLE IF EXISTS InventarioObjeto"
-            )){
-        stmtBorrarInventarioObjeto.executeUpdate();
-        }catch(SQLException e){
-            e.printStackTrace();
-            System.err.println("Error al borrar las tablas:" + e.getMessage());
-        }
+        dropTable(conexion, "InventarioObjeto");
 
         //Borrar personaje
-        try(PreparedStatement stmtBorrarPersonaje = conexion.prepareStatement(
-            "DROP TABLE IF EXISTS personaje"
-            )){
-        stmtBorrarPersonaje.executeUpdate();
-        }catch(SQLException e){
-            e.printStackTrace();
-            System.err.println("Error al borrar las tablas:" + e.getMessage());
-        }
+        dropTable(conexion, "personaje");
 
         //Borrar inventario
-        try(PreparedStatement stmtBorrarInventario = conexion.prepareStatement(
-            "DROP TABLE IF EXISTS inventario"
-            )){
-        stmtBorrarInventario.executeUpdate();
-        }catch(SQLException e){
-            e.printStackTrace();
-            System.err.println("Error al borrar las tablas:" + e.getMessage());
-        }
+        dropTable(conexion, "inventario");
 
         //Borrar hermandad
-        try(PreparedStatement stmtBorrarHermandad = conexion.prepareStatement(
-            "DROP TABLE IF EXISTS hermandad"
-            )){
-        stmtBorrarHermandad.executeUpdate();
-        }catch(SQLException e){
-            e.printStackTrace();
-            System.err.println("Error al borrar las tablas:" + e.getMessage());
-        }
+        dropTable(conexion, "hermandad");
 
         //Borrar objeto
-        try(PreparedStatement stmtBorrarObjeto = conexion.prepareStatement(
-            "DROP TABLE IF EXISTS objeto"
-            )){
-        stmtBorrarObjeto.executeUpdate();
-        }catch(SQLException e){
-            e.printStackTrace();
-            System.err.println("Error al borrar las tablas:" + e.getMessage());
-        }
+        dropTable(conexion, "objeto");
     }
     
     //CRUD de OBJETO
@@ -401,11 +371,25 @@ public void crearBaseDatos() {
             // Validamos la transacción
             conexion.commit();
         } catch (SQLIntegrityConstraintViolationException e) {
-            e.printStackTrace();
             System.err.println("CLAVE PRIMARIA REPETIDA EN PERSONAJE");
+            if (conexion != null) {
+                try {
+                    System.err.print("Transaction is being rolled back");
+                    conexion.rollback();
+                } catch (SQLException excep) {
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             System.err.println("ERROR EN LA CONSULTA PARA INSERTAR PERSONAJE");
+            if (conexion != null) {
+                try {
+                    System.err.print("Transaction is being rolled back");
+                    conexion.rollback();
+                } catch (SQLException excep) {
+                    excep.printStackTrace();
+                }
+            }
         } finally {
             try {
                 if (consultaInventario != null) {
@@ -416,6 +400,9 @@ public void crearBaseDatos() {
                 }
                 if (consultaInventarioModificacion != null) {
                     consultaInventarioModificacion.close();
+                }
+                if (conexion != null) {
+                    conexion.setAutoCommit(true);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -983,6 +970,44 @@ public void crearBaseDatos() {
             return objeto;
         } else {
             return null;
+        }
+    }
+
+    /**
+     * @brief Devuelve el id del objeto en la tabla inventarioObjeto
+     * @param idObjeto 
+     * @param idInventario
+     * @return el id del objeto o null si no se encuentra en la tabla
+     * @throws SQLException
+     */
+    public String getIdObjetoEnTablaInventarioObjeto(String idObjeto, String idInventario) throws SQLException {
+        Connection conexion = instancia.getConexion(nombreDb);
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT idObjeto FROM InventarioObjeto WHERE idObjeto = ? AND idInventario = ?";
+            stmt = conexion.prepareStatement(query);
+            stmt.setString(1, idObjeto);
+            stmt.setString(2, idInventario);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("idObjeto");
+            } else {
+                return null;
+            }
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {}
+            }
         }
     }
 }
