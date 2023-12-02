@@ -986,12 +986,12 @@ public void crearBaseDatos() {
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (SQLException e) { /* ignored */ }
+                } catch (SQLException e) {}
             }
             if (stmt != null) {
                 try {
                     stmt.close();
-                } catch (SQLException e) { /* ignored */ }
+                } catch (SQLException e) {}
             }
         }
     }
@@ -1033,6 +1033,51 @@ public void crearBaseDatos() {
             }
         }
     }
+
+    /**
+     * @brief Devuelve un personaje de la bd
+     * @param idPersonaje
+     * @return el personaje o null si no se encuentra en la tabla
+     * @throws SQLException
+     * 
+     */
+    public Personaje getPersonaje(int idPersonaje) throws SQLException {
+        Connection conexion = instancia.getConexion(nombreDb);
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT idPersonaje, nombre, servidor, faccion, raza, nivel FROM personaje WHERE idPersonaje = ?";
+            stmt = conexion.prepareStatement(query);
+            stmt.setInt(1, idPersonaje);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Personaje personaje = new Personaje();
+                personaje.setIdPersonaje(rs.getInt("idPersonaje"));
+                personaje.setNombre(rs.getString("nombre"));
+                personaje.setServidor(rs.getString("servidor"));
+                personaje.setFaccion(rs.getString("faccion"));
+                personaje.setRaza(rs.getString("raza"));
+                personaje.setNivel(rs.getInt("nivel"));
+                return personaje;
+            } else {
+                return null;
+            }
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {}
+            }
+        }
+    }
+
 }
 
 

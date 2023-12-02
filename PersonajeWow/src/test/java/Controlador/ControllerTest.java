@@ -24,6 +24,7 @@ import org.xml.sax.SAXException;
 
 import Modelo.Inventario;
 import Modelo.Objeto;
+import Modelo.Personaje;
 import Vista.Ventana1;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -377,6 +378,32 @@ public class ControllerTest {
         }
         assertEquals(idObjetoBorradoString, idObjetoInicialTest, "El objeto debería existir en la base de datos");
         assertTrue(controlador.getArrayDeInventariosSistema().get(0).getObjetosInventario().size() == 1, "El inventario no se ha vaciado");
-
     }
+
+    /**
+     * Test de aniadirPersonaje de la clase Controller, cuando el personaje no existe
+     */
+    @Test
+    public void testAniadirPersonajeValido(){
+        controlador.aniadirPersonaje("TestName", "TestRaza", "TestRaza", "12", "TestFaccion");
+        for(int i = 0; i < controlador.getArrayDePersonajesDeSistema().size(); i++){
+            System.out.println(controlador.getArrayDePersonajesDeSistema().get(i).getNombre());
+        }
+        Personaje personaje = null;
+        try{
+            personaje = controlador.conector.getPersonaje(2);
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertEquals("TestName", personaje.getNombre(), "El nombre del personaje no se ha añadido correctamente");
+        assertEquals("TestRaza", personaje.getRaza(), "La raza del personaje no se ha añadido correctamente");
+        assertEquals(12, personaje.getNivel(), "El nivel del personaje no se ha añadido correctamente");
+        assertEquals("TestFaccion", personaje.getFaccion(), "La faccion del personaje no se ha añadido correctamente");
+        assertTrue(controlador.getArrayDePersonajesDeSistema().size() == 2, "El personaje se ha añadido al array de personajes");
+        assertTrue(controlador.getArrayDeInventariosSistema().size() == 2, "El personaje se ha añadido al array de inventarios");
+        assertTrue(controlador.getArrayDePersonajesDeSistema().get(1).getInventario().getObjetosInventario().isEmpty(), "El personaje se ha añadido al array de personajes");
+    }
+
+    //TODO: PROGRAMAR LOS AÑADIR PERSONAJE CUANDO NO ES CORRECTO
 }
