@@ -164,9 +164,17 @@ public class Controller {
     }
     //****************************************Funciones de los objetos******************************************************************************************
     public void aniadirObjeto(String nombreObjeto, String rareza, String precio, String descipcion, String IdObjeto){
-        
+        boolean correcto = true;
+        //Comprobamos si el objeto ya existe en el sistema
+        for(int i = 0; i < getArrayDeObjetosSistema().size(); i++){
+            if(getArrayDeObjetosSistema().get(i).getNombreObjeto().equals(nombreObjeto) && getArrayDeObjetosSistema().get(i).getRareza().equals(rareza)){
+                mostrarMensajesError("El objeto ya existe");
+                i = getArrayDeObjetosSistema().size();
+                correcto = false;
+            }
+        }
         try{
-            if(nombreObjeto != null && rareza != null && precio != null && descipcion != null){
+            if(nombreObjeto != null && rareza != null && precio != null && descipcion != null && correcto == true){
                      Objeto objeto = new Objeto();
                     //Eliminamos los espacios en blanco
                     nombreObjeto = nombreObjeto.trim();
@@ -304,7 +312,16 @@ public class Controller {
      }
     
     public void modificarObjeto(String id, String nombre, String rareza, String precio, String descripcion){
-        if(getPosicionObjetoById(id) !=-1 && nombre != null && rareza != null && precio != null && descripcion != null){
+         boolean correcto = true;
+        //Comprobamos si el objeto ya existe en el sistema
+        for(int i = 0; i < getArrayDeObjetosSistema().size(); i++){
+            if(getArrayDeObjetosSistema().get(i).getNombreObjeto().equals(nombre) && getArrayDeObjetosSistema().get(i).getRareza().equals(rareza)){
+                mostrarMensajesError("El objeto ya existe");
+                i = getArrayDeObjetosSistema().size();
+                correcto = false;
+            }
+        }
+        if(getPosicionObjetoById(id) !=-1 && nombre != null && rareza != null && precio != null && descripcion != null && correcto == true){
             try{
                 double precioParseado = Double.parseDouble(precio);
                 if(getArrayDeObjetosSistema().get(getPosicionObjetoById(id)) != null && precioParseado >= 1){
