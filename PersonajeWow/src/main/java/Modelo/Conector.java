@@ -632,7 +632,7 @@ public void crearBaseDatos() {
      * @param hermandad Hermandad a insertar
      */
     public void insertarHermandadEnBD(Hermandad hermandad) throws SQLException, SQLIntegrityConstraintViolationException, NullPointerException {
-        if(hermandad.getIdHermandad() == null || hermandad.getNombreHermandad() == null || hermandad.getServidorHermandad() == null || hermandad.getNumeroMiembros() < 0){
+        if(hermandad.getIdHermandad() == null || hermandad.getNombreHermandad() == null || hermandad.getServidorHermandad() == null ){
             throw new IllegalArgumentException("Uno o mas campos estan vacios");
         }
         String sql = "INSERT INTO hermandad (idHermandad, nombreHermandad, servidorHermandad, numeroMiembros) VALUES (?, ?, ?, ?)";
@@ -645,6 +645,8 @@ public void crearBaseDatos() {
                 consulta.setString(3, hermandad.getServidorHermandad());
                 consulta.setInt(4, hermandad.getNumeroMiembros());
                 consulta.executeUpdate();
+        }catch(SQLIntegrityConstraintViolationException e){
+            System.err.println("CLAVE PRIMARIA REPETIDA EN HERMANDAD");
         } catch (SQLException e) {
             e.printStackTrace();
             System.err.println("Error al insertar Hermandad:" + e.getMessage());
@@ -1236,6 +1238,38 @@ public void crearBaseDatos() {
             } else {
                 return null;
             }
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {}
+            }
+        }
+    }
+
+    /**
+     * @brief devuelve una lista de los ids de las hermandades de la bd
+     */
+    public ArrayList<String> getListaIdsHermandades() throws SQLException {
+        Connection conexion = instancia.getConexion(nombreDb);
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT IdHermandad FROM hermandad";
+            stmt = conexion.prepareStatement(query);
+            rs = stmt.executeQuery();
+
+            ArrayList<String> hermandades = new ArrayList<>();
+            while (rs.next()) {
+                hermandades.add(rs.getString("IdHermandad"));
+            }
+            return hermandades;
         } finally {
             if (rs != null) {
                 try {

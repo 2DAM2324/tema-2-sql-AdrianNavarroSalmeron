@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Controlador;
+import java.lang.reflect.Array;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
@@ -709,6 +710,21 @@ public class Controller {
      public void aniadirHermandad(String nombre, String servidor){
         if(buscarHermandadPorNombre(nombre, servidor) == -1){
             Hermandad hermandad = new Hermandad();
+            ArrayList<String> listaIdsHermandad = new ArrayList<>();
+            try{
+                listaIdsHermandad = conector.getListaIdsHermandades();
+            }
+            catch(SQLException | NullPointerException e){
+                mostrarMensajesError("ERROR AL LEER IDS DE HERMANDADES DE LA BASE DE DATOS");
+            }
+            //En caso de que haya una id repetida, se genera una nueva
+            for (int i = 0; i < listaIdsHermandad.size(); i++) {
+                if (listaIdsHermandad.get(i).equals(hermandad.getIdHermandad())) {
+                    String newId = hermandad.generateNewIdHermandad();
+                    hermandad.setIdHermandad(newId);
+                    System.out.println("Cambiando id de hermandad" + hermandad.getIdHermandad() + "por id" + newId + "porque ya existe");
+                }
+            }
             hermandad.setNombreHermandad(nombre);
             hermandad.setServidorHermandad(servidor);
             ArrayDeHermandadesSistema.add(hermandad);
