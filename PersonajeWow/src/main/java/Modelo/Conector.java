@@ -1119,6 +1119,41 @@ public void crearBaseDatos() {
             }
         }
     }
+
+    /**
+     * @brief devuelve una lista de ids de personajes que hay en una hermandad en la tabla hermandadPersonaje
+     * @param idHermandad
+     * @return la lista de ids de personajes o la lista vacia si no hay personajes en la tabla
+     */
+    public ArrayList<Integer> getPersonajesEnHermandad(String idHermandad) throws SQLException {
+        Connection conexion = instancia.getConexion(nombreDb);
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT idPersonaje FROM hermandadPersonaje WHERE idHermandad = ?";
+            stmt = conexion.prepareStatement(query);
+            stmt.setString(1, idHermandad);
+            rs = stmt.executeQuery();
+
+            ArrayList<Integer> personajes = new ArrayList<>();
+            while (rs.next()) {
+                personajes.add(rs.getInt("idPersonaje"));
+            }
+            return personajes;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {}
+            }
+        }
+    }
 }
 
 
