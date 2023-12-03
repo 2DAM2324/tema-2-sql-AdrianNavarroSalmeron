@@ -87,10 +87,7 @@ public class Controller {
          try{
             conector.leerPersonajeDeBd(ArrayDePersonajesSistema, ArrayDeInventariosSistema, ArrayDeHermandadesSistema);
         }
-        catch(SQLException e){
-            mostrarMensajesError("ERROR AL LEER PERSONAJES DE LA BASE DE DATOS");
-        }
-        catch(NullPointerException e){
+        catch(SQLException | NullPointerException e){
             mostrarMensajesError("ERROR AL LEER PERSONAJES DE LA BASE DE DATOS");
         }
 
@@ -121,7 +118,7 @@ public class Controller {
         cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
     }
     
-    public void mostrarMensajesError(String message) {
+    public final void mostrarMensajesError(String message) {
         if (!estoyEnTest) {
             JOptionPane.showMessageDialog(vista, message, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
@@ -603,9 +600,18 @@ public class Controller {
     
     
     public void modificarPersonaje(Integer idPersonaje, String nombre, String servidor, String raza, int nivel, String faccion){
-  
+        boolean correcto = true;
         int posicionPersonaje = buscarPersonajeEnSistemaPorId(idPersonaje);
-         if(posicionPersonaje != -1){
+        //Comprobar si el nombre y el servidor que quiere introducir ya existe en el sistema
+        for(int i = 0; i < getArrayDePersonajesDeSistema().size(); i++){
+            if(getArrayDePersonajesDeSistema().get(i).getNombre().equals(nombre) && getArrayDePersonajesDeSistema().get(i).getServidor().equals(servidor) && posicionPersonaje != i){
+                mostrarMensajesError("El personaje ya existe");
+                i = getArrayDePersonajesDeSistema().size();
+                correcto = false;
+            }
+        }
+         if(posicionPersonaje != -1 && correcto == true){
+            
             getArrayDePersonajesDeSistema().get(posicionPersonaje).setNombre(nombre);
             getArrayDePersonajesDeSistema().get(posicionPersonaje).setServidor(servidor);
             getArrayDePersonajesDeSistema().get(posicionPersonaje).setRaza(raza);
