@@ -6,15 +6,14 @@ package Modelo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -624,86 +623,316 @@ public void testModificarHermandadEnBd() throws SQLException {
     assertEquals(hermandad.getNombreHermandad(), hermandadBd.getNombreHermandad());
 }
 
-// /**
-//  * Test of modificarHermandadEnBd method, of class Conector.
-//  */
-// @Test
-// public void testModificarHermandadEnBd() throws Exception {
-//     System.out.println("modificarHermandadEnBd");
-//     Hermandad hermandad = null;
-//     Conector instance = null;
-//     instance.modificarHermandadEnBd(hermandad);
-//     // TODO review the generated test code and remove the default call to fail.
-//     fail("The test case is a prototype.");
-// }
+/**
+ * Test de borrarHermandadBd()
+ */
+@Test
+public void testBorrarHermandadBd() throws SQLException {
+    //Traemos la hermandad de la bd
+    Hermandad hermandad = null;
+    try{
+        hermandad = conector.getHermandad("Los Errantes", "Los Errantes");
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer la hermandad de la bd");
+    }
+    try{
+        conector.borrarHermandadBd(hermandad);
+    }
+    catch(SQLException e){
+        fail("No se ha podido borrar la hermandad");
+    }
+    //Traemos la hermandad de la bd
+    Hermandad hermandadBd = null;
+    try{
+        hermandadBd = conector.getHermandad("Los Errantes", "Los Errantes");
+    }
+    catch(SQLException e){
+        assertEquals("No existe la hermandad", e.getMessage());
+        fail("Se ha lanzado la excepcion");
+    }
+    //Comprobamos que no existe la hermandad
+    assertNull(hermandadBd);
+}
 
-// /**
-//  * Test of borrarHermandadBd method, of class Conector.
-//  */
-// @Test
-// public void testBorrarHermandadBd() throws Exception {
-//     System.out.println("borrarHermandadBd");
-//     Hermandad hermandad = null;
-//     Conector instance = null;
-//     instance.borrarHermandadBd(hermandad);
-//     // TODO review the generated test code and remove the default call to fail.
-//     fail("The test case is a prototype.");
-// }
+/**
+ * Test de leerHermandad de la bd
+ */
+@Test
+public void testLeerHermandad() throws SQLException {
+    ArrayList<Hermandad> hermandadesSistema = new ArrayList<>();
+    try{
+        conector.leerHermandad(hermandadesSistema);
+    }
+    catch(SQLException e){
+        fail("No se ha podido leer las hermandades");
+    }
+    assertEquals(1, hermandadesSistema.size());
+}
 
-// /**
-//  * Test of leerHermandad method, of class Conector.
-//  */
-// @Test
-// public void testLeerHermandad() throws Exception {
-//     System.out.println("leerHermandad");
-//     ArrayList<Hermandad> ArrayDeHermandadesSistema = null;
-//     Conector instance = null;
-//     instance.leerHermandad(ArrayDeHermandadesSistema);
-//     // TODO review the generated test code and remove the default call to fail.
-//     fail("The test case is a prototype.");
-// }
+/**
+ * Test leer hermandad de la bd cuando no hay hermandades
+ */
+@Test
+public void testLeerHermandadFail() throws SQLException {
+    conector.borrarDb();
+    conector.crearBaseDatos();
+    ArrayList<Hermandad> hermandadesSistema = new ArrayList<>();
+    try{
+        conector.leerHermandad(hermandadesSistema);
+    }
+    catch(SQLException e){
+        assertEquals("No hay hermandades en la base de datos", e.getMessage());
+    }
+}
 
-// /**
-//  * Test of leerHermandadPersonaje method, of class Conector.
-//  */
-// @Test
-// public void testLeerHermandadPersonaje() throws Exception {
-//     System.out.println("leerHermandadPersonaje");
-//     ArrayList<Hermandad> arrayDeHermandadesSistema = null;
-//     ArrayList<Personaje> personajesSistema = null;
-//     Conector instance = null;
-//     instance.leerHermandadPersonaje(arrayDeHermandadesSistema, personajesSistema);
-//     // TODO review the generated test code and remove the default call to fail.
-//     fail("The test case is a prototype.");
-// }
+/**
+ * Test leerHermandadPersonaje
+ */
+@Test
+public void testLeerHermandadPersonaje() throws SQLException {
+    ArrayList<Hermandad> hermandadesSistema = new ArrayList<>();
+    ArrayList<Personaje> personajesSistema = new ArrayList<>();
+    try{
+        conector.leerHermandadPersonaje(hermandadesSistema, personajesSistema);
+    }
+    catch(SQLException e){
+        fail("No se ha podido leer las hermandades");
+    }
+    //Leemos la hermandad
+    try{
+        conector.leerHermandad(hermandadesSistema);
+    }
+    catch(SQLException e){
+        fail("No se ha podido leer las hermandades");
+    }
+    //Leemos el personaje
+    try{
+        conector.leerPersonajeDeBd(personajesSistema, new ArrayList<Inventario>(), new ArrayList<Hermandad>());
+    }
+    catch(SQLException e){
+        fail("No se ha podido leer los personajes");
+    }
+    try{
+        conector.leerHermandadPersonaje(hermandadesSistema, personajesSistema);
+    }
+    catch(SQLException e){
+        fail("No se ha podido leer las hermandades");
+    }
+    assertEquals(1, personajesSistema.get(0).getListaHermandadades().size());
+    assertEquals(1, hermandadesSistema.get(0).getListaMiembros().size());
+}
 
-// /**
-//  * Test of insertarPersonajeHermandad method, of class Conector.
-//  */
-// @Test
-// public void testInsertarPersonajeHermandad() throws Exception {
-//     System.out.println("insertarPersonajeHermandad");
-//     Personaje personaje = null;
-//     Hermandad hermandad = null;
-//     Conector instance = null;
-//     instance.insertarPersonajeHermandad(personaje, hermandad);
-//     // TODO review the generated test code and remove the default call to fail.
-//     fail("The test case is a prototype.");
-// }
+/**
+ * Test insertarPersonajeEnHermandad
+ */
+@Test
+public void testInsertarPersonajeEnHermandad() throws SQLException {
+    //Creamos un nuevo personaje
+    Personaje personaje = new Personaje();
+    personaje.setNombre("Tyrion");
+    personaje.setServidor("Exodar");   
+    personaje.setRaza("Humano");
+    personaje.setNivel(14);
+    personaje.setFaccion("Alianza");
+    try{
+        conector.insertarPersonajeYInventarioEnBD(personaje, personaje.getInventario());
+    }
+    catch(Exception e){
+        fail("No se ha podido insertar el personaje");
+    }
+    personaje.setIdPersonaje(2);
+    //Recuperamos el personaje
+    Personaje personajeBd = null;
+    try{
+        personajeBd = conector.getPersonaje(2);
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer el personaje de la bd");
+    } 
+   //Recuperamos la hermandad de la bd
+    Hermandad hermandad = null;
+    try{
+        hermandad = conector.getHermandad("Los Errantes", "Los Errantes");
+    }
+    catch(Exception e){
+        fail("No se ha podido insertar la hermandad");
+    }
+    //Insertamos el personaje en la hermandad
+    try{
+        conector.insertarPersonajeHermandad(personajeBd, hermandad);
+    }
+    catch(Exception e){
+        fail("No se ha podido insertar el personaje en la hermandad");
+    }
+    //Traemos la hermandad de la bd
+    ArrayList<Integer> personajesEnHermandad = null;
+    try{
+        personajesEnHermandad = conector.getPersonajesEnHermandad(hermandad.getIdHermandad());
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer la hermandad de la bd");
+    }
+    //Comprobamos que el personaje se ha insertado en la hermandad
+    assertEquals(2, personajesEnHermandad.size());
+}
 
-// /**
-//  * Test of borrarPersonajeHermandad method, of class Conector.
-//  */
-// @Test
-// public void testBorrarPersonajeHermandad() throws Exception {
-//     System.out.println("borrarPersonajeHermandad");
-//     Personaje personaje = null;
-//     Hermandad hermandad = null;
-//     Conector instance = null;
-//     instance.borrarPersonajeHermandad(personaje, hermandad);
-//     // TODO review the generated test code and remove the default call to fail.
-//     fail("The test case is a prototype.");
-// }
+/**
+ * Test insertar personaje en hermandad cuando se intenta insertar dos veces el mismo personaje
+ */
+@Test
+public void testInsertarPersonajeEnHermandadFail() throws SQLException {
+    //Recuperamos el personaje
+    Personaje personajeBd = null;
+    try{
+        personajeBd = conector.getPersonaje(1);
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer el personaje de la bd");
+    } 
+   //Recuperamos la hermandad de la bd
+    Hermandad hermandad = null;
+    try{
+        hermandad = conector.getHermandad("Los Errantes", "Los Errantes");
+    }
+    catch(SQLException e){
+        fail("No se ha podido insertar la hermandad");
+    }
+    //Insertamos el personaje en la hermandad
+    try{
+        conector.insertarPersonajeHermandad(personajeBd, hermandad);
+    }
+    catch(SQLException e){
+        assertTrue(e.getMessage().startsWith("Error al insertar PersonajeHermandad: UNIQUE constraint failed: PersonajeHermandad.idPersonaje, PersonajeHermandad.idHermandad"));
+
+    }
+}
+
+/**
+ * Test insertar personaje en hermandad cuando se intenta insertar con campos nulos
+ */
+@Test
+public void testInsertarPersonajeEnHermandadFail2() throws SQLException {
+    //Creamos un personaje con el id en null
+    Personaje personaje = new Personaje();
+    personaje.setNombre("Tyrion");
+    personaje.setServidor("Exodar");
+    personaje.setRaza("Humano");
+    personaje.setNivel(14);
+    personaje.setFaccion("Alianza");
+    personaje.setIdPersonaje(null);
+   
+   //Recuperamos la hermandad de la bd
+    Hermandad hermandad = null;
+    try{
+        hermandad = conector.getHermandad("Los Errantes", "Los Errantes");
+    }
+    catch(SQLException e){
+        fail("No se ha podido insertar la hermandad");
+    }
+    //Insertamos el personaje en la hermandad
+    try{
+        conector.insertarPersonajeHermandad(personaje, hermandad);
+        fail("No se ha lanzado la excepcion");
+    }
+    catch(IllegalArgumentException e){
+        assertEquals("Uno o mas campos estan vacios", e.getMessage());
+    }             
+}
+
+/**
+ * Test borrarPersonajeHermandad de la bd
+ */ 
+@Test
+public void testBorrarPersonajeHermandad() throws SQLException {
+    //Recuperamos el personaje
+    Personaje personajeBd = null;
+    try{
+        personajeBd = conector.getPersonaje(1);
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer el personaje de la bd");
+    } 
+   //Recuperamos la hermandad de la bd
+    Hermandad hermandad = null;
+    try{
+        hermandad = conector.getHermandad("Los Errantes", "Los Errantes");
+    }
+    catch(SQLException e){
+        fail("No se ha podido insertar la hermandad");
+    }
+    //Borramos el personaje de la hermandad
+    try{
+        conector.borrarPersonajeHermandad(personajeBd, hermandad);
+    }
+    catch(SQLException e){
+        fail("No se ha podido borrar el personaje de la hermandad");
+    }
+    //Traemos la hermandad de la bd
+    ArrayList<Integer> personajesEnHermandad = null;
+    try{
+        personajesEnHermandad = conector.getPersonajesEnHermandad(hermandad.getIdHermandad());
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer la hermandad de la bd");
+    }
+    //Comprobamos que el personaje se ha borrado de la hermandad
+    assertEquals(0, personajesEnHermandad.size());
+}
+
+
+/**
+ * test insertarObjetoEnInventario
+ */
+@Test
+public void testInsertarObjetoEnInventario() throws SQLException {
+    //Creamos un nuevo objeto
+    Objeto objeto = new Objeto();
+    objeto.setNombreObjeto("Cuchillo");
+    objeto.setDescripcion("Arma");
+    objeto.setPrecio(12);
+    objeto.setRareza("Comun");
+    objeto.setIdObjeto("OB5");
+    try{
+        conector.insertarObjetoEnBd(objeto);
+    }
+    catch(Exception e){
+        fail("No se ha podido insertar el objeto");
+    }
+    //Traemos el objeto de la bd
+    Objeto objetoBd = null;
+    try{
+        objetoBd = conector.getObjeto("OB5");
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer el objeto de la bd");
+    }
+    //Leermos los inventarios
+    ArrayList<Inventario> inventariosSistema = new ArrayList<>();
+    try{
+        conector.leerInventario(inventariosSistema);
+    }
+    catch(SQLException e){
+        fail("No se ha podido leer los inventarios");
+    }
+    //Insertamos el objeto en el inventario del personaje
+    try{
+        conector.insertarObjetoEnInventario(objetoBd, inventariosSistema.get(0));
+    }
+    catch(SQLException e){
+        fail("No se ha podido insertar el objeto en el inventario");
+    }
+    //Traemos el inventario de la bd
+    ArrayList<String> objetosEnInventario = null;
+    try{
+        objetosEnInventario = conector.getObjetosEnInventario(inventariosSistema.get(0).getIdInventario());
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer el inventario de la bd");
+    }
+    //Comprobamos que el objeto se ha insertado en el inventario
+    assertEquals(2, objetosEnInventario.size());
+}
 
 // /**
 //  * Test of insertarObjetoEnInventario method, of class Conector.

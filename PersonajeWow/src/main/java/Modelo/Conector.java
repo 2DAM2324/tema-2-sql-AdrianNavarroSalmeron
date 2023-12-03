@@ -787,6 +787,9 @@ public void crearBaseDatos() {
      * @param hermandad Hermandad en la que se inserta el personaje
      */
     public void insertarPersonajeHermandad(Personaje personaje, Hermandad hermandad) throws SQLException, SQLIntegrityConstraintViolationException, NullPointerException{
+        if(personaje.getIdPersonaje() == null || hermandad.getIdHermandad() == null){
+            throw new IllegalArgumentException("Uno o mas campos estan vacios");
+        }
         String sql = "INSERT INTO hermandadPersonaje (idHermandad, idPersonaje) VALUES (?, ?)";
         Connection conexion = instancia.getConexion(nombreDb);
 
@@ -795,15 +798,17 @@ public void crearBaseDatos() {
             consulta.setString(1, hermandad.getIdHermandad());
             consulta.setInt(2, personaje.getIdPersonaje());
             consulta.executeUpdate();
+        }
+         catch(SQLIntegrityConstraintViolationException e){
+            System.err.println("Clave primaria repetida:" + e.getMessage());
+            throw e;
         }catch(SQLException e){
-            e.printStackTrace();
             System.err.println("Error al insertar PersonajeHermandad:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
             System.err.println("PersonajeHermandad NULL:" + e.getMessage());
-
         }
+       
     }
 
     /**
@@ -1158,6 +1163,79 @@ public void crearBaseDatos() {
                 personajes.add(rs.getInt("idPersonaje"));
             }
             return personajes;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {}
+            }
+        }
+    }
+
+    /**
+     * @brief devuelve una lista de ids de objetos que hay en un inventario en la tabla inventarioObjeto
+     * @param idInventario
+     * @return la lista de ids de objetos o la lista vacia si no hay objetos en la tabla
+     */
+    public ArrayList<String> getObjetosEnInventario(String idInventario) throws SQLException {
+        Connection conexion = instancia.getConexion(nombreDb);
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT idObjeto FROM InventarioObjeto WHERE idInventario = ?";
+            stmt = conexion.prepareStatement(query);
+            stmt.setString(1, idInventario);
+            rs = stmt.executeQuery();
+
+            ArrayList<String> objetos = new ArrayList<>();
+            while (rs.next()) {
+                objetos.add(rs.getString("idObjeto"));
+            }
+            return objetos;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {}
+            }
+        }
+    }
+
+    /**
+     * @brief devuelve un inventario de la bd
+     * @param idInventario
+     * @return el inventario o null si no se encuentra en la tabla
+     */
+    public Inventario getInventario(String idInventario) throws SQLException {
+        Connection conexion = instancia.getConexion(nombreDb);
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT idInventario, capacidadMaxima, espaciosOcupados FROM inventario WHERE idInventario = ?";
+            stmt = conexion.prepareStatement(query);
+            stmt.setString(1, idInventario);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Inventario inventario = new Inventario();
+                inventario.setIdInventario(rs.getString("idInventario"));
+                inventario.setEspaciosOcupados(rs.getInt("espaciosOcupados"));
+                return inventario;
+            } else {
+                return null;
+            }
         } finally {
             if (rs != null) {
                 try {
