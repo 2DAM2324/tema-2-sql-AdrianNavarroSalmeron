@@ -91,7 +91,7 @@ public void crearBaseDatos() {
         + " nombreObjeto TEXT NOT NULL )")) {
             stmtObjeto.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            
             System.err.println("Error al crear la tabla Objeto:" + e.getMessage());
         }
             
@@ -104,7 +104,7 @@ public void crearBaseDatos() {
                 + "numeroMiembros INTEGER NOT NULL)")) {
             stmtHermandad.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            
             System.err.println("Error al crear la tabla Hermandad:" + e.getMessage());
         }
             
@@ -118,7 +118,7 @@ public void crearBaseDatos() {
                     +")")) {
             stmtInventario.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            
             System.err.println("Error al crear la tabla Inventario:" + e.getMessage());
         }
 
@@ -136,7 +136,7 @@ public void crearBaseDatos() {
                 +")")) {
             stmtPersonaje.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            
             System.err.println("Error al crear la tabla Personaje:" + e.getMessage());
         }
 
@@ -151,7 +151,7 @@ public void crearBaseDatos() {
             + ")")){
             stmtInventarioObjeto.executeUpdate();
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al crear la tabla InventarioObjeto:" + e.getMessage());
         }
             
@@ -165,7 +165,7 @@ public void crearBaseDatos() {
             + ") ")){
         stmtHermandadPersonaje.executeUpdate();
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al crear la tabla hermandadPersonaje:" + e.getMessage());
         }
         
@@ -179,7 +179,7 @@ public void crearBaseDatos() {
             )) {
                 stmt.executeUpdate();
             } catch (SQLException e) {
-                e.printStackTrace();
+                
                 System.err.println("Error al borrar la tabla " + tableName + ": " + e.getMessage());
             }
     }
@@ -261,11 +261,11 @@ public void crearBaseDatos() {
             consulta.setString(5, objeto.getIdObjeto());
             consulta.executeUpdate();
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al modificar Objeto:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("Objeto NULL:" + e.getMessage());
         }
     }
@@ -288,11 +288,11 @@ public void crearBaseDatos() {
             consultaObjeto.setString(1, objeto.getIdObjeto());
             consultaObjeto.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            
             System.err.println("Error al borrar Objeto:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("Objeto NULL:" + e.getMessage());
         }
     }
@@ -322,11 +322,11 @@ public void crearBaseDatos() {
                 ObjetosSistema.add(objeto);
             }
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al leer Objetos:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("Objeto NULL:" + e.getMessage());
         }
     }
@@ -397,7 +397,7 @@ public void crearBaseDatos() {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            
             System.err.println("ERROR EN LA CONSULTA PARA INSERTAR PERSONAJE");
             if (conexion != null) {
                 try {
@@ -422,11 +422,11 @@ public void crearBaseDatos() {
                     conexion.setAutoCommit(true);
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                
                 System.err.println("Error cerrando recursos: " + e.getMessage());
             }
             catch(NullPointerException e){
-                e.printStackTrace();
+                
                 System.err.println("Objeto NULL:" + e.getMessage());
             }
         }
@@ -474,10 +474,10 @@ public void crearBaseDatos() {
                 ArrayListDePersonajesSistema.add(personaje);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("Personaje NULL:" + e.getMessage());
         }
     }
@@ -500,11 +500,11 @@ public void crearBaseDatos() {
                 inventariosSistema.add(inventario);
             }
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al leer Inventario:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("Inventario NULL:" + e.getMessage());
         }
     }
@@ -530,11 +530,11 @@ public void crearBaseDatos() {
             consulta.setInt(6, personaje.getIdPersonaje());
             consulta.executeUpdate();
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al modificar Personaje:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("Objeto NULL:" + e.getMessage());
         }
     }
@@ -563,11 +563,11 @@ public void crearBaseDatos() {
             consultaPersonaje.setInt(1, personaje.getIdPersonaje());
             consultaPersonaje.executeUpdate();
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al borrar Personaje:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("Personaje NULL:" + e.getMessage());
         }
     }
@@ -620,11 +620,11 @@ public void crearBaseDatos() {
                 personajesSitema.add(personaje);
             }
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al leer Personaje:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("Personaje NULL:" + e.getMessage());
         }
 
@@ -653,11 +653,11 @@ public void crearBaseDatos() {
         }catch(SQLIntegrityConstraintViolationException e){
             System.err.println("CLAVE PRIMARIA REPETIDA EN HERMANDAD");
         } catch (SQLException e) {
-            e.printStackTrace();
+            
             System.err.println("Error al insertar Hermandad:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("Hermandad NULL:" + e.getMessage());
         }
     }
@@ -678,11 +678,11 @@ public void crearBaseDatos() {
             consulta.setString(4, hermandad.getIdHermandad());
             consulta.executeUpdate();
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al modificar Hermandad:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("Hermandad NULL:" + e.getMessage());
         }
     }
@@ -704,11 +704,11 @@ public void crearBaseDatos() {
             consultaHermandad.setString(1, hermandad.getIdHermandad());
             consultaHermandad.executeUpdate();
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al borrar Hermandad:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("Hermandad NULL:" + e.getMessage());
         }
     }
@@ -733,11 +733,11 @@ public void crearBaseDatos() {
                 ArrayDeHermandadesSistema.add(hermandad);
             }
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al leer Hermandad:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("Hermandad NULL:" + e.getMessage());
         }
     }
@@ -779,11 +779,11 @@ public void crearBaseDatos() {
                 }
             }
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al leer HermandadPersonaje:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("HermandadPersonaje NULL:" + e.getMessage());
         }
     }
@@ -833,11 +833,11 @@ public void crearBaseDatos() {
             consulta.setInt(2, personaje.getIdPersonaje());
             consulta.executeUpdate();
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al borrar PersonajeHermandad:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("PersonajeHermandad NULL:" + e.getMessage());
 
         }
@@ -861,11 +861,11 @@ public void crearBaseDatos() {
            // inventario.getObjetosInventario().add(objeto);
             consulta.executeUpdate();
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al insertar ObjetoInventario:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("ObjetoInventario NULL:" + e.getMessage());
 
         }
@@ -886,11 +886,11 @@ public void crearBaseDatos() {
             consulta.setString(2, objeto.getIdObjeto());
             consulta.executeUpdate();
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al borrar ObjetoInventario:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("ObjetoInventario NULL:" + e.getMessage());
 
         }
@@ -910,11 +910,11 @@ public void crearBaseDatos() {
             consulta.setString(2, inventario.getIdInventario());
             consulta.executeUpdate();
          }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al modificar inventario:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("Inventario NULL:" + e.getMessage());
 
         }
@@ -947,11 +947,11 @@ public void crearBaseDatos() {
                 }
             }
         }catch(SQLException e){
-            e.printStackTrace();
+            
             System.err.println("Error al leer InventarioObjeto:" + e.getMessage());
         }
         catch(NullPointerException e){
-            e.printStackTrace();
+            
             System.err.println("InventarioObjeto NULL:" + e.getMessage());
 
         }

@@ -1287,6 +1287,17 @@ public class Ventana1 extends javax.swing.JFrame {
      }
      
      private void jButton_guardar_objetoActionPerformed(java.awt.event.ActionEvent evt){      
+         
+         //Eliminamos los espacios en blanco
+        nombreObjetoProcesado = nombreObjetoProcesado.trim();
+        rarezaObjetoProcesado = rarezaObjetoProcesado.trim();
+        descripcionObjetoProcesado = descripcionObjetoProcesado.trim();
+
+        // Comprobamos que ningun campo esta en blanco
+        if (nombreObjetoProcesado.isEmpty() || rarezaObjetoProcesado.isEmpty() || descripcionObjetoProcesado.isEmpty() && !nivelProcesado.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No se permiten campos vacíos", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
          controlador.aniadirObjeto(nombreObjetoProcesado, rarezaObjetoProcesado, precioObjetoProcesado, descripcionObjetoProcesado, idObjetoProcesado);
          ocultarSeccionInferiorObjeto();
      }
@@ -1390,7 +1401,11 @@ public class Ventana1 extends javax.swing.JFrame {
         servidorPersonaje = servidorPersonaje.trim();
         razaPersonaje = razaPersonaje.trim();
         faccion = faccion.trim();
-
+        //Comprobamos que ningun campo pueda estar vacio
+         if (nombrePersonaje.isEmpty() || servidorPersonaje.isEmpty() || razaPersonaje.isEmpty() || faccion.isEmpty()) {
+             JOptionPane.showMessageDialog(this, "No se permiten campos vacíos", "Error", JOptionPane.ERROR_MESSAGE);
+             return;
+         }
         try{
             int posicionPersonaje = controlador.buscarPersonajeEnSistema(nombrePersonaje, servidorPersonaje);
             if (posicionPersonaje == -1 && controlador.comprobarSiNivelCorrecto(Integer.parseInt(nivelPersonaje)) && !razaPersonaje.isEmpty() && !faccion.isEmpty()) {
