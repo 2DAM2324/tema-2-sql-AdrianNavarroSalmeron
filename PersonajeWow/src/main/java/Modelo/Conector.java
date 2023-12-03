@@ -28,6 +28,11 @@ public class Conector {
     private Conector() {
     }
 
+    /**
+     * @brief Crea un objeto de tipo Conector si no existe y lo devuelve
+     * @param dbName
+     * @return instancia
+     */
     public static Conector getInstancia(String dbName) {
         if (instancia == null) {
             instancia = new Conector();
@@ -36,6 +41,11 @@ public class Conector {
         return instancia;
     }
 
+    /**
+     * @brief Devuelve la conexión a la base de datos
+     * @param dbName Nombre de la base de datos // db.sqlite o dbTest.sqlite
+     * @return conn o connTest dependiendo de si entramos a la base de datos de test o no
+     */
     public Connection getConexion(String dbName) {
         switch (dbName) {
             case "db.sqlite" -> {
@@ -50,6 +60,10 @@ public class Conector {
         }
     }
 
+    /**
+     * @brief Conecta a la base de datos
+     * @param dbNombre Nombre de la base de datos // db.sqlite o dbTest.sqlite
+     */
     public void conectar(String dbNombre) {
         try {
             switch (dbNombre) {
@@ -434,10 +448,7 @@ public void crearBaseDatos() {
 
 
     /**
-     * 
- /
-     *
-     **
+        * @brief Lee un personaje de la base de datos y lo añade al array de personajes
      * @param nombre del personaje
      * @param servidor servidor del personaje
      * @param ArrayListDePersonajesSistema ArrayList donde se almacenarán los

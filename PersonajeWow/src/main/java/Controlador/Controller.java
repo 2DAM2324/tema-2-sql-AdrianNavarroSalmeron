@@ -32,7 +32,12 @@ public class Controller {
     private Ventana1 vista;
     private boolean estoyEnTest;
     
-   
+   /**
+    * @brief Constructor de Controller
+    * @param vistaSet instacia de la ventana
+    * @param nombreBd nombre de la base de datos a la que nos conectamos
+    * @param estoyTestando booleano que indica si estamos en test o no
+    */
     public Controller(Ventana1 vistaSet, String nombreBd, boolean estoyTestando){
         ArrayList<Personaje> nuevoArray = new ArrayList<>();
         ArrayList<Objeto> arrayObjeto = new ArrayList<>();
@@ -118,12 +123,20 @@ public class Controller {
         cargarHermandadesEnTabla(ArrayDeHermandadesSistema);
     }
     
+    /**
+     * @brief Muestra las ventanas emergente en caso de no estar en test
+     * @param message mensaje que se muestra en la ventana emergente
+     */
     public final void mostrarMensajesError(String message) {
         if (!estoyEnTest) {
             JOptionPane.showMessageDialog(vista, message, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    /**
+     * @brief Muestra las ventanas emergente en caso de no estar en test
+     * @param message mensaje que se muestra en la ventana emergente
+     */
     public void mostrarMensajesOk(String message){
         if(!estoyEnTest){
             JOptionPane.showMessageDialog(vista, message, "OK", JOptionPane.INFORMATION_MESSAGE);
@@ -163,6 +176,14 @@ public class Controller {
         return ArrayDeInventariosSistema;
     }
     //****************************************Funciones de los objetos******************************************************************************************
+    /**
+     * @brief Añade un objeto al sistema
+     * @param nombreObjeto 
+     * @param rareza
+     * @param precio
+     * @param descipcion
+     * @param IdObjeto
+     */
     public void aniadirObjeto(String nombreObjeto, String rareza, String precio, String descipcion, String IdObjeto){
         boolean correcto = true;
         //Comprobamos si el objeto ya existe en el sistema
@@ -232,6 +253,10 @@ public class Controller {
         }
     }
     
+    /**
+     * @brief Borra un objeto del sistema
+     * @param idObjetoaBorrar
+     */
     public void borrarObjeto(String idObjetoaBorrar) {
         Objeto objetoaBorrar = null;
         for (Objeto objeto : ArrayDeObjetosSistema) {
@@ -270,6 +295,11 @@ public class Controller {
         }
     }
 
+    /**
+     * @brief Borra un objeto del inventario
+     * @param idObjeto
+     * @param idInventario
+     */
     public void borrarObjetoInventario(String idObjeto, String idInventario){
         int posicionObjeto = getPosicionObjetoById(idObjeto);
         int posicionInventario = buscarInventarioPorId(idInventario);
@@ -305,7 +335,12 @@ public class Controller {
             mostrarMensajesError("No se ha encontrado el objeto o el inventario");
         }
     }
-    
+
+    /**
+     * @brief Busca un objeto por su id
+     * @param id
+     * @return objeto encontrado
+     */
     public Objeto getObjetoById(String id){
         for(Objeto objeto : ArrayDeObjetosSistema){
             if(objeto.getIdObjeto().equals(id)){
@@ -315,6 +350,11 @@ public class Controller {
         return null;
     }
     
+    /**
+     * @brief Busca la posicion de un objeto por su id
+     * @param id
+     * @return posicion del objeto
+     */
      public int getPosicionObjetoById(String id){
          int posicion = -1;
         for(Objeto objeto : ArrayDeObjetosSistema){
@@ -326,6 +366,14 @@ public class Controller {
         return posicion;
      }
     
+    /**
+     * @brief Modifica un objeto del sistema
+     * @param id
+     * @param nombre
+     * @param rareza
+     * @param precio
+     * @param descripcion
+     */
     public void modificarObjeto(String id, String nombre, String rareza, String precio, String descripcion){
          boolean correcto = true;
         //Comprobamos si el objeto ya existe en el sistema
@@ -366,6 +414,10 @@ public class Controller {
         }
     }
     
+    /**
+     * @brief Carga los objetos en la tabla
+     * @param ArrayDeObjetos 
+     */
     public void cargarObjetoEnTabla(ArrayList<Objeto> ArrayDeObjetos) {
         DefaultTableModel model = (DefaultTableModel) vista.jTable_objeto_objeto.getModel();
 
@@ -385,6 +437,10 @@ public class Controller {
     }
     //******************************************************************************************************************************************
     
+    /**
+     * @brief Carga las hermandades en la tabla
+     * @param arrayDeInventarios
+     */
     public void cargarInventariosSistmemaEnTabla(ArrayList<Inventario> arrayDeInventarios){
         DefaultTableModel model = (DefaultTableModel) vista.jTable_inventario_objetos.getModel();
         
@@ -399,7 +455,11 @@ public class Controller {
          vista.jTable_inventario_objetos.setModel(model);
     }
     
-    
+    /**
+     * @brief Carga el inventario del personaje en la tabla
+     * @param nombrePersonaje 
+     * @param servidorPersonaje
+     */
       public void cargarInventarioDetallesPersonajes(String nombrePersonaje, String servidorPersonaje){
           DefaultTableModel model = (DefaultTableModel) vista.jTable_detalles_inventario_personaje_personaje.getModel();
           int posicionPersonaje = buscarPersonajeEnSistema(nombrePersonaje, servidorPersonaje);
@@ -422,6 +482,10 @@ public class Controller {
         return vista;
     }
 
+    /**
+     * @brief Carga el inventario en la tabla
+     * @param idPersonaje del personaje
+     */
     public void cargarInventarioPersonajeEnTabla(Integer idPersonaje){
         DefaultTableModel model = (DefaultTableModel) vista.jTable_inventario_personaje.getModel();
         while(model.getRowCount()  > 0){
@@ -439,7 +503,11 @@ public class Controller {
          vista.jTable_inventario_personaje.setModel(model);
     }
     
-    //Agrega un personaje a una hermandad si hay espacio
+    /**
+     * @brief agrega un personaje a la hermandad
+     * @param personaje 
+     * @param hermandad
+     */
     public void agregarUnPersonajeaHermandad(Personaje personaje, Hermandad hermandad){
             if(hermandad.getListaMiembros().size() <= 100){
                 hermandad.getListaMiembros().add(personaje);
@@ -452,7 +520,11 @@ public class Controller {
     
     
     //*************************************FUNCIONES INVENTARIO****************************************************
-    
+    /**
+     * @brief Añade un inventario al sistema
+     * @param nombrePersonaje
+     * @param servidorPersonaje
+     */
     public void aniadirInventario( String nombrePersonaje, String servidorPersonaje ){
             int posicionPersonaje = buscarPersonajeEnSistema(nombrePersonaje, servidorPersonaje);
             
@@ -471,7 +543,11 @@ public class Controller {
             } 
     }
     
-   
+   /**
+    * @brief añade un objeto a un inventario
+    * @param idObjeto 
+    * @param idInventario
+    */
     //Se realizan comprobaciones para ver si el objeto existe, si el inventario existe y si el objeto existe dentro del inventario
     public void aniadirObjetoaInventario(String idObjeto, String idInventario){
         int posicionObjeto =  getPosicionObjetoById(idObjeto);
@@ -514,7 +590,10 @@ public class Controller {
         }
     }
     
-    
+    /**
+     * @brief Vacia un inventario
+     * @param idInventario
+     */
     public void vaciarInventario(String idInventario){
         
         for(Inventario inventario : getArrayDeInventariosSistema()){
@@ -537,6 +616,11 @@ public class Controller {
         
     }
     
+    /**
+     * @brief Busca un inventario por su id
+     * @param idInventario
+     * @return posicion del inventario
+     */
     //Busca el inventario por el id en el vector de inventarios del sistema.
     public int buscarInventarioPorId(String idInventario){
         int posicion = -1;
@@ -550,7 +634,11 @@ public class Controller {
    
     //****************************Funciones del PERSONAJE*****************************************************************
 
-
+    /**
+     * @brief comprueba que el nivel este entre 1-60
+     * @param nivel
+     * @return true si el nivel es correcto false si no lo es
+     */
     public boolean comprobarSiNivelCorrecto(int nivel){
         boolean correcto = false;
         if(nivel < 1 || nivel > 60){
@@ -562,6 +650,14 @@ public class Controller {
         return correcto;
     }
 
+    /**
+     * @brief añade un personaje al sistema, crea su inventario y se lo asigna al personaje. Añade el personaje y el inventario a la base de datos
+     * @param nombre
+     * @param servidor
+     * @param Raza
+     * @param nivel
+     * @param faccion
+     */
     //Esto se ejecuta en el boton de guardar.
     public void aniadirPersonaje(String nombre, String servidor, String Raza, String nivel, String faccion  ){
         try{
@@ -607,6 +703,12 @@ public class Controller {
         }
     }
     
+    /**
+     * @brief busca un personaje en el sistema
+     * @param nombre
+     * @param servidor
+     * @return posicion del personaje
+     */
     public int buscarPersonajeEnSistema(String nombre, String servidor){
         for (int i = 0; i < this.getArrayDePersonajesDeSistema().size(); i++) {
             if (nombre.equals(this.getArrayDePersonajesDeSistema().get(i).getNombre()) && servidor.equals(this.getArrayDePersonajesDeSistema().get(i).getServidor())) {
@@ -616,6 +718,11 @@ public class Controller {
         return -1; // Si no se encuentra el personaje, devuelve -1
     }
     
+    /**
+     * @brief busca un personaje en el sistema por su id
+     * @param idPersonaje
+     * @return posicion del personaje
+     */
     //Devuelve la posicion en la cual se encuentra ese personaje en el array del sistema
     public int buscarPersonajeEnSistemaPorId(Integer idPersonaje){
         int posicion = -1;
@@ -627,10 +734,15 @@ public class Controller {
         return posicion;
     }
     
-   
-    
-    
-    
+   /**
+    * @brief modifica un personaje del sistema
+    * @param idPersonaje 
+    * @param nombre
+    * @param servidor
+    * @param raza
+    * @param nivel
+    * @param faccion
+    */
     public void modificarPersonaje(Integer idPersonaje, String nombre, String servidor, String raza, int nivel, String faccion){
         boolean correcto = true;
         int posicionPersonaje = buscarPersonajeEnSistemaPorId(idPersonaje);
@@ -659,6 +771,11 @@ public class Controller {
          }
     }
     
+    /**
+     * @brief Borra un personaje del sistema
+     * @param nombre
+     * @param servidor
+     */
     public void borrarPersonaje(String nombre, String servidor){
         
         int posicionPersonaje = buscarPersonajeEnSistema(nombre, servidor);
@@ -700,6 +817,10 @@ public class Controller {
         }
     }
     
+    /**
+     * @brief Carga los personajes en la tabla
+     * @param ArrayDePersonajes
+     */
      public void cargarPersonajesEnTabla(ArrayList<Personaje> ArrayDePersonajes) {
         DefaultTableModel model = (DefaultTableModel) vista.jTable_personaje.getModel();
 
@@ -721,6 +842,12 @@ public class Controller {
      //***************************************************************************************************************************************************************
         
      //**********************************************************FUNCIONES de Hermandad**************************************************************************
+     /**
+      * @brief añade una hermandad al sistema y a la bd
+      * @pre los datos vienen filtrados de la vista
+      * @param nombre
+      * @param servidor
+      */
      public void aniadirHermandad(String nombre, String servidor){
         if(buscarHermandadPorNombre(nombre, servidor) == -1){
             Hermandad hermandad = new Hermandad();
@@ -797,6 +924,14 @@ public class Controller {
         return false;
      }
 
+     /**
+      * @brief añade un personaje a la hermandad
+        * @param nombrePersonaje
+        * @param servidorPersonaje
+        * @param nombreHermandad
+        * @param servidorHermandad
+        *@pre los datos vienen filtrados de la vista
+      */
      //Añade un personaje a una hermandad
      public void aniadirPersonajeaHermandad(String nombrePersonaje, String servidorPersonaje, String nombreHermandad, String servidorHermandad){
             int posicionPersonaje = buscarPersonajeEnSistema(nombrePersonaje, servidorPersonaje);
@@ -842,6 +977,15 @@ public class Controller {
                  System.out.println("No se ha encontrado la hermandad o el personaje");
             }                
         }
+
+        /**
+         * @brief borra personajes de una hermandad y de la lista de hermandades del personaje tambien de la bd
+         * @pre los datos vienen filtrados de la vista
+         * @param nombrePersonaje
+         * @param servidorPersonaje
+         * @param nombreHermandad
+         * @param servidorHermandad
+         */
      
      //Recibe el nombre y el servidor del personaje y lo borra de la lista de miembros de la hermandad, y de la lista de hermandades del personaje borra esa hermnadad
         public void borrarPersonajeDeHermandad(String nombrePersonaje, String servidorPersonaje, String nombreHermandad, String servidorHermandad){
@@ -880,6 +1024,13 @@ public class Controller {
                 }
         }
 
+        /**
+         * @brief modifica una hermandad
+         * @param nombreOriginal
+         * @param servidorOriginal
+         * @param nombreCambiar
+         * @param servidorCambiar
+         */
      //Modifica una hermandad
      public void modificarHermandad(String nombreOriginal, String servidorOriginal, String nombreCambiar, String servidorCambiar){
             boolean correcto = true;
@@ -917,6 +1068,12 @@ public class Controller {
             }
      }
 
+     /**
+      * @brief borra una hermandad
+      * @param nombreHermandad
+      * @param servidorHermandad
+      */
+
     //Busca la hermandad, si esta existe busca en listaHermandades de cada personaje para borrar esta hermandad de sus listas, luego borra la hermandad del sistema
      public void borrarHermandad(String nombreHermandad, String servidorHermandad) {
         int posicionHermandad = buscarHermandadPorNombre(nombreHermandad, servidorHermandad);
@@ -949,7 +1106,10 @@ public class Controller {
     }
 
 
-
+    /**
+     * @brief Carga las hermandades en la tabla
+     * @param ArrayDeHermandadesSistema
+     */
     public void cargarHermandadesEnTabla(ArrayList ArrayDeHermandadesSistema){
         DefaultTableModel model = (DefaultTableModel) vista.jTable_hermandad.getModel();
 
@@ -968,6 +1128,10 @@ public class Controller {
         vista.jTable_hermandad.setModel(model);
     }
 
+    /**
+     * @brief Carga los personajes de la hermandad en la tabla
+     * @param idHermandad
+     */
     public void cargarPersonajesHermandadEnTabla(String idHermandad){
         DefaultTableModel model = (DefaultTableModel) vista.jTable_personajes_hermandad.getModel();
         while(model.getRowCount()  > 0){
@@ -985,6 +1149,10 @@ public class Controller {
          vista.jTable_personajes_hermandad.setModel(model);
     }
     
+    /**
+     * @brief cierra la conexion con la base de datos
+     * @param nombreDb de la base de datos a la que se cierra la conexion
+     */
     public void cerrarConexionDesdeControlador(String nombreDb){
           Conector.getInstancia(nombreDb).cerrarConexion(nombreDb);
     }
