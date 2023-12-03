@@ -469,7 +469,7 @@ public void crearBaseDatos() {
      * @brief lee un personaje de la base de datos y cada inventario que lee lo mete en el array de inventarios
      * @param inventariosSistema ArrayList donde se almacenarán los inventarios
      */
-    public void leerInventario(ArrayList inventariosSistema) throws SQLException, NullPointerException{
+    public void leerInventario(ArrayList<Inventario> inventariosSistema) throws SQLException, NullPointerException{
         String sql = "SELECT * FROM inventario";
         Connection conexion = instancia.getConexion(nombreDb);
         try{
@@ -558,7 +558,7 @@ public void crearBaseDatos() {
      * @param inventariosSistema ArrayList donde esta el inventario del personaje
      * @param hermandadesSistema ArrayList donde se busca las hermandades donde esta el personaje
      */
-    public void leerPersonajeDeBd(ArrayList personajesSitema, ArrayList inventariosSistema, ArrayList<Hermandad> hermandadesSistema) throws SQLException, NullPointerException{
+    public void leerPersonajeDeBd(ArrayList<Personaje> personajesSitema, ArrayList<Inventario> inventariosSistema, ArrayList<Hermandad> hermandadesSistema) throws SQLException, NullPointerException{
         String sql = "SELECT * FROM personaje";
         Connection conexion = instancia.getConexion(nombreDb);
 

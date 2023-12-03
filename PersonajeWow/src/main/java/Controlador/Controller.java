@@ -728,7 +728,12 @@ public class Controller {
             System.out.println("La hermandad ya existe");
         }
      }
-
+     /**
+      * @brief Busca una hermandad por su nombre y servidor
+      * @param nombre
+      * @param servidor
+      * @return Devuelve la posicion en la que se encuentra la hermandad en el array de hermandades de sistema o -1 si no la encuentra
+      */
      //Nos devuelve la posicion en la que se encuentra la hermandad en el array de hermandaddes de sistema
      public int buscarHermandadPorNombre(String nombre, String servidor){
          for(Hermandad hermandad : getArrayDeHermandadesSistema()){
@@ -847,12 +852,21 @@ public class Controller {
 
      //Modifica una hermandad
      public void modificarHermandad(String nombreOriginal, String servidorOriginal, String nombreCambiar, String servidorCambiar){
+            boolean correcto = true;
+            //Comprobamos si la hermandad ya existe en el sistema
+            for(int i = 0; i < getArrayDeHermandadesSistema().size(); i++){
+                if(getArrayDeHermandadesSistema().get(i).getNombreHermandad().equals(nombreCambiar) && getArrayDeHermandadesSistema().get(i).getServidorHermandad().equals(servidorCambiar)){
+                    mostrarMensajesError("La hermandad ya existe");
+                    i = getArrayDeHermandadesSistema().size();
+                    correcto = false;
+                }
+            }
             //Te busca la posicion de la hermandad que quieres modificar
             int posicionHermandad = buscarHermandadPorNombre(nombreOriginal, servidorOriginal);
             int posicionHermandadCambiar = buscarHermandadPorNombre(nombreCambiar, servidorCambiar);
             if(posicionHermandad != -1){
                 //Comprueba si ya existe una hermandad con el mismo nombre y el mismo servidor
-                if(posicionHermandadCambiar == -1){
+                if(posicionHermandadCambiar == -1 && correcto == true){
                     getArrayDeHermandadesSistema().get(posicionHermandad).setNombreHermandad(nombreCambiar);
                     getArrayDeHermandadesSistema().get(posicionHermandad).setServidorHermandad(servidorCambiar);
                     //Una vez que se han cambiado el nombre y el servidor en el controlador lo cambiamos en la bd.
