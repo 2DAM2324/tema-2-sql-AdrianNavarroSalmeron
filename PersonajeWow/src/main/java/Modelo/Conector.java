@@ -243,9 +243,13 @@ public void crearBaseDatos() {
     /**
      * @brief Modifica un objeto en la base de datos
      * @param objeto Objeto a modificar
+     * @throws SQLException exception
      */
 
     public void modificarObjetoEnBd(Objeto objeto) throws SQLException, NullPointerException{
+        if (objeto.getIdObjeto() == null || objeto.getRareza() == null || objeto.getDescripcion() == null || objeto.getPrecio() <= 0 || objeto.getNombreObjeto() == null) {
+            throw new IllegalArgumentException("Uno o mas campos estan vacios");
+        }
         String sql = "UPDATE objeto SET rareza = ?, descripcion = ?, precio = ?, nombreObjeto = ? WHERE idObjeto = ?";
         Connection conexion = instancia.getConexion(nombreDb);
         try{
