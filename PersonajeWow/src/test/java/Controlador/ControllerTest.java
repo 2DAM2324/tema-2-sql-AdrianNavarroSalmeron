@@ -616,14 +616,82 @@ public class ControllerTest {
     @Test
     public void testAniadirPersonajeaHermandadValido(){
         ArrayList<Integer> idsPersonajes = new ArrayList<>();
-        controlador.aniadirPersonajeaHermandad("Victarion", "Sanguino", "Baptisterio", "Sanguino");
+        //Creamos un nuevo personaje
+        controlador.aniadirPersonaje("TestName", "TestRaza", "TestRaza", "12", "TestFaccion");
+        controlador.aniadirPersonajeaHermandad("TestName", "TestRaza", "Baptisterio", "Sanguino");
         try{
             idsPersonajes = (controlador.conector.getPersonajesEnHermandad(controlador.getArrayDeHermandadesSistema().get(0).getIdHermandad()));
-            assertTrue(idsPersonajes.contains(controlador.getArrayDePersonajesDeSistema().get(0).getIdPersonaje()), "El personaje se ha añadido a la hermandad");
+            assertTrue(idsPersonajes.contains(controlador.getArrayDePersonajesDeSistema().get(1).getIdPersonaje()), "El personaje se ha añadido a la hermandad");
         }
         catch(SQLException e){
             fail("La base de datos ha fallado: " + e.getMessage());
         }
-        assertTrue(controlador.getArrayDeHermandadesSistema().get(0).getListaMiembros().size() == 1, "El personaje se ha añadido a la hermandad");
+        assertTrue(controlador.getArrayDeHermandadesSistema().get(0).getListaMiembros().size() == 2, "El personaje se ha añadido a la hermandad");
     }
+
+    /**
+     * Test aniadirPersonajeaHermandad cuando el personaje no existe
+     */
+    @Test
+    public void testAniadirPersonajeaHermandadNoExistente(){
+        controlador.aniadirPersonajeaHermandad("TestName", "TestRaza", "Baptisterio", "Sanguino");
+        try{
+            assertTrue(controlador.conector.getPersonajesEnHermandad(controlador.getArrayDeHermandadesSistema().get(0).getIdHermandad()).size() ==1, "El personaje no se ha añadido a la hermandad");
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertTrue(controlador.getArrayDeHermandadesSistema().get(0).getListaMiembros().size() == 1, "El personaje no se ha añadido a la hermandad");
+    }
+
+    /**
+     * Test aniadirPersonajeaHermandad cuando la hermandad no existe
+     */
+    @Test
+    public void testAniadirPersonajeaHermandadHermandadNoExistente(){
+        controlador.aniadirPersonajeaHermandad("Victarion", "Sanguino", "TestName", "TestServidor");
+        try{
+            assertTrue(controlador.conector.getHermandad("TestName", "TestServidor") == null, "La hermandad no se ha borrado de la base de datos");
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        //Comprobamos que solo tiene una hermandad
+        assertTrue(controlador.getArrayDePersonajesDeSistema().get(0).getListaHermandadades().size() == 1);
+    }
+
+    /**
+     * Test borrarPersonajeaHermandad cuando es valido y existe
+     * 
+     */
+    @Test
+    public void testBorrarPersonajeaHermandadValido(){
+        controlador.borrarPersonajeDeHermandad("Victarion", "Sanguino", "Baptisterio", "Sanguino");
+        try{
+            assertTrue(controlador.conector.getPersonajesEnHermandad(controlador.getArrayDeHermandadesSistema().get(0).getIdHermandad()).size() ==0, "El personaje no se ha borrado de la hermandad");
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertTrue(controlador.getArrayDeHermandadesSistema().get(0).getListaMiembros().size() == 0, "El personaje no se ha borrado de la hermandad");
+        assertTrue(controlador.getArrayDePersonajesDeSistema().get(0).getListaHermandadades().size() == 0, "El personaje no se ha borrado de la hermandad");
+    }
+
+    /**
+     * Test borrarPersonajeaHermandad cuando se introduce el nombre correcto pero el servidor es invalido
+     * El personaje no se borra y sigue existiendo en la bd
+     */
+    @Test
+    public void testBorrarPersonajeaHermandadServidorInvalido(){
+        controlador.borrarPersonajeDeHermandad("Victarion", "España", "Baptisterio", "Sanguino");
+        try{
+            assertTrue(controlador.conector.getPersonajesEnHermandad(controlador.getArrayDeHermandadesSistema().get(0).getIdHermandad()).size() ==1, "El personaje no se ha borrado de la hermandad");
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertTrue(controlador.getArrayDeHermandadesSistema().get(0).getListaMiembros().size() == 1, "El personaje no se ha borrado de la hermandad");
+        assertTrue(controlador.getArrayDePersonajesDeSistema().get(0).getListaHermandadades().size() == 1, "El personaje no se ha borrado de la hermandad");
+    }
+
 }
