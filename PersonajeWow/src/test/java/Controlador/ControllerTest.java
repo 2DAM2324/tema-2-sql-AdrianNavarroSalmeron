@@ -500,4 +500,81 @@ public class ControllerTest {
         assertTrue(controlador.getArrayDePersonajesDeSistema().size() == 1, "El personaje no se ha borrado del array de personajes");
         assertTrue(controlador.getArrayDeInventariosSistema().size() == 1, "El personaje no se ha borrado del array de inventarios");
     }
+
+    //TESTS CRUD HERMANDAD
+    
+    /**
+     * Test de aniadirHermandad de la clase Controller, cuando la hermandad no existe
+     */
+    @Test
+    public void testAniadirHermandadValido(){
+        controlador.aniadirHermandad("TestName", "TestServidor");
+        try{
+            assertTrue(controlador.conector.getHermandad("TestName", "TestServidor") != null, "La hermandad se ha añadido a la base de datos");
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertTrue(controlador.getArrayDeHermandadesSistema().size() == 2, "La hermandad se ha añadido al array de hermandades");
+    }
+
+    /**
+     * Test de aniadirHermandad de la clase Controller, cuando la hermandad ya existe
+     */
+    @Test
+    public void testAniadirHermandadYaExistente(){
+        controlador.aniadirHermandad("Baptisterio", "Sanguino");
+        try{
+            assertTrue(controlador.conector.getHermandad("Baptisterio", "Sanguino") != null, "La hermandad se ha añadido a la base de datos");
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertTrue(controlador.getArrayDeHermandadesSistema().size() == 1, "La hermandad no se ha añadido al array de hermandades");
+    }
+
+    /**
+     * Test de modificarHermandad cuando es valido y la hermandad existe
+     */
+    @Test
+    public void testModificarHermandadValido(){
+        controlador.modificarHermandad("Baptisterio", "Sanguino", "TestName", "TestServidor");
+        try{
+            assertTrue(controlador.conector.getHermandad("TestName", "TestServidor") != null, "La hermandad se ha añadido a la base de datos");
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertTrue(controlador.getArrayDeHermandadesSistema().size() == 1, "La hermandad se ha añadido al array de hermandades");
+    }
+
+    /**
+     * Test de modificarHermandad cuando la hermandad no existe
+     */
+    @Test
+    public void testModificarHermandadNoExistente(){
+        controlador.modificarHermandad("TestName", "TestServidor", "TestName", "TestServidor");
+        try{
+            assertTrue(controlador.conector.getHermandad("TestName", "TestServidor") == null, "La hermandad no se ha añadido a la base de datos");
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertTrue(controlador.getArrayDeHermandadesSistema().size() == 1, "La hermandad no se ha añadido al array de hermandades");
+    }
+
+    /**
+     * Test modificar hermandad cuando la hermandad existe pero queremos cambiarla a una que ya existe
+     */
+    @Test
+    public void testModificarHermandadYaExistente(){
+        controlador.modificarHermandad("Baptisterio", "Sanguino", "Baptisterio", "Sanguino");
+        try{
+            assertTrue(controlador.conector.getHermandad("Baptisterio", "Sanguino") != null, "La hermandad se ha añadido a la base de datos");
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertTrue(controlador.getArrayDeHermandadesSistema().size() == 1, "La hermandad no se ha añadido al array de hermandades");
+    }
 }

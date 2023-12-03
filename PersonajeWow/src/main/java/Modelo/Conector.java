@@ -1078,6 +1078,47 @@ public void crearBaseDatos() {
         }
     }
 
+    /**
+     * Devuelve un objeto de tipo Hermandad de la bd
+     * @param nombreHermandad
+     * @param servidorHermandad
+     * @return la hermandad o null si no se encuentra en la tabla
+     */
+    public Hermandad getHermandad(String nombreHermandad, String servidorHermandad) throws SQLException {
+        Connection conexion = instancia.getConexion(nombreDb);
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT idHermandad, nombreHermandad, servidorHermandad, numeroMiembros FROM hermandad WHERE nombreHermandad = ? AND servidorHermandad = ?";
+            stmt = conexion.prepareStatement(query);
+            stmt.setString(1, nombreHermandad);
+            stmt.setString(2, servidorHermandad);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Hermandad hermandad = new Hermandad();
+                hermandad.setIdHermandad(rs.getString("idHermandad"));
+                hermandad.setNombreHermandad(rs.getString("nombreHermandad"));
+                hermandad.setServidorHermandad(rs.getString("servidorHermandad"));
+                hermandad.setNumeroMiembros(rs.getInt("numeroMiembros"));
+                return hermandad;
+            } else {
+                return null;
+            }
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {}
+            }
+        }
+    }
 }
 
 
