@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Controlador;
-import java.lang.reflect.Array;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
@@ -177,6 +176,21 @@ public class Controller {
         try{
             if(nombreObjeto != null && rareza != null && precio != null && descipcion != null && correcto == true){
                      Objeto objeto = new Objeto();
+                     ArrayList<String> listaIdsObjetos = new ArrayList<>();
+                        try{
+                            listaIdsObjetos = conector.getListaIdsObjetos();
+                        }
+                        catch(SQLException | NullPointerException e){
+                            mostrarMensajesError("ERROR AL LEER IDS DE OBJETOS DE LA BASE DE DATOS");
+                        }
+                    //En caso de que haya una id repetida, se genera una nueva
+                    for (int i = 0; i < listaIdsObjetos.size(); i++) {
+                        if (listaIdsObjetos.get(i).equals(objeto.getIdObjeto())) {
+                            String newId = objeto.generateNewIdObjeto();
+                            objeto.setIdObjeto(newId);
+                            System.out.println("Cambiando id de OBJETO" + objeto.getIdObjeto() + "por id" + newId + "porque ya existe");
+                            }
+                    }
                     //Eliminamos los espacios en blanco
                     nombreObjeto = nombreObjeto.trim();
                     rareza = rareza.trim();

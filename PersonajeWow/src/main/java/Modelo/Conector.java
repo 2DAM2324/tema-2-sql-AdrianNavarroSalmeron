@@ -301,7 +301,7 @@ public void crearBaseDatos() {
      * @brief Lee un objeto de la base de datos
      * @param  ObjetosSistema ArrayList donde se almacenarán los objetos
      */
-    public void leerObjetosDeBd(ArrayList ObjetosSistema) throws SQLException, NullPointerException{
+    public void leerObjetosDeBd(ArrayList <Objeto>ObjetosSistema) throws SQLException, NullPointerException{
         String sql = "SELECT * FROM objeto";
         Connection conexion = instancia.getConexion(nombreDb);
         try{
@@ -313,7 +313,12 @@ public void crearBaseDatos() {
                 String descripcion = resulsetObjeto.getString("descripcion");
                 double precio = resulsetObjeto.getDouble("precio");
                 String nombreObjeto = resulsetObjeto.getString("nombreObjeto");
-                Objeto objeto = new Objeto(idObjeto, rareza, descripcion, precio, nombreObjeto);
+                Objeto objeto = new Objeto();
+                objeto.setIdObjeto(idObjeto);
+                objeto.setRareza(rareza);
+                objeto.setDescripcion(descripcion);
+                objeto.setPrecio(precio);
+                objeto.setNombreObjeto(nombreObjeto);
                 ObjetosSistema.add(objeto);
             }
         }catch(SQLException e){
@@ -1270,6 +1275,38 @@ public void crearBaseDatos() {
                 hermandades.add(rs.getString("IdHermandad"));
             }
             return hermandades;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) { }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {}
+            }
+        }
+    }
+
+    /**
+     * @brief devuelve una lista de los ids de los objetos de la bd
+     */
+    public ArrayList<String> getListaIdsObjetos() throws SQLException {
+        Connection conexion = instancia.getConexion(nombreDb);
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT idObjeto FROM objeto";
+            stmt = conexion.prepareStatement(query);
+            rs = stmt.executeQuery();
+
+            ArrayList<String> objetos = new ArrayList<>();
+            while (rs.next()) {
+                objetos.add(rs.getString("idObjeto"));
+            }
+            return objetos;
         } finally {
             if (rs != null) {
                 try {
