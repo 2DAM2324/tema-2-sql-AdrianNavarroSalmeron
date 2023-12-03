@@ -26,7 +26,6 @@ import Modelo.Inventario;
 import Modelo.Objeto;
 import Modelo.Personaje;
 import Vista.Ventana1;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  *
@@ -74,7 +73,7 @@ public class ControllerTest {
 
     @AfterAll
     public static void tearDownClass() {
-        controlador.cerrarConexionDesdeControlador(nombreBd);
+        //controlador.cerrarConexionDesdeControlador(nombreBd);
     }
     
     

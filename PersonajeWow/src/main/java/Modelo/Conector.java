@@ -218,6 +218,9 @@ public void crearBaseDatos() {
      * @throws NullPointerException
      */
     public void insertarObjetoEnBd(Objeto objeto) throws SQLException, SQLIntegrityConstraintViolationException, NullPointerException {
+        if (objeto.getIdObjeto() == null  || objeto.getRareza() == null || objeto.getDescripcion() == null || objeto.getPrecio() <= 0 || objeto.getNombreObjeto() == null) {
+            throw new IllegalArgumentException("Uno o mas campos estan vacios");
+        }
          String sql = "INSERT INTO objeto (idObjeto, rareza, descripcion, precio, nombreObjeto) VALUES (?, ?, ?, ?, ?)";
          Connection conexion = instancia.getConexion(nombreDb);
         // Conectar a la base de datos
@@ -954,7 +957,6 @@ public void crearBaseDatos() {
 
     /**
      * @brief Devuelve el id del inventario en la tabla inventarioObjeto
-     * @param idInventario
      * @param idObjeto
      * @return el id del inventario o null si no se encuentra en la tabla
      * @throws SQLException
