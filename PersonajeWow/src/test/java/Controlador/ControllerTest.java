@@ -55,11 +55,14 @@ public class ControllerTest {
            controlador.setArrayDeObjetosSistema(new ArrayList<>());
            controlador.setArrayDeInventariosSistema(new ArrayList<>());
            controlador.setArrayDePersonajesDeSistema(new ArrayList<>());
+           controlador.setArrayDeHermandadesSistema(new ArrayList<>());
            
             //Setter, personaje, inventario y objeto
             controlador.aniadirObjeto("Espada", "Comun", "41", "Es una espada", "41");
             controlador.aniadirPersonaje("Victarion", "Sanguino", "Elfo", "60", "Horda");
             controlador.aniadirObjetoaInventario(controlador.getArrayDeObjetosSistema().get(0).getIdObjeto(), controlador.getArrayDePersonajesDeSistema().get(0).getInventario().getIdInventario());
+            controlador.aniadirHermandad("Baptisterio","Sanguino" );
+            controlador.aniadirPersonajeaHermandad("Victarion", "Sanguino", "Baptisterio", "Sanguino");
             
             //Almacenos los ids en la variable de clase
              idObjetoInicialTest = controlador.getArrayDeObjetosSistema().get(0).getIdObjeto();
@@ -405,5 +408,96 @@ public class ControllerTest {
         assertTrue(controlador.getArrayDePersonajesDeSistema().get(1).getInventario().getObjetosInventario().isEmpty(), "El personaje se ha añadido al array de personajes");
     }
 
-    //TODO: PROGRAMAR LOS AÑADIR PERSONAJE CUANDO NO ES CORRECTO
+    /**
+     * Test de aniadirPersonaje de la clase Controller, cuando el nivel no es un numero
+     * El personaje no se añade a la bd
+     */
+    @Test
+    public void testAniadirPersonajeNivelNoNumero(){
+        controlador.aniadirPersonaje("TestName", "TestRaza", "TestRaza", "12a", "TestFaccion");
+        Personaje personaje = null;
+        try{
+            personaje = controlador.conector.getPersonaje(2);
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertNull(personaje, "El personaje no debería existir en la base de datos");
+        assertTrue(controlador.getArrayDePersonajesDeSistema().size() == 1, "El personaje no se ha añadido al array de personajes");
+        assertTrue(controlador.getArrayDeInventariosSistema().size() == 1, "El personaje no se ha añadido al array de inventarios");
+    }
+
+    /**
+     * Test de modificarPersonaje cuando es valido y el personaje existe
+     */
+    @Test
+    public void testModificarPersonajeValido(){
+        controlador.modificarPersonaje(1, "TestName", "TestRaza", "TestRaza", 12, "TestFaccion");
+        Personaje personaje = null;
+        try{
+            personaje = controlador.conector.getPersonaje(1);
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertEquals("TestName", personaje.getNombre(), "El nombre del personaje no se ha modificado correctamente");
+        assertEquals("TestRaza", personaje.getRaza(), "La raza del personaje no se ha modificado correctamente");
+        assertEquals(12, personaje.getNivel(), "El nivel del personaje no se ha modificado correctamente");
+        assertEquals("TestFaccion", personaje.getFaccion(), "La faccion del personaje no se ha modificado correctamente");
+    }
+
+    /**
+     * Test de modificarPersonaje cuando el personaje no existe
+     */
+    @Test
+    public void testModificarPersonajeNoExistente(){
+        controlador.modificarPersonaje(2, "TestName", "TestRaza", "TestRaza", 12, "TestFaccion");
+        Personaje personaje = null;
+        try{
+            personaje = controlador.conector.getPersonaje(2);
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertNull(personaje, "El personaje no debería existir en la base de datos");
+    }
+
+  /**
+   * Test borrarPersonaje cuando es valido y existe
+   * 
+   */
+    @Test
+    public void testBorrarPersonajeValido(){
+        controlador.borrarPersonaje("Victarion","Sanguino");
+        Personaje personaje = null;
+        try{
+            personaje = controlador.conector.getPersonaje(1);
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertNull(personaje, "El personaje no debería existir en la base de datos");
+        assertTrue(controlador.getArrayDePersonajesDeSistema().isEmpty(), "El personaje no se ha borrado del array de personajes");
+        assertTrue(controlador.getArrayDeInventariosSistema().isEmpty(), "El personaje no se ha borrado del array de inventarios");
+    }
+
+    /**
+     * Test borrarPersonaje cuando se introduce el nombre correcto pero el servidor es invalido
+     * El personaje no se borra y sigue existiendo en la bd
+     */
+    @Test
+    public void testBorrarPersonajeNombreInvalido(){
+        controlador.borrarPersonaje("Victarion","España");
+        Personaje personaje = null;
+        try{
+            personaje = controlador.conector.getPersonaje(1);
+        }
+        catch(SQLException e){
+            fail("La base de datos ha fallado: " + e.getMessage());
+        }
+        assertEquals("Victarion", personaje.getNombre(), "El personaje no debería existir en la base de datos");
+        assertEquals("Sanguino", personaje.getServidor(), "El personaje no debería existir en la base de datos");
+        assertTrue(controlador.getArrayDePersonajesDeSistema().size() == 1, "El personaje no se ha borrado del array de personajes");
+        assertTrue(controlador.getArrayDeInventariosSistema().size() == 1, "El personaje no se ha borrado del array de inventarios");
+    }
 }
