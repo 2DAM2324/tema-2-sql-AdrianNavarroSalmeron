@@ -332,8 +332,13 @@ public void crearBaseDatos() {
      * @brief Inserta un personaje en la base de datos y su inventario
      * @param personaje Personaje a insertar
      * @param inventario Inventario del personaje a insertar
+     * @throws SQLException
+     * @throws SQLIntegrityConstraintViolationException
      */
     public void insertarPersonajeYInventarioEnBD(Personaje personaje, Inventario inventario) throws SQLException, SQLIntegrityConstraintViolationException, NullPointerException {
+        if (personaje.getNombre() == null || personaje.getServidor() == null || personaje.getFaccion() == null || personaje.getRaza() == null || personaje.getNivel() <= 0 || inventario.getIdInventario() == null || inventario.getCapacidadMaxima() <= 0 || inventario.getEspaciosOcupados() < 0) {
+            throw new IllegalArgumentException("Uno o mas campos estan vacios");
+        }
         String sqlInventario = "INSERT INTO inventario (idInventario, capacidadMaxima, espaciosOcupados) VALUES (?, ?, ?)";
         String sqlPersonaje = "INSERT INTO personaje (nombre, servidor, faccion, raza, idInventario, nivel) VALUES (?, ?, ?, ?, ?, ?)";
         String modificacionInventario = "UPDATE inventario SET idPersonaje = ? WHERE idInventario = ?";
@@ -341,7 +346,7 @@ public void crearBaseDatos() {
         PreparedStatement consultaInventario = null;
         PreparedStatement consultaPersonaje = null;
         PreparedStatement consultaInventarioModificacion = null;
-
+        
         try {
             conexion.setAutoCommit(false);
 
@@ -504,6 +509,9 @@ public void crearBaseDatos() {
      * @param personaje Personaje a modificar
      */
     public void modificarPersonajeBd(Personaje personaje) throws SQLException, NullPointerException{
+        if(personaje.getNombre() == null || personaje.getServidor() == null || personaje.getFaccion() == null || personaje.getRaza() == null || personaje.getNivel() <= 0){
+            throw new IllegalArgumentException("Uno o mas campos estan vacios");
+        }
         String sql = "UPDATE personaje SET nombre = ?, servidor = ?, faccion = ?, raza = ?, nivel = ? WHERE idPersonaje = ?";
         Connection conexion = instancia.getConexion(nombreDb);
 
@@ -624,6 +632,9 @@ public void crearBaseDatos() {
      * @param hermandad Hermandad a insertar
      */
     public void insertarHermandadEnBD(Hermandad hermandad) throws SQLException, SQLIntegrityConstraintViolationException, NullPointerException {
+        if(hermandad.getIdHermandad() == null || hermandad.getNombreHermandad() == null || hermandad.getServidorHermandad() == null || hermandad.getNumeroMiembros() < 0){
+            throw new IllegalArgumentException("Uno o mas campos estan vacios");
+        }
         String sql = "INSERT INTO hermandad (idHermandad, nombreHermandad, servidorHermandad, numeroMiembros) VALUES (?, ?, ?, ?)";
         Connection conexion = instancia.getConexion(nombreDb);
         

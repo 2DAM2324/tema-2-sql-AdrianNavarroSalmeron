@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.AfterAll;
@@ -300,7 +301,7 @@ public void testLeerObjetosDeBd() throws Exception {
  */
 @Test
 public void testLeerObjetosDeBdFail() throws SQLException {
-    conector.borrarDb();
+    conector.borrarObjetoDeBd(conector.getObjeto("OB50"));
     ArrayList<Objeto> ObjetosSistema = new ArrayList<>();
     try{
         conector.leerObjetosDeBd(ObjetosSistema);
@@ -310,101 +311,318 @@ public void testLeerObjetosDeBdFail() throws SQLException {
     }
 }
 
-// /**
-//  * Test of insertarPersonajeYInventarioEnBD method, of class Conector.
-//  */
-// @Test
-// public void testInsertarPersonajeYInventarioEnBD() throws Exception {
-//     System.out.println("insertarPersonajeYInventarioEnBD");
-//     Personaje personaje = null;
-//     Inventario inventario = null;
-//     Conector instance = null;
-//     instance.insertarPersonajeYInventarioEnBD(personaje, inventario);
-//     // TODO review the generated test code and remove the default call to fail.
-//     fail("The test case is a prototype.");
-// }
+/**
+ * Test of insertarPersonajeYInventarioEnBD method, of class Conector.
+ */
+@Test
+public void testInsertarPersonajeYInventarioEnBD() throws Exception {
+    Personaje personaje = new Personaje();
+    personaje.setNombre("Victarion");
+    personaje.setServidor("Los Errantes");
+    personaje.setRaza("Humano");
+    personaje.setNivel(14);
+    personaje.setFaccion("Alianza");
+    try{
+        conector.insertarPersonajeYInventarioEnBD(personaje, personaje.getInventario());
+    }
+    catch(Exception e){
+        fail("No se ha podido insertar el personaje");
+    }
+    //Traemos el personaje de la bd
+    Personaje personajeBd = null;
+    try{
+        personajeBd = conector.getPersonaje(1);
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer el personaje de la bd");
+    }
+    assertEquals(personaje.getNombre(), personajeBd.getNombre());
+}
 
-// /**
-//  * Test of leerPersonaje method, of class Conector.
-//  */
-// @Test
-// public void testLeerPersonaje() throws Exception {
-//     System.out.println("leerPersonaje");
-//     String nombre = "";
-//     String servidor = "";
-//     ArrayList<Personaje> ArrayListDePersonajesSistema = null;
-//     Conector instance = null;
-//     instance.leerPersonaje(nombre, servidor, ArrayListDePersonajesSistema);
-//     // TODO review the generated test code and remove the default call to fail.
-//     fail("The test case is a prototype.");
-// }
+/**
+ * Test insertar personaje cuando se intenta insertar dos veces el mismo personaje
+ */
+@Test
+public void testInsertarPersonajeYInventarioEnBDFail() throws SQLException {
+    Personaje personaje = new Personaje();
+    personaje.setNombre("Victarion");
+    personaje.setServidor("Los Errantes");
+    personaje.setRaza("Humano");
+    personaje.setNivel(14);
+    personaje.setFaccion("Alianza");
+    try{
+        conector.insertarPersonajeYInventarioEnBD(personaje, personaje.getInventario());
+    }
+    catch(SQLIntegrityConstraintViolationException e){
+        assertEquals("UNIQUE constraint failed: Personaje.nombre, Personaje.servidor", e.getMessage());
+    }             
+}
 
-// /**
-//  * Test of leerInventario method, of class Conector.
-//  */
-// @Test
-// public void testLeerInventario() throws Exception {
-//     System.out.println("leerInventario");
-//     ArrayList<Inventario> inventariosSistema = null;
-//     Conector instance = null;
-//     instance.leerInventario(inventariosSistema);
-//     // TODO review the generated test code and remove the default call to fail.
-//     fail("The test case is a prototype.");
-// }
+/**
+ * Test insertar personaje cuando se intenta insertar con campos nulos
+ */
+@Test
+public void testInsertarPersonajeYInventarioEnBDFail2() throws SQLException {
+    Personaje personaje = new Personaje();
+    personaje.setNombre(null);
+    personaje.setServidor("Los Errantes");
+    personaje.setRaza("Humano");
+    personaje.setNivel(14);
+    personaje.setFaccion("Alianza");
+    try{
+        conector.insertarPersonajeYInventarioEnBD(personaje, personaje.getInventario());
+        fail("No se ha lanzado la excepcion");
+    }
+    catch(IllegalArgumentException e){
+        assertEquals("Uno o mas campos estan vacios", e.getMessage());
+    }             
+}
 
-// /**
-//  * Test of modificarPersonajeBd method, of class Conector.
-//  */
-// @Test
-// public void testModificarPersonajeBd() throws Exception {
-//     System.out.println("modificarPersonajeBd");
-//     Personaje personaje = null;
-//     Conector instance = null;
-//     instance.modificarPersonajeBd(personaje);
-//     // TODO review the generated test code and remove the default call to fail.
-//     fail("The test case is a prototype.");
-// }
+/**
+ * Test leer personaje de la bd
+ */
+@Test
+public void testLeerPersonajeDeBd() throws SQLException {
+    ArrayList<Personaje> personajesSistema = new ArrayList<>();
+    ArrayList<Inventario> inventariosSistema = new ArrayList<>();
+    ArrayList<Hermandad> hermandadesSistema = new ArrayList<>();
+    try{
+        conector.leerPersonajeDeBd(personajesSistema, inventariosSistema, hermandadesSistema);
+    }
+    catch(SQLException e){
+        fail("No se ha podido leer los personajes");
+    }
+    assertEquals(1, personajesSistema.size());
+}
 
-// /**
-//  * Test of borrarPersonajeIventarioBd method, of class Conector.
-//  */
-// @Test
-// public void testBorrarPersonajeIventarioBd() throws Exception {
-//     System.out.println("borrarPersonajeIventarioBd");
-//     Personaje personaje = null;
-//     Conector instance = null;
-//     instance.borrarPersonajeIventarioBd(personaje);
-//     // TODO review the generated test code and remove the default call to fail.
-//     fail("The test case is a prototype.");
-// }
+/**
+ * Test leer personaje de la bd cuando no hay personajes
+ */
+@Test
+public void testLeerPersonajeDeBdFail() throws SQLException {
+   conector.borrarDb();
+    conector.crearBaseDatos();
+    ArrayList<Personaje> personajesSistema = new ArrayList<>();
+    ArrayList<Inventario> inventariosSistema = new ArrayList<>();
+    ArrayList<Hermandad> hermandadesSistema = new ArrayList<>();
+    try{
+        conector.leerPersonajeDeBd(personajesSistema, inventariosSistema, hermandadesSistema);
+    }
+    catch(SQLException e){
+        assertEquals("No hay personajes en la base de datos", e.getMessage());
+    }
+}
 
-// /**
-//  * Test of leerPersonajeDeBd method, of class Conector.
-//  */
-// @Test
-// public void testLeerPersonajeDeBd() throws Exception {
-//     System.out.println("leerPersonajeDeBd");
-//     ArrayList<Personaje> personajesSitema = null;
-//     ArrayList<Inventario> inventariosSistema = null;
-//     ArrayList<Hermandad> hermandadesSistema = null;
-//     Conector instance = null;
-//     instance.leerPersonajeDeBd(personajesSitema, inventariosSistema, hermandadesSistema);
-//     // TODO review the generated test code and remove the default call to fail.
-//     fail("The test case is a prototype.");
-// }
 
-// /**
-//  * Test of insertarHermandadEnBD method, of class Conector.
-//  */
-// @Test
-// public void testInsertarHermandadEnBD() throws Exception {
-//     System.out.println("insertarHermandadEnBD");
-//     Hermandad hermandad = null;
-//     Conector instance = null;
-//     instance.insertarHermandadEnBD(hermandad);
-//     // TODO review the generated test code and remove the default call to fail.
-//     fail("The test case is a prototype.");
-// }
+/**
+ * Test de leerInventario de la bd
+ */
+@Test
+public void testLeerInventario() throws SQLException {
+    ArrayList<Inventario> inventariosSistema = new ArrayList<>();
+    try{
+        conector.leerInventario(inventariosSistema);
+    }
+    catch(SQLException e){
+        fail("No se ha podido leer los inventarios");
+    }
+    assertEquals(1, inventariosSistema.size());
+}
+
+/**
+ * Test leer inventario de la bd cuando no hay inventarios
+ */
+@Test
+public void testLeerInventarioFail() throws SQLException {
+    conector.borrarDb();
+    conector.crearBaseDatos();
+    ArrayList<Inventario> inventariosSistema = new ArrayList<>();
+    try{
+        conector.leerInventario(inventariosSistema);
+    }
+    catch(SQLException e){
+        assertEquals("No hay inventarios en la base de datos", e.getMessage());
+    }
+}
+
+/**
+ * Test de modificarPersonajeBd de la bd
+ */
+@Test
+public void testModificarPersonajeBd() throws SQLException {
+    Personaje personaje = null;
+    try{
+        personaje = conector.getPersonaje(1);
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer el personaje de la bd");
+    }
+    personaje.setNombre("Victarion Greyjoy");
+    try{
+        conector.modificarPersonajeBd(personaje);
+    }
+    catch(SQLException e){
+        fail("No se ha podido modificar el personaje");
+    }
+    Personaje personajeBd = null;
+    try{
+        personajeBd = conector.getPersonaje(1);
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer el personaje de la bd");
+    }
+    assertEquals(personaje.getNombre(), personajeBd.getNombre());
+}
+
+/**
+ * Test modificar personaje de la bd cuando se intenta modificar con campos nulos
+ */
+@Test
+public void testModificarPersonajeBdFail() throws SQLException {
+    Personaje personaje = null;
+    try{
+        personaje = conector.getPersonaje(1);
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer el personaje de la bd");
+    }
+    personaje.setNombre(null);
+    try{
+        conector.modificarPersonajeBd(personaje);
+        fail("No se ha lanzado la excepcion");
+    }
+    catch(IllegalArgumentException e){
+        assertEquals("Uno o mas campos estan vacios", e.getMessage());
+    }             
+}
+
+/**
+ * Test borrarPersonajeInventarioBd de la bd
+ */
+@Test
+public void testBorrarPersonajeInventarioBd() throws SQLException {
+    Personaje personaje = null;
+    try{
+        personaje = conector.getPersonaje(1);
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer el personaje de la bd");
+    }
+    try{
+        conector.borrarPersonajeIventarioBd(personaje);
+    }
+    catch(SQLException e){
+        fail("No se ha podido borrar el personaje");
+    }
+
+    //Recuperamos el personaje de la bd
+    Personaje personajeBd = null;
+    try{
+        personajeBd = conector.getPersonaje(1);  
+    }
+    catch(SQLException e){
+        assertEquals("No existe el personaje", e.getMessage());
+        fail("Se ha lanzado la excepcion");
+    }
+    //Comprobamos que no existe el personaje
+    assertNull(personajeBd);
+}
+
+/**
+ * Test insertarHermandadEnBd
+ */
+
+@Test
+public void testInsertarHermandadEnBd() throws SQLException {
+    Hermandad hermandad = new Hermandad();
+    hermandad.setNombreHermandad("Los Errantes");
+    hermandad.setServidorHermandad("Sanguino");
+    hermandad.setNumeroMiembros(0);
+    try{
+        conector.insertarHermandadEnBD(hermandad);
+    }
+    catch(Exception e){
+        fail("No se ha podido insertar la hermandad");
+    }
+    //Traemos la hermandad de la bd
+    Hermandad hermandadBd = null;
+    try{
+        hermandadBd = conector.getHermandad("Los Errantes", "Los Errantes");
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer la hermandad de la bd");
+    }
+    assertEquals(hermandad.getNombreHermandad(), hermandadBd.getNombreHermandad());
+}
+
+/**
+ * Test insertar hermandad cuando se intenta insertar dos veces la misma hermandad
+ */
+@Test
+public void testInsertarHermandadEnBdFail() throws SQLException {
+    Hermandad hermandad = new Hermandad();
+    hermandad.setNombreHermandad("Los Errantes");
+    hermandad.setServidorHermandad("Los Errantes");
+    hermandad.setNumeroMiembros(0);
+    try{
+        conector.insertarHermandadEnBD(hermandad);
+    }
+    catch(SQLIntegrityConstraintViolationException e){
+        assertEquals("UNIQUE constraint failed: Hermandad.nombreHermandad, Hermandad.servidorHermandad", e.getMessage());
+    }             
+}
+
+/**
+ * Test insertar hermandad cuando se intenta insertar con campos nulos
+ */
+@Test
+public void testInsertarHermandadEnBdFail2() throws SQLException {
+    Hermandad hermandad = new Hermandad();
+    hermandad.setNombreHermandad(null);
+    hermandad.setServidorHermandad("Los Errantes");
+    hermandad.setNumeroMiembros(0);
+    try{
+        conector.insertarHermandadEnBD(hermandad);
+        fail("No se ha lanzado la excepcion");
+    }
+    catch(IllegalArgumentException e){
+        assertEquals("Uno o mas campos estan vacios", e.getMessage());
+    }             
+}
+
+/**
+ * Test modificarHermandadEnBd de la bd
+ */
+@Test
+public void testModificarHermandadEnBd() throws SQLException {
+    //Traemos la hermandad de la bd
+    Hermandad hermandad = null;
+    try{
+        hermandad = conector.getHermandad("Los Errantes", "Los Errantes");
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer la hermandad de la bd");
+    }
+    //Cambiamos el nombre
+    hermandad.setNombreHermandad("Ana, me voy a matar");
+    try{
+        //La modificamos en la bd
+        conector.modificarHermandadEnBd(hermandad);
+    }
+    catch(SQLException e){
+        fail("No se ha podido modificar la hermandad");
+    }
+    //Traemos la hermandad de la bd
+    Hermandad hermandadBd = null;
+    try{
+        hermandadBd = conector.getHermandad("Ana, me voy a matar", "Los Errantes");
+    }
+    catch(SQLException e){
+        fail("No se ha podido traer la hermandad de la bd");
+    }
+    //Comprobamos que el nombre se ha modificado
+    assertEquals(hermandad.getNombreHermandad(), hermandadBd.getNombreHermandad());
+}
 
 // /**
 //  * Test of modificarHermandadEnBd method, of class Conector.
